@@ -58,8 +58,6 @@ dotnet tool update -g dotnet-aspnet-codegenerator
 cd ..
 ~~~
 
-3f9c0db6-32ae-4151-b721-4ea591001a68
-8c33745e-db4f-4664-8db0-181f4b474b44
 
 Api controllers
 ~~~bash
