@@ -1,0 +1,84 @@
+@using Microsoft.IdentityModel.Tokens
+@model IEnumerable<App.Domain.Entities.Discussion>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Discussions</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Picture</th>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Tittle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AppUser)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Book)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Genre)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Author)
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr>
+        <td>
+        @if (!item.imageData.IsNullOrEmpty())
+        {
+            <img src="data:image;base64,@Convert.ToBase64String(item.imageData)" width="180px" height="270px" alt="Picture not found!"/>
+        }
+        </td>
+        <td><a asp-action="Details" asp-route-id="@item.Id">Open</a></td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Tittle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AppUser!.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @if (item.Book != null)
+            {
+                @Html.DisplayFor(modelItem => item.Book.Tittle)
+            }
+            else
+            {<span>---</span>}
+        </td>
+        <td>
+            @if (item.Genre != null)
+            {
+                @Html.DisplayFor(modelItem => item.Genre.Name)
+            }
+            else
+            {<span>---</span>}
+        </td>
+        <td>
+            @if (item.Author != null)
+            {
+                @Html.DisplayFor(modelItem => item.Author.Name)
+            }
+            else
+            {<span>---</span>}
+        </td>
+    </tr>
+}
+    </tbody>
+</table>

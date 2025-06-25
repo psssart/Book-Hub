@@ -1,0 +1,12 @@
+input[type=text], input[type=password] {
+    width: 80%;
+    padding: 12px 20px;
+    margin: 8px;
+    height: 8%;
+    display: block;
+    border: 3px solid #6474C9;
+    border-radius: 15px;
+    box-sizing: border-box;
+    font-family: Gilroy-Medium-added;
+    font-size: 28px;
+}

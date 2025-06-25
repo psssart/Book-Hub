@@ -1,0 +1,161 @@
+@using App.Domain.Address_Tables
+@using App.Domain.Entities
+@using System.Security.Claims
+@using Microsoft.IdentityModel.Tokens
+@using Message = NuGet.Protocol.Plugins.Message
+@model App.Domain.Entities.Discussion
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Html.DisplayFor(model => model.Tittle)</h1>
+
+<div>
+    <h4>Discussion</h4>
+    <hr />
+    <dl class="row">
+        @if (!Model.imageData.IsNullOrEmpty())
+        {
+            <dt>Picture</dt>
+            <dd>
+                <img src="data:image;base64,@Convert.ToBase64String(Model.imageData)" width="180px" height="270px" alt="Picture not found!"/>
+            </dd>
+        }
+        @if (User.Identity!.IsAuthenticated && User.Identity!.Name!.Equals(Model.AppUser!.UserName))
+        {
+            <span><a asp-area="" asp-controller="Discussions" asp-action="Edit" asp-route-id="@Model.Id">Edit</a></span>
+        }
+        @if (Model.Book != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Book)
+            </dt>
+            <dd class="col-sm-10">
+                <a asp-area="" asp-controller="Books" asp-action="Details" asp-route-id="@Model.Book.Id">@Model.Book.Tittle</a>
+            </dd>
+        }
+        @if (Model.Genre != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Genre)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Genre!.Name)
+            </dd>
+        }
+        @if (Model.Author != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Author)
+            </dt>
+            <dd class="col-sm-10">
+                <a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@Model.Author.Id">@Model.Author.Name</a>
+            </dd>
+        }
+        <dt class="col-sm-2">Creator</dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AppUser!.UserName)
+        </dd>
+        <dt class="col-sm-2">Created</dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreationTime)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <!-- Display associated topics -->
+        <dt class="col-sm-2">
+            Topics
+        </dt>
+        <dd class="col-sm-10">
+            @if (ViewData["Topics"] != null && ((List<Topic>)ViewData["Topics"]!).Any())
+            {
+                @foreach (var topic in (ViewData["Topics"] as List<Topic>)!)
+                {
+                    <div>
+                        <a asp-area="" asp-controller="Topics" asp-action="Details" asp-route-id="@topic.Id">
+                            <strong>@Html.DisplayFor(model => topic.Tittle) -- @Html.DisplayFor(model => topic.AppUser!.UserName)</strong>
+                            <div>@Html.DisplayFor(model => topic.Content) -- @Html.DisplayFor(model => topic.CreationTime)</div>
+                        </a>
+                        <!-- Add more properties of the Topic entity as needed -->
+                    </div>
+
+                    <!-- Display messages for each topic -->
+                    @if (ViewData["Messages"] != null && ((List<App.Domain.Entities.Message>)ViewData["Messages"]!).Any())
+                    {
+                        <div>
+                            <button class="toggleMessagesBtn">↓</button>
+                            <div class="messagesContainer" style="display: none;">
+                                @foreach (var message in (ViewData["Messages"] as List<App.Domain.Entities.Message>)!)
+                                {
+                                    if (message.TopicId == topic.Id)
+                                    {
+                                        <div>
+                                            <span>@Html.DisplayFor(model => message.AppUser!.UserName) -- @Html.DisplayFor(model => message.Content)</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                        </div>
+                    }
+                }
+            }
+            else
+            {
+                <p>No topics found for this discussion.</p>
+            }
+
+
+            <!-- Button to show/hide create topic form -->
+            <button id="btnCreateTopic">Create Topic</button>
+
+            <!-- Create Topic Form (initially hidden) -->
+            <div id="createTopicForm" style="display:none;">
+                <h4>Create Topic</h4>
+                <form asp-controller="Topics" asp-action="Create" method="post">
+                    @* Select current user *@
+                    <input type="hidden" name="AppUserId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
+                    @* Select current discussion *@
+                    <input type="hidden" name="DiscussionId" value="@Model.Id"/>
+                    <div class="form-group">
+                        <label class="control-label">Tittle</label>
+                        <input class="form-control" name="Tittle"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Content</label>
+                        <input class="form-control" name="Content"/>
+                    </div>
+                    <button type="submit">Create</button>
+                </form>
+            </div>
+
+        </dd>
+
+    </dl>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var createTopicForm = document.getElementById('createTopicForm');
+        var btnCreateTopic = document.getElementById('btnCreateTopic');
+        
+        var toggleButtons = document.querySelectorAll('.toggleMessagesBtn');
+
+        btnCreateTopic.addEventListener('click', function () {
+            createTopicForm.style.display = (createTopicForm.style.display === 'none') ? 'block' : 'none';
+        });
+        
+        toggleButtons.forEach(function (button) {
+             button.addEventListener('click', function () {
+                var messagesContainer = button.nextElementSibling;
+                messagesContainer.style.display = (messagesContainer.style.display === 'none') ? 'block' : 'none';
+             });
+        });
+    });
+</script>

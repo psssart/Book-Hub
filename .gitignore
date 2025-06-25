@@ -1,0 +1,79 @@
+﻿## Build results
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.app
+*.log
+*.cache
+*.pdb
+
+## Rider project files
+.idea/
+*.sln.iml
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## ASP.NET specific
+project.lock.json
+project.fragment.lock.json
+artifacts/
+wwwroot/node_modules/
+wwwroot/lib/
+
+## Visual Studio Code (if used occasionally)
+.vscode/
+
+## Paket dependency manager
+.paket/
+paket-files/
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.assets.json
+
+## dotCover
+*.dotCover
+
+## Logs
+*.log
+log/
+logs/
+*.tlog
+
+## Temporary files
+*.tmp
+*.temp
+*.bak
+
+## Recycle Bin (Windows)
+$RECYCLE.BIN/
+
+## Mac OS
+.DS_Store
+
+## Windows thumbnail cache
+Thumbs.db
+
+## Rider caches
+.idea/.idea.IC/
+.idea/.idea.Rider/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+
+## Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## JetBrains system files
+*.sln.ide

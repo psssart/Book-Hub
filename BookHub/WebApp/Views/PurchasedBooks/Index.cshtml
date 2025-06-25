@@ -1,0 +1,198 @@
+@using App.Domain.Entities
+@using System.Security.Claims
+@using System.Text
+@model IEnumerable<App.Domain.Address_Tables.PurchasedBook>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>My Books</h1>
+
+@if (Model.Any())
+{
+    <head>
+        <style>
+        .rating {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        .rating input {
+          display: none;
+        }
+        
+        .rating label {
+          cursor: pointer;
+          font-size: 30px;
+          color: #ccc;
+        }
+        
+        .rating label:before {
+          content: '\2605'; /* Unicode character for a star */
+        }
+        
+        .rating input:checked ~ label {
+          color: #f8d64e; /* Color for the selected stars */
+        }
+        
+        /* Optional: Add hover effect */
+        .rating input:not(:checked) ~ label:hover,
+        .rating input:not(:checked):hover ~ label {
+          color: #f8d64e;
+        }
+        </style>
+    </head>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Book</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Book Has Read</th>
+            <th>Your review</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var purchasedBook in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="data:image;base64,@Convert.ToBase64String(@purchasedBook.Book?.imageData)" width="100px" height="130" alt=""/>
+                    </td>
+                    <td>@purchasedBook.Book?.Tittle</td>
+                    <td>@purchasedBook.Book?.Price</td>
+                    <td>
+                        <form asp-action="ToggleBookHasRead"><input type="hidden" name="id" value="@purchasedBook.Id">
+                            <button type="submit">
+                                @if (purchasedBook.BookHasRead)
+                                {<span>&#10004;</span>}
+                                else
+                                {<span>X</span>}
+                            </button></form>
+                    </td>
+                    <td>
+                        @if (ViewData["Reviews"] is List<Rating> reviews && reviews.Any(review => review.BookId == purchasedBook.BookId))
+                        {
+                            var review = reviews.Single(review => review.BookId == purchasedBook.BookId);
+                            <div style="font-size: x-large">@GenerateStarIcons(System.Convert.ToInt32(review.Value))</div>
+                            <span>@review.Comment</span>
+                            <div><a asp-area="" asp-controller="Ratings" asp-action="Edit" asp-route-id="@review.Id">--Edit--</a></div>
+                            <span><a asp-area="" asp-controller="Ratings" asp-action="Delete" asp-route-id="@review.Id">--Delete Review--</a></span>
+                        }
+                        else
+                        {
+                            <button class="btnAddReview">Add Review</button>
+                            <div class="addReviewForm" style="display:none;">
+                                <form asp-controller="Ratings" asp-action="Create" method="post">
+                                    @* Select current user *@
+                                    <input type="hidden" name="AppUserId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
+                                    @* Select current book *@
+                                    <input type="hidden" name="BookId" value="@purchasedBook.BookId"/>
+                                    <div class="rating">
+                                        <input type="radio" id="star1_@purchasedBook.BookId" name="Value" value="5" />
+                                        <label for="star1_@purchasedBook.BookId"></label>
+                                        <input type="radio" id="star2_@purchasedBook.BookId" name="Value" value="4"/>
+                                        <label for="star2_@purchasedBook.BookId"></label>
+                                        <input type="radio" id="star3_@purchasedBook.BookId" name="Value" value="3"/>
+                                        <label for="star3_@purchasedBook.BookId"></label>
+                                        <input type="radio" id="star4_@purchasedBook.BookId" name="Value" value="2"/>
+                                        <label for="star4_@purchasedBook.BookId"></label>
+                                        <input type="radio" id="star5_@purchasedBook.BookId" name="Value" value="1"/>
+                                        <label for="star5_@purchasedBook.BookId"></label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Comment:</label>
+                                        <input class="form-control" name="Comment"/>
+                                    </div>
+                                    <button type="submit">Add</button>
+                                </form>
+                            </div>
+                        }
+                    </td>
+                    <td><form asp-action="Create" asp-controller="Ratings" method="post"></form></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No purchased books found.</p>
+}
+
+@functions {
+
+    // Helper function to generate star icons based on the rating value
+    string GenerateStarIcons(int rating)
+    {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < rating)
+            {
+                stars.Append("★"); // Full star
+            }
+            else
+            {
+                stars.Append("☆"); // Empty star
+            }
+        }
+        return stars.ToString();
+    }
+
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggleButtons = document.querySelectorAll('.btnAddReview');
+        
+        toggleButtons.forEach(function (button) {
+             button.addEventListener('click', function () {
+                var messagesContainer = button.nextElementSibling;
+                messagesContainer.style.display = (messagesContainer.style.display === 'none') ? 'block' : 'none';
+             });
+        });
+    });
+</script>
+
+@* <p> *@
+@*     <a asp-action="Create">Create New</a> *@
+@* </p> *@
+@* <table class="table"> *@
+@*     <thead> *@
+@*         <tr> *@
+@*             <th> *@
+@*                 @Html.DisplayNameFor(model => model.Book) *@
+@*             </th> *@
+@*             <th> *@
+@*                 @Html.DisplayNameFor(model => model.Purchase) *@
+@*             </th> *@
+@*             <th> *@
+@*                 @Html.DisplayNameFor(model => model.BookHasRead) *@
+@*             </th> *@
+@*             <th></th> *@
+@*         </tr> *@
+@*     </thead> *@
+@*     <tbody> *@
+@* @foreach (var item in Model) { *@
+@*         <tr> *@
+@*             <td> *@
+@*                 @Html.DisplayFor(modelItem => item.Book!.Description) *@
+@*             </td> *@
+@*             <td> *@
+@*                 @Html.DisplayFor(modelItem => item.Purchase!.Id) *@
+@*             </td> *@
+@*             <td> *@
+@*                 @Html.DisplayFor(modelItem => item.BookHasRead) *@
+@*             </td> *@
+@*             <td> *@
+@*                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
+@*                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> | *@
+@*                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+@*             </td> *@
+@*         </tr> *@
+@* } *@
+@*     </tbody> *@
+@* </table> *@

@@ -1,0 +1,49 @@
+@using System.Security.Claims
+@using App.Domain.Entities
+@model App.BLL.DTO.Topic
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Html.DisplayFor(model => model.Tittle)</h1>
+
+<div>
+    <h4>Discussion: <a asp-area="" asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.Discussion!.Id">@Model.Discussion!.Tittle</a></h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayFor(model => model.AppUser!.UserName)
+        </dt>
+        <dd class="col-sm-10">
+            ---  @Html.DisplayFor(model => model.Content)  ---  @Html.DisplayFor(model => model.CreationTime)
+        </dd>
+    </dl>
+    
+    @if (ViewData["Messages"] != null && ((List<App.BLL.DTO.Message>)ViewData["Messages"]!).Any())
+    {
+        <div>
+            @foreach (var message in (ViewData["Messages"] as List<App.BLL.DTO.Message>)!)
+            {
+                <div>
+                    <span>@message.AppUser!.UserName -- @message.Content</span>
+                </div>
+            }
+        </div>
+    }
+    
+    <!-- Create Message Form -->
+    <div>
+        <h4>Chat</h4>
+        <form asp-controller="Messages" asp-action="Create" method="post">
+            @* Select current user *@
+            <input type="hidden" name="AppUserId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
+            @* Select current Topic *@
+            <input type="hidden" name="TopicId" value="@Model.Id"/>
+            <div class="form-group">
+                <input class="form-control" name="Content"/>
+            </div>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</div>

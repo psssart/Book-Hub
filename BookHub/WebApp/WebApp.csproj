@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-WebApp-DB006A5D-3BCF-41CD-92E5-0D13656032A7</UserSecretsId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true"/>
+        <None Include="wwwroot\Pictures\illuminates.jpg" />
+        <None Include="wwwroot\Pictures\magic_mount.jpg" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+        <PackageReference Include="AutoMapper" Version="13.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.1" />
+        <PackageReference Include="Npgsql" Version="8.0.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\App.BLL\App.BLL.csproj" />
+      <ProjectReference Include="..\App.Contracts.BLL\App.Contracts.BLL.csproj" />
+      <ProjectReference Include="..\App.DAL.EF\App.DAL.EF.csproj" />
+      <ProjectReference Include="..\App.DTO\App.DTO.csproj" />
+      <ProjectReference Include="..\Helpers\Helpers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Areas\Admin\Controllers\" />
+      <Folder Include="Areas\Admin\ViewModels\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Contests\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Contests\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Contests\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Contests\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Contests\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Cart\ShoppingCart.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\Contests\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\Contests\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\Contests\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\Contests\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\Contests\Index.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Views\Contests\Create.cshtml" />
+      <UpToDateCheckInput Remove="Views\Contests\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Views\Contests\Details.cshtml" />
+      <UpToDateCheckInput Remove="Views\Contests\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Views\Contests\Index.cshtml" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,53 @@
+@model WebApp.Models.CartModel
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+    double totalValue = Model.Books.Sum(b => b.Price);
+}
+
+<h1>Shopping Cart</h1>
+
+@if (Model.Books.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th></th>
+            <th>Price</th>
+            <th>Remove from Cart</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var purchasedBook in Model.Books)
+        {
+            <tr>
+                <td>
+                    <img src="data:image;base64,@Convert.ToBase64String(@purchasedBook.imageData)" width="100px" height="130" alt=""/>
+                </td>
+                <td>@purchasedBook.Tittle</td>
+                <td>@purchasedBook.Price$</td>
+                <td>
+                    <form asp-controller="PurchasedBooks" asp-action="RemoveFromTempCart" method="post">
+                        <input type="hidden" name="id" value="@purchasedBook.Id"/>
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <form asp-controller="PurchasedBooks" asp-action="CreatePur" method="post">
+        <button type="submit">Buy</button>
+    </form>
+    <span>Total: @totalValue$</span>
+}
+else
+{
+    <p>No items in the cart.</p>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

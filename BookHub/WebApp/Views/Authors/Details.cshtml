@@ -1,0 +1,105 @@
+@using App.Domain.Entities
+@using System.Text
+@model App.Domain.Entities.Author
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Html.DisplayFor(model => model.Name)</h1>
+
+<div>
+    <h4>Author</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Age)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Age)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Biography)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Biography)
+        </dd>
+        <dt class="col-sm-2">
+            Books
+        </dt>
+        <dd class="col-sm-10">
+            @if (((List<Book>)ViewData["AuthorsBooks"]!).Any())
+            {
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th></th>
+                        <th>Price</th>
+                        <th>Rating</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var book in ((List<Book>)ViewData["AuthorsBooks"]!))
+                    {
+                        <tr>
+                            <td>
+                                <img src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" width="260px" height="320px" alt=""/>
+                            </td>
+                            <td><a asp-area="" asp-controller="Books" asp-action="Details" asp-route-id="@book.Id">@book.Tittle</a></td>
+                            <td>@book.Price$</td>
+                            <td>
+                                @{
+                                    int quantity = 0;
+                                    float sum = 0;
+                                }
+                                @foreach (var rating in ((List<Rating>)ViewData["Ratings"]!))
+                                {
+                                    if (rating.BookId == book.Id)
+                                    {
+                                        quantity++;
+                                        sum += rating.Value;
+                                    }
+                                }
+                                @{
+                                    float averageRating = quantity > 0 ? sum / quantity : 0;
+                                    string formattedRating = averageRating.ToString("0.0");
+                                    int roundedRating = (int)Math.Round(averageRating); // Closest integer
+                                }
+                                @* Stars for rating and rating value *@
+                                <div style="font-size: x-large">@GenerateStarIcons(System.Convert.ToInt32(roundedRating))</div>
+                                <span style="text-align: center;">@formattedRating</span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <span>No books found from this author!</span>
+            }
+        </dd>
+    </dl>
+</div>
+
+@functions
+{
+    // Helper function to generate star icons based on the rating value
+    string GenerateStarIcons(int rating)
+    {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < rating)
+            {
+                stars.Append("★"); // Full star
+            }
+            else
+            {
+                stars.Append("☆"); // Empty star
+            }
+        }
+        return stars.ToString();
+    }
+}

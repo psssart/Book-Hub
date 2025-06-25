@@ -1,0 +1,73 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/auth.css">
+
+
+    <title>Login in</title>
+
+</head>
+<body>
+<img src="~/img/svg/Ellipse.svg" alt="background-ellipses" class="image-ellipse-login">
+
+<div class="auth-container">
+
+    <div class="auth-title">Authorisation</div>
+
+    <div class="auth-frame">
+
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-element">
+                <label asp-for="Input.Email" class="label-text">Email</label>
+                <div class="textbox-align">
+                    <input asp-for="Input.Email" type="text" placeholder="name@example.com" aria-required="true" autocomplete="username">
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-element">
+                <label asp-for="Input.Password" class="label-text">Password</label>
+                <div class="textbox-align">
+                    <input asp-for="Input.Password" type="password" autocomplete="current-password" aria-required="true" placeholder="Password">
+                    <span asp-validation-for="Input.Password" class="text-danger"></span></div>
+            </div>
+            <button id="login-submit" type="submit" class="login-button">Log in</button>
+            @* <a href="javascript:void(0);" class="login-button" onclick="this.closest('form').submit();"> *@
+            @*     Login in *@
+            @* </a> *@
+            <div class="logo-auth">
+                <a asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/img/svg/BookHub-auth-logo.svg" alt=""></a>
+            </div>
+            @*<div>
+                <p>
+                    <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+                </p>
+                <p>
+                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+                </p>
+                <p>
+                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
+                </p>
+            </div>*@
+        </form>
+
+    </div>
+
+
+</div>
+</body>
+</html>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

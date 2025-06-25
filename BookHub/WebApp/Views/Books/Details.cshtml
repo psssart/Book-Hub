@@ -1,0 +1,187 @@
+@using App.Domain.Address_Tables
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Text
+@using App.Domain.Entities
+@model App.Domain.Entities.Book
+
+@{
+    ViewData["Title"] = "Details";
+    int quantity = 0; 
+    float sum = 0;
+    string reviews = "";
+    @if (ViewData["Ratings"] != null && ((List<Rating>)ViewData["Ratings"]!).Any())
+    {
+        @foreach (var rating in (List<Rating>)ViewData["Ratings"]!)
+        {
+            quantity++;
+            sum += rating.Value;
+            reviews += rating.AppUser!.UserName + ":\n" + rating.Comment + "\t" + GenerateStarIcons((int)Math.Round(rating.Value)) + "\n\n";
+        }
+    }
+    float averageRating = quantity > 0 ? sum / quantity : 0;
+    string formattedRating = averageRating.ToString("0.0");
+    int roundedRating = (int)Math.Round(averageRating); // Closest integer
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+
+
+</head>
+<body>
+<div class="column">
+    <div class="first-column">
+        <img class="book-page-image" src="data:image;base64,@Convert.ToBase64String(Model.imageData)" width="285px" height="438px" alt="Picture not found!"/>
+    </div>
+</div>
+<div class="column">
+    <img class="vertical-line" src="~/img/svg/vertical-line.svg" alt="">
+    <div class="second-column">
+        <div class="author-name">@Model.Tittle</div>
+        <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+            @Model.Description
+        <div class="row-element">
+                    <div class="sub-header">Score</div>
+                    <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        if (i < roundedRating)
+                        {
+                            <img class="rating-star\" src="~/img/svg/rating-checked.svg" width="24px" height="24px" alt="">
+                        }
+                        else
+                        {
+                            <img class="rating-star\" src="~/img/svg/rating-unchecked.svg" width="24px" height="24px" alt="">
+                        }
+                        
+                    }
+                    &nbsp; @formattedRating
+                    
+        </div>
+        <div class="row-element">
+            <div class="sub-header">
+                Authors
+            </div>
+            <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+            <div class="author-frame">
+            <div class="author-frame-name">
+                @if (ViewData["BookAuthors"] != null && ((List<BookAuthor>)ViewData["BookAuthors"]!).Any())
+                    {
+                        var bookAuthors = ViewData["BookAuthors"] as List<BookAuthor>;
+                        string authors = string.Join(", ", bookAuthors!.Select(bookAuthor => bookAuthor.Author!.Name));
+                        <span>@authors</span>
+                    }
+                    else
+                    {
+                        <p>No authors found for this book.</p>
+                    }
+                </div>
+            </div>
+
+        </div>
+        <div class="row-element">
+            <div class="sub-header">Genres</div>
+            <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+            @if (ViewData["BookGenres"] != null && ((List<BookGenre>)ViewData["BookGenres"]!).Any())
+            {
+                var bookGenres = ViewData["BookGenres"] as List<BookGenre>;
+                string genres = string.Join(", ", bookGenres!.Select(bookGenre => bookGenre.Genre!.Name));
+                <span>@genres</span>
+            }
+            else
+            {
+                <p>No genres found for this book.</p>
+            }
+        </div>
+        <div class="row-element">
+            <div class="sub-header">Reviews</div>
+            @if (ViewData["Ratings"] != null && ((List<Rating>)ViewData["Ratings"]!).Any())
+            {
+                @foreach (var rating in (List<Rating>)ViewData["Ratings"]!)
+                {
+                    <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+                    <div class="author-frame">
+                        @if (rating.AppUser!.AvatarImageData != null)
+                        {
+                            <img class="author-image" src="data:image;base64,@Convert.ToBase64String(rating.AppUser!.AvatarImageData)" width="285px" height="438px" alt="Picture not found!"/>
+                        }
+                        else
+                        {
+                            <img class="author-image" src="~/img/svg/profile-nophoto.svg" width="285px" height="438px" alt="Picture not found!"/>
+                        }
+                        
+                        <div class="author-frame-name-review">@rating.AppUser!.UserName: "@rating.Comment”</div>
+                    </div>
+                }
+            }
+            <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+        </div>
+
+    </div>
+</div>
+
+<div class="column">
+    <img class="vertical-line" src="~/img/svg/vertical-line.svg" alt="">
+    <div class="third-column">
+            <div class="price">30.21 € Physical</div>
+            <a href="">
+                <div class="text-wrapper-blue-purchase">
+                    <div class="text-white">
+                        Check availability
+                    </div>
+                </div>
+            </a>
+            <a href="">
+                <div class="text-wrapper-gray-purchase">
+                    <div class="text-black">
+                        Order
+                    </div>
+                </div>
+            </a>
+        <img class="line-delimiter-purchase" src="~/img/svg/line-delimeter-horisontal.svg" alt="">
+        <div class="price">@Html.DisplayFor(model => model.Price)€ eBook</div>
+        <a href="">
+            <div class="text-wrapper-blue-purchase">
+                <div class="text-white">
+                    Check availability
+                </div>
+            </div>
+        </a>
+        <form asp-controller="Books" asp-action="AddToTempCart" method="post">
+            <input type="hidden" name="id" value="@Model.Id"/>
+            <div class="text-wrapper-gray-purchase" style="cursor: pointer;" onclick="this.closest('form').submit();">
+                <div class="text-black">
+                    Add to cart
+                </div>
+            </div>
+        </form>
+
+</div>
+</div>
+
+</body>
+</html>
+
+@functions
+{
+    // Helper function to generate star icons based on the rating value
+    string GenerateStarIcons(int rating)
+    {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < rating)
+            {
+                stars.Append("★"); // Full star
+            }
+            else
+            {
+                stars.Append("☆"); // Empty star
+            }
+        }
+        return stars.ToString();
+    }
+}
