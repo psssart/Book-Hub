@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true"/>
         <None Include="wwwroot\Pictures\illuminates.jpg" />
         <None Include="wwwroot\Pictures\magic_mount.jpg" />
     </ItemGroup>

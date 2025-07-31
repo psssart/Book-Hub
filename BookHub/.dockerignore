@@ -1,0 +1,38 @@
+# Assembly artifacts
+**/bin/
+**/obj/
+**/publish/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# NuGet packets
+**/*.nupkg
+**/*.snupkg
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Enviroment files
+.env
+.env.*
+
+# node_modules
+node_modules/
+
+# Docker-specific
+Dockerfile*
+docker-compose*.yml

@@ -15,12 +15,14 @@ COPY App.DAL.DTO/*.csproj ./App.DAL.DTO/
 COPY App.DAL.EF/*.csproj ./App.DAL.EF/
 COPY App.DTO/*.csproj ./App.DTO/
 COPY App.Domain/*.csproj ./App.Domain/
+COPY App.Test/*.csproj ./App.Test/
 COPY Base.BLL/*.csproj ./Base.BLL/
 COPY Base.Contracts.BLL/*.csproj ./Base.Contracts.BLL/
 COPY Base.Contracts.DAL/*.csproj ./Base.Contracts.DAL/
 COPY Base.Contracts.Domain/*.csproj ./Base.Contracts.Domain/
 COPY Base.DAL.EF/*.csproj ./Base.DAL.EF/
 COPY Base.Domain/*.csproj ./Base.Domain/
+COPY Base.Tests/*.csproj ./Base.Tests/
 COPY Helpers/*.csproj ./Helpers/
 
 # Restore dependencies (cached unless csproj changes)
