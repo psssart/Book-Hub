@@ -22,35 +22,31 @@ services:
       context: .
       dockerfile: dev.Dockerfile
     container_name: bookhub-app-dev
+    working_dir: /src
     ports:
-      - "8080:8080"
+      - "80:80"
+      - "443:443"
     volumes:
-      # Mount all project folders for live code updates
-      - ./WebApp:/src/WebApp:delegated
-      - ./App.BLL:/src/App.BLL:delegated
-      - ./App.BLL.DTO:/src/App.BLL.DTO:delegated
-      - ./App.Contracts.BLL:/src/App.Contracts.BLL:delegated
-      - ./App.Contracts.DAL:/src/App.Contracts.DAL:delegated
-      - ./App.DAL.DTO:/src/App.DAL.DTO:delegated
-      - ./App.DAL.EF:/src/App.DAL.EF:delegated
-      - ./App.DTO:/src/App.DTO:delegated
-      - ./App.Domain:/src/App.Domain:delegated
-      - ./Base.BLL:/src/Base.BLL:delegated
-      - ./Base.Contracts.BLL:/src/Base.Contracts.BLL:delegated
-      - ./Base.Contracts.DAL:/src/Base.Contracts.DAL:delegated
-      - ./Base.Contracts.Domain:/src/Base.Contracts.Domain:delegated
-      - ./Base.DAL.EF:/src/Base.DAL.EF:delegated
-      - ./Base.Domain:/src/Base.Domain:delegated
-      - ./Helpers:/src/Helpers:delegated
+      - ./:/src:cached
+      - nuget_cache:/root/.nuget/packages
+      - ./https:/https:ro
+    command: >
+      sh -c "
+        dotnet restore &&
+        dotnet watch run --project WebApp/WebApp.csproj --no-launch-profile --no-restore
+      "
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "Host=bookhub-sql-dev;Port=5432;Database=bookhub;Username=postgres;Password=postgres"
+      ASPNETCORE_URLS: "https://+:443;http://+:80"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/bookhub.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "MyPassword"
     depends_on:
       sql:
         condition: service_healthy
     restart: on-failure
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -58,3 +54,4 @@ services:
 volumes:
   sql-volume:
     name: bookhub-sql-data-dev
+  nuget_cache:

@@ -2,6 +2,8 @@
 **/bin/
 **/obj/
 **/publish/
+.docker_cache/
+.docker/
 
 # Visual Studio
 .vs/
@@ -10,8 +12,9 @@
 *.userosscache
 *.sln.docstates
 
-# Rider / JetBrains
+# Rider / JetBrains | Vscode
 .idea/
+.vscode/
 
 # NuGet packets
 **/*.nupkg
@@ -33,6 +36,11 @@ Thumbs.db
 # node_modules
 node_modules/
 
-# Docker-specific
-Dockerfile*
-docker-compose*.yml
+# Test results / coverage
+**/TestResults/
+**/coverage/
+
+# Certificate / Git files
+*.pfx
+.git
+.github/

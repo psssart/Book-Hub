@@ -25,14 +25,12 @@ COPY Base.Domain/*.csproj ./Base.Domain/
 COPY Base.Tests/*.csproj ./Base.Tests/
 COPY Helpers/*.csproj ./Helpers/
 
-# Restore dependencies (cached unless csproj changes)
+# Restore dependencies
 RUN dotnet restore
 
-# Copy everything else and rely on bind-mounts for source; skip copying full source here
-# Bind mounts will overlay the code during development
+# Settings for development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true \
+    DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER=true
 
-# Expose the development port
-EXPOSE 8080
-
-# Launch the app with hot-reload enabled
-ENTRYPOINT ["dotnet", "watch", "run", "--project", "WebApp", "--urls", "http://0.0.0.0:8080"]
+# Expose the development ports
+EXPOSE 80 443

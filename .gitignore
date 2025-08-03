@@ -77,3 +77,6 @@ _ReSharper*/
 
 ## JetBrains system files
 *.sln.ide
+
+## Certificates
+*.pfx

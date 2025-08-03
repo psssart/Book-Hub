@@ -10,10 +10,25 @@ namespace WebApp.Infrastructure.Data;
 /// </summary>
 public class SeedUserSettings
 {
+    /// <summary>
+    /// Email
+    /// </summary>
     public string Email { get; set; } = null!;
+    /// <summary>
+    /// First Name
+    /// </summary>
     public string FirstName { get; set; } = null!;
+    /// <summary>
+    /// Last Name
+    /// </summary>
     public string LastName { get; set; } = null!;
+    /// <summary>
+    /// Password
+    /// </summary>
     public string Password { get; set; } = null!;
+    /// <summary>
+    /// Roles
+    /// </summary>
     public string[] Roles { get; set; } = Array.Empty<string>();
 }
 
