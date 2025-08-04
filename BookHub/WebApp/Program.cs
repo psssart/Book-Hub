@@ -2,10 +2,9 @@ using App.BLL;
 using App.Contracts.BLL;
 using App.Contracts.DAL;
 using App.DAL.EF;
-using App.Domain.Identity;
 using Asp.Versioning.ApiExplorer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapperProfile = WebApp.Helpers.AutoMapperProfile;
 
 using WebApp.Infrastructure.Data;
 using WebApp.Infrastructure.Extensions;
@@ -23,15 +22,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddScoped<IAppUnitOfWork, AppUOW>();
 builder.Services.AddScoped<IAppBLL, AppBLL>();
 
-// 3. Identity
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services
-    .AddIdentity<AppUser, AppRole>(opts => opts.SignIn.RequireConfirmedAccount = false)
-    .AddDefaultUI()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-// 4. Session
+// 3. Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(opts =>
 {
@@ -40,7 +31,7 @@ builder.Services.AddSession(opts =>
     opts.Cookie.IsEssential = true;
 });
 
-// 5. CORS
+// 4. CORS
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>() 
@@ -64,14 +55,19 @@ builder.Services.AddCors(opts =>
     })
 );
 
-// 6. JWT Authentication
-builder.Services.AddJwtAuthentication(builder.Configuration);
+// 5. Authentication & Authorization
+builder.Services.AddAppAuthentication(builder.Configuration);
 
-// 7. AutoMapper + API Versioning + Swagger
+// 6. AutoMapper + API Versioning + Swagger
 builder.Services.AddMappingProfiles();
 builder.Services.AddVersioningAndSwagger();
+builder.Services.AddAutoMapper(
+    typeof(App.DAL.EF.AutoMapperProfile),
+    typeof(App.BLL.AutoMapperProfile),
+    typeof(AutoMapperProfile)
+);
 
-// 8. MVC / Controllers / RazorPages
+// 7. MVC / Controllers / RazorPages
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -79,7 +75,7 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// 9. Pipeline
+// 8. Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -127,7 +123,7 @@ app.MapControllerRoute(
 );
 app.MapRazorPages();
 
-// 10. Seeding
+// 9. Seeding
 app.Seed();
 
 app.Run();

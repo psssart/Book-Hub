@@ -20,6 +20,7 @@ namespace WebApp.ApiControllers.Identity;
 [ApiVersion("0.9", Deprecated = true)]
 [ApiController]
 [Route("/api/v{version:apiVersion}/identity/[controller]/[action]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class AccountController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;

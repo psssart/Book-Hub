@@ -1,81 +1,121 @@
-## Useful commands in .net console CLI
+# BookHub
 
-Install tooling
+A modern **ASP.NET Core MVC** web application (built on **.NET 8.0**) for managing books, authors, genres, publishers, and more. BookHub provides a clean, layered architecture, complete with authentication, API endpoints, and Docker support to help you get started quickly and deploy with confidence.
 
-~~~bash
-dotnet tool update -g dotnet-ef
-dotnet tool update -g dotnet-aspnet-codegenerator 
-~~~
+## Table of Contents
 
-## EF Core migrations
+- [Features](#features)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Running Locally](#running-locally)
+- [Docker Deployment](#docker-deployment)
+- [API Documentation](#api-documentation)
+- [Running Tests](#running-tests)
+- [Contributing](#contributing)
+- [License](#license)
 
-Run from solution folder  
+## Features
 
-~~~bash
-dotnet ef migrations --project App.DAL.EF --startup-project WebApp add FOOBAR
-dotnet ef database   --project App.DAL.EF --startup-project WebApp update
-dotnet ef database   --project App.DAL.EF --startup-project WebApp drop
-~~~
+- **CRUD Operations** for Books, Authors, Genres, Publishers, Warehouses, Purchases, and User Subscriptions
+- **User Authentication & Authorization** via ASP.NET Core Identity
+- **Discussion & Messaging** modules for user interaction
+- **Ratings & Reviews** to rate and discuss books
+- **RESTful API Endpoints** alongside the MVC UI, versioned and documented with Swagger
+- **Data Seeding** for initial setup
+- **Layered Architecture**: Domain, Data Access (EF Core), Business Logic, and WebApp layers
 
+## Architecture
 
-0## MVC controllers
+BookHub follows a clean, domain-driven design with the following layers:
 
-Install from nuget:  
-- Microsoft.VisualStudio.Web.CodeGeneration.Design
-- Microsoft.EntityFrameworkCore.SqlServer
+1. **App.Domain** — Domain entities and interfaces
+2. **App.DAL.EF** — Entity Framework Core implementation for data access
+3. **App.BLL** — Business logic and services
+4. **WebApp** — ASP.NET Core MVC project with controllers, views, and API controllers
+5. **Infrastructure** — Configuration extensions, Swagger options, and data seeding
 
+## Prerequisites
 
-Run from WebApp folder!  
-
-~~~bash
-cd WebApp
-
-dotnet aspnet-codegenerator controller -name PublishersController        -actions -m  App.Domain.Entities.Publisher        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name BooksController        -actions -m  App.Domain.Entities.Book        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name WarehousesController        -actions -m  App.Domain.Entities.Warehouse        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name BooksWarehousesController        -actions -m  App.Domain.Address_Tables.BookWarehouses        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name GenresController        -actions -m  App.Domain.Entities.Genre        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name BooksGenresController        -actions -m  App.Domain.Address_Tables.BookGenre        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name AuthorsController        -actions -m  App.Domain.Entities.Author        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name BooksAuthorsController        -actions -m  App.Domain.Address_Tables.BookAuthor        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name RatingsController        -actions -m  App.Domain.Entities.Rating        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name UsersSubscriptionsController        -actions -m  App.Domain.Address_Tables.UserSubscription        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name PurchasesController        -actions -m  App.Domain.Entities.Purchase        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name PurchasedBooksController        -actions -m  App.Domain.Address_Tables.PurchasedBook        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name DiscussionsController        -actions -m  App.Domain.Entities.Discussion        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name TopicsController        -actions -m  App.Domain.Entities.Topic        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name MessagesController        -actions -m  App.Domain.Entities.Message        -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-
-# use area (EXAMPLE)
-dotnet aspnet-codegenerator controller -name ContestsController        -actions -m  App.Domain.Contest        -dc AppDbContext -outDir Areas/Admin/Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Entity Framework Core Tools](https://docs.microsoft.com/ef/core/cli/dotnet)
+- [Docker](https://www.docker.com/) & [Docker Compose]
 
 
-Download .NET 8.0: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
-dotnet tool update -g dotnet-aspnet-codegenerator
-# Generate User Authentication pages
-# Do not use that, it's already generated!
-# dotnet aspnet-codegenerator identity -f --userClass=App.Domain.Identity.AppUser -gl
-cd ..
-~~~
+## Getting Started
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-org/BookHub.git
+   cd BookHub/BookHub
+2. **Configure the database connection**
+   * Edit `appsettings.json` or set environment variables:
+   ```
+   "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=BookHubDb;Trusted_Connection=True;"
+    }
+3. **Apply migrations and seed data**
+    ```bash 
+    dotnet ef database update --project App.DAL.EF
 
+### Running Locally
+From the solution root:
+```bash
+dotnet build
+dotnet run --project WebApp/WebApp.csproj
+```
+Navigate to https://localhost:5001 in your browser.
 
-Api controllers
-~~~bash
-dotnet aspnet-codegenerator controller -name ContestsController  -m  App.Domain.Contest        -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-~~~
+### Docker Deployment
+Build and run with Docker:
+```bash
+docker build -f Dockerfile -t pasubi/bookhub:latest .
 
-## Docker
-
-~~~bash
-mkdir "https"
-dotnet dev-certs https -ep .\https\bookhub.pfx -p "MyPassword"
-dotnet dev-certs https --trust
-
-docker-compose build app
 docker-compose up -d
+```
+Push multi-arch image and deploy:
+```bash
+docker build --platform linux/amd64 -t pasubi/bookhub:latest -f dev.Dockerfile .
+docker push pasubi/bookhub:latest
+```
 
-# multiplatform build on apple silicon
-# https://docs.docker.com/build/building/multi-platform/
-docker buildx create --name mybuilder --bootstrap --use
-docker buildx build --platform linux/amd64 -t pasubi/webapp:latest --push .
-~~~
+### API Documentation
+API endpoints are documented and available at runtime via Swagger UI:
+https://localhost:5001/swagger
+
+### Running Tests
+Execute all unit tests:
+```bash
+dotnet test ./App.Test/App.Test.csproj
+dotnet test ./Base.Tests/Base.Tests.csproj
+```
+
+
+## Useful Commands
+* **Add EF Core Migration**:
+
+  ```bash
+  dotnet ef migrations add InitialCreate --project App.DAL.EF --startup-project WebApp
+  ```
+### Code Generation
+To scaffold MVC controllers, use:
+```bash
+dotnet aspnet-codegenerator controller -name PublishersController \
+    -actions \
+    -m App.Domain.Entities.Publisher \
+    -dc AppDbContext \
+    -outDir Controllers \
+    --useDefaultLayout \
+    --useAsyncActions \
+    --referenceScriptLibraries \
+    -f
+```
+To scaffold API controllers, use:
+```bash
+dotnet aspnet-codegenerator controller -name ContestsController \
+    -m App.Domain.Contest \
+    -dc AppDbContext \
+    -outDir ApiControllers \
+    -api \
+    --useAsyncActions \
+    -f
+```
