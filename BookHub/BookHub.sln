@@ -15,9 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0_Solution_Items", "0_Solut
 		README.md = README.md
 		docker-compose.yml = docker-compose.yml
 		Directory.Build.props = Directory.Build.props
-		.gitignore = .gitignore
 		Dockerfile = Dockerfile
+		dev.Dockerfile = dev.Dockerfile
 		.dockerignore = .dockerignore
+		docker-compose.prod.yml = docker-compose.prod.yml
+		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base.Contracts.Domain", "Base.Contracts.Domain\Base.Contracts.Domain.csproj", "{39FAE350-A60F-4F17-A5BD-EB461046B15D}"

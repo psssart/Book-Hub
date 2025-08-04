@@ -1,0 +1,46 @@
+# Assembly artifacts
+**/bin/
+**/obj/
+**/publish/
+.docker_cache/
+.docker/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains | Vscode
+.idea/
+.vscode/
+
+# NuGet packets
+**/*.nupkg
+**/*.snupkg
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Enviroment files
+.env
+.env.*
+
+# node_modules
+node_modules/
+
+# Test results / coverage
+**/TestResults/
+**/coverage/
+
+# Certificate / Git files
+*.pfx
+.git
+.github/
