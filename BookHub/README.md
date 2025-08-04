@@ -67,15 +67,15 @@ dotnet aspnet-codegenerator controller -name ContestsController  -m  App.Domain.
 ## Docker
 
 ~~~bash
+mkdir "https"
 dotnet dev-certs https -ep .\https\bookhub.pfx -p "MyPassword"
 dotnet dev-certs https --trust
 
-docker buildx build --progress=plain --force-rm --push -t akaver/webapp:latest . 
+docker-compose build app
+docker-compose up -d
 
 # multiplatform build on apple silicon
 # https://docs.docker.com/build/building/multi-platform/
 docker buildx create --name mybuilder --bootstrap --use
-docker buildx build --platform linux/amd64 -t akaver/webapp:latest --push .
-
-
+docker buildx build --platform linux/amd64 -t pasubi/webapp:latest --push .
 ~~~
