@@ -1,36 +1,13 @@
-﻿using App.DAL.EF;
+﻿using System.Text.Json;
+using App.DAL.EF;
+using App.Domain.Address_Tables;
+using App.Domain.Entities;
 using App.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Infrastructure.Data.SeedDTO;
 
 namespace WebApp.Infrastructure.Data;
-
-/// <summary>
-/// DTO for serialization from config
-/// </summary>
-public class SeedUserSettings
-{
-    /// <summary>
-    /// Email
-    /// </summary>
-    public string Email { get; set; } = null!;
-    /// <summary>
-    /// First Name
-    /// </summary>
-    public string FirstName { get; set; } = null!;
-    /// <summary>
-    /// Last Name
-    /// </summary>
-    public string LastName { get; set; } = null!;
-    /// <summary>
-    /// Password
-    /// </summary>
-    public string Password { get; set; } = null!;
-    /// <summary>
-    /// Roles
-    /// </summary>
-    public string[] Roles { get; set; } = Array.Empty<string>();
-}
 
 /// <summary>
 /// Primary interactions with a database
@@ -38,10 +15,10 @@ public class SeedUserSettings
 public static class DbInitializer
 {
     /// <summary>
-    /// Seeding admin user
+    /// Seed all requested data from config
     /// </summary>
     /// <param name="app"></param>
-    public static void Seed(this IApplicationBuilder app)
+    public static async Task SeedAsync(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices
             .GetRequiredService<IServiceScopeFactory>()
@@ -52,33 +29,39 @@ public static class DbInitializer
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
-        // 1) Migrations
         if (!context.Database.ProviderName!.Contains("InMemory"))
         {
-            context.Database.Migrate();
+            await context.Database.MigrateAsync();
         }
 
-        // 2) Reading the list of users from the config
-        var usersSection = config.GetSection("SeedData:Users");
-        var seedUsers = usersSection.Get<List<SeedUserSettings>>()
-                        ?? new List<SeedUserSettings>();
+        var seedSettings = config.GetSection("SeedData").Get<SeedSettings>() ?? new SeedSettings();
 
-        foreach (var u in seedUsers)
+        await SeedUsersAsync(seedSettings.Users, userManager, roleManager);
+        await SeedPublishersAsync(context, seedSettings.Publishers);
+        await SeedAuthorsAsync(context, seedSettings.Authors);
+        if (seedSettings.Genres) await SeedGenresAsync(context);
+        await SeedWarehousesAsync(context, seedSettings.Warehouses);
+        await SeedBooksAsync(context, seedSettings.Books);
+    }
+    
+        private static async Task SeedUsersAsync(
+        List<UserSeedDto> users,
+        UserManager<AppUser> userManager,
+        RoleManager<AppRole> roleManager)
+    {
+        foreach (var u in users)
         {
-            // 2.1) create roles if they don't exist
             foreach (var role in u.Roles)
             {
-                if (!roleManager.RoleExistsAsync(role).Result)
+                if (!await roleManager.RoleExistsAsync(role))
                 {
-                    roleManager.CreateAsync(new AppRole { Name = role }).Wait();
+                    await roleManager.CreateAsync(new AppRole { Name = role });
                 }
             }
 
-            // 2.2) check if there is already a user
-            var existing = userManager.FindByEmailAsync(u.Email).Result;
+            var existing = await userManager.FindByEmailAsync(u.Email);
             if (existing != null) continue;
 
-            // 2.3) creating user
             var user = new AppUser
             {
                 Email = u.Email,
@@ -86,19 +69,180 @@ public static class DbInitializer
                 FirstName = u.FirstName,
                 LastName = u.LastName
             };
-            var createRes = userManager.CreateAsync(user, u.Password).Result;
+
+            var createRes = await userManager.CreateAsync(user, u.Password);
             if (!createRes.Succeeded)
             {
-                Console.WriteLine($"Error creating {u.Email}: {string.Join(", ", createRes.Errors)}");
+                Console.WriteLine($"Error creating {u.Email}: {string.Join(", ", createRes.Errors.Select(e => e.Description))}");
                 continue;
             }
 
-            // 2.4) add to roles
-            var addRoleRes = userManager.AddToRolesAsync(user, u.Roles).Result;
+            var addRoleRes = await userManager.AddToRolesAsync(user, u.Roles);
             if (!addRoleRes.Succeeded)
             {
-                Console.WriteLine($"Error assigning roles to {u.Email}: {string.Join(", ", addRoleRes.Errors)}");
+                Console.WriteLine($"Error assigning roles to {u.Email}: {string.Join(", ", addRoleRes.Errors.Select(e => e.Description))}");
             }
         }
+    }
+
+    private static async Task SeedPublishersAsync(AppDbContext context, int count)
+    {
+        if (context.Publishers.Any()) return;
+
+        var data = await File.ReadAllTextAsync(GetSeedFilePath("publishers.json"));
+        var publishers = JsonSerializer.Deserialize<List<PublisherSeedDto>>(data) ?? new();
+
+        foreach (var publisher in publishers.Take(count))
+        {
+            context.Publishers.Add(new Publisher
+            {
+                Name = publisher.Name,
+                Description = publisher.Description
+            });
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedAuthorsAsync(AppDbContext context, int count)
+    {
+        if (context.Authors.Any()) return;
+
+        var data = await File.ReadAllTextAsync(GetSeedFilePath("authors.json"));
+        var authors = JsonSerializer.Deserialize<List<AuthorSeedDto>>(data) ?? new();
+
+        foreach (var author in authors.Take(count))
+        {
+            var imageName = author.FullName.ToLower().Replace(" ", "-") + ".jpg";
+            var imagePath = Path.Combine("wwwroot", "img", "authors", imageName);
+            byte[]? imageData = File.Exists(imagePath) ? await File.ReadAllBytesAsync(imagePath) : null;
+
+            context.Authors.Add(new Author
+            {
+                Name = author.FullName,
+                Age = DateTime.UtcNow.Year - author.BirthYear,
+                Biography = author.Biography,
+                imageData = imageData
+            });
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedGenresAsync(AppDbContext context)
+    {
+        if (context.Genres.Any()) return;
+
+        var data = await File.ReadAllTextAsync(GetSeedFilePath("genres.json"));
+        var genres = JsonSerializer.Deserialize<List<GenreSeedDto>>(data) ?? new();
+
+        context.Genres.AddRange(genres.Select(g => new Genre
+        {
+            Name = g.Name,
+            Description = g.Description,
+            IsMainGenre = g.IsMainGenre
+        }));
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedWarehousesAsync(AppDbContext context, int count)
+    {
+        if (context.Warehouses.Any()) return;
+
+        var data = await File.ReadAllTextAsync(GetSeedFilePath("warehouses.json"));
+        var warehouses = JsonSerializer.Deserialize<List<WarehouseSeedDto>>(data) ?? new();
+
+        foreach (var w in warehouses.Take(count))
+        {
+            context.Warehouses.Add(new Warehouse
+            {
+                Name = w.Name,
+                GpsX = w.GpsX,
+                GpsY = w.GpsY
+            });
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedBooksAsync(AppDbContext context, int count)
+    {
+        if (context.Books.Any()) return;
+
+        var data = await File.ReadAllTextAsync(GetSeedFilePath("books.json"));
+        var books = JsonSerializer.Deserialize<List<BookSeedDto>>(data) ?? new();
+        var random = new Random();
+
+        foreach (var bookDto in books.Take(count))
+        {
+            var publisher = context.Publishers.FirstOrDefault(p => p.Name == bookDto.Publisher);
+            if (publisher == null) continue;
+
+            var imageName = bookDto.Title.ToLower().Replace(" ", "-") + ".jpg";
+            var imagePath = Path.Combine("wwwroot", "img", "books", imageName);
+            byte[]? imageData = File.Exists(imagePath) ? await File.ReadAllBytesAsync(imagePath) : null;
+
+            var book = new Book
+            {
+                Tittle = bookDto.Title,
+                Description = bookDto.Description,
+                ReleaseYear = bookDto.ReleaseYear,
+                Price = bookDto.Price,
+                PublisherId = publisher.Id,
+                imageData = imageData
+            };
+
+            context.Books.Add(book);
+            await context.SaveChangesAsync();
+
+            // Link Authors
+            foreach (var authorName in bookDto.AuthorNames)
+            {
+                var author = context.Authors.FirstOrDefault(a => a.Name == authorName);
+                if (author != null)
+                {
+                    context.BooksAuthors.Add(new BookAuthor
+                    {
+                        BookId = book.Id,
+                        AuthorId = author.Id
+                    });
+                }
+            }
+
+            // Link Genres
+            foreach (var genreName in bookDto.Genres)
+            {
+                var genre = context.Genres.FirstOrDefault(g => g.Name == genreName);
+                if (genre != null)
+                {
+                    context.BooksGenres.Add(new BookGenre
+                    {
+                        BookId = book.Id,
+                        GenreId = genre.Id
+                    });
+                }
+            }
+
+            // Link Warehouses (1 to 3 random)
+            var warehouseIds = context.Warehouses.Select(w => w.Id).ToList();
+            var selected = warehouseIds.OrderBy(_ => random.Next()).Take(random.Next(1, 4));
+
+            foreach (var warehouseId in selected)
+            {
+                context.BooksWarehouses.Add(new BookWarehouses
+                {
+                    BookId = book.Id,
+                    WarehouseId = warehouseId
+                });
+            }
+
+            await context.SaveChangesAsync();
+        }
+    }
+    
+    private static string GetSeedFilePath(string fileName)
+    {
+        return Path.Combine(AppContext.BaseDirectory, "Infrastructure", "Data", "SeedData", fileName);
     }
 }

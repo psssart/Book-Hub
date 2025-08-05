@@ -1,0 +1,77 @@
+﻿[
+  {
+    "FullName": "Charles E. Leiserson",
+    "Biography": "American computer scientist known for his work on algorithms and parallel computing.",
+    "BirthYear": 1953
+  },
+  {
+    "FullName": "Clifford Stein",
+    "Biography": "Co-author of 'Introduction to Algorithms' and professor of industrial engineering and operations research.",
+    "BirthYear": 1965
+  },
+  {
+    "FullName": "Daniel Kahneman",
+    "Biography": "Psychologist and Nobel laureate known for his work on the psychology of judgment and decision-making.",
+    "BirthYear": 1934
+  },
+  {
+    "FullName": "Douglas Hofstadter",
+    "Biography": "American author and professor best known for his book 'Gödel, Escher, Bach'.",
+    "BirthYear": 1945
+  },
+  {
+    "FullName": "Ernest Hemingway",
+    "Biography": "Renowned American novelist and short-story writer, winner of the Nobel Prize in Literature.",
+    "BirthYear": 1899
+  },
+  {
+    "FullName": "Fyodor Dostoevsky",
+    "Biography": "Russian novelist and philosopher, author of 'Crime and Punishment' and 'The Brothers Karamazov'.",
+    "BirthYear": 1821
+  },
+  {
+    "FullName": "George Orwell",
+    "Biography": "English novelist, essayist, journalist, and critic best known for '1984' and 'Animal Farm'.",
+    "BirthYear": 1903
+  },
+  {
+    "FullName": "Herman Melville",
+    "Biography": "American novelist, best known for 'Moby-Dick'.",
+    "BirthYear": 1819
+  },
+  {
+    "FullName": "Johann Goethe",
+    "Biography": "German writer and statesman, author of 'Faust'.",
+    "BirthYear": 1749
+  },
+  {
+    "FullName": "Mikhail Bulgakov",
+    "Biography": "Russian writer and playwright, known for 'The Master and Margarita'.",
+    "BirthYear": 1891
+  },
+  {
+    "FullName": "Nikolai Gogol",
+    "Biography": "Ukrainian-born Russian dramatist and novelist, author of 'Dead Souls'.",
+    "BirthYear": 1809
+  },
+  {
+    "FullName": "Robert Greene",
+    "Biography": "American author known for books on strategy, power, and seduction.",
+    "BirthYear": 1959
+  },
+  {
+    "FullName": "Ronald L. Rivest",
+    "Biography": "Cryptographer and co-author of 'Introduction to Algorithms'.",
+    "BirthYear": 1947
+  },
+  {
+    "FullName": "Scott Fitzgerald",
+    "Biography": "American novelist and short-story writer, author of 'The Great Gatsby'.",
+    "BirthYear": 1896
+  },
+  {
+    "FullName": "Thomas H. Cormen",
+    "Biography": "Computer scientist and co-author of 'Introduction to Algorithms'.",
+    "BirthYear": 1956
+  }
+]

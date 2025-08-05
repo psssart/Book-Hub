@@ -1,0 +1,12 @@
+﻿[
+  { "Name": "New York Warehouse", "GpsX": 40.7128, "GpsY": -74.0060 },
+  { "Name": "Berlin Distribution Center", "GpsX": 52.5200, "GpsY": 13.4050 },
+  { "Name": "Tokyo Storage Hub", "GpsX": 35.6895, "GpsY": 139.6917 },
+  { "Name": "São Paulo Depot", "GpsX": -23.5505, "GpsY": -46.6333 },
+  { "Name": "Cape Town Warehouse", "GpsX": -33.9249, "GpsY": 18.4241 },
+  { "Name": "Sydney Storage Facility", "GpsX": -33.8688, "GpsY": 151.2093 },
+  { "Name": "Toronto Book Hub", "GpsX": 43.651070, "GpsY": -79.347015 },
+  { "Name": "Moscow Logistic Base", "GpsX": 55.7558, "GpsY": 37.6173 },
+  { "Name": "Delhi Stock Center", "GpsX": 28.6139, "GpsY": 77.2090 },
+  { "Name": "Paris Warehouse", "GpsX": 48.8566, "GpsY": 2.3522 }
+]

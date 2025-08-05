@@ -1,0 +1,119 @@
+﻿[
+  {
+    "Title": "1984",
+    "AuthorNames": [ "George Orwell" ],
+    "Description": "A dystopian novel set in a totalitarian society ruled by Big Brother.",
+    "ReleaseYear": 1949,
+    "Publisher": "Secker & Warburg",
+    "Genres": [ "Dystopian", "Political Fiction" ],
+    "Price": 19.99
+  },
+  {
+    "Title": "Algorithms Unlocked",
+    "AuthorNames": [ "Thomas H. Cormen" ],
+    "Description": "An accessible introduction to algorithms and computer science.",
+    "ReleaseYear": 2013,
+    "Publisher": "MIT Press",
+    "Genres": [ "Computer Science", "Non-Fiction" ],
+    "Price": 39.95
+  },
+  {
+    "Title": "An Eternal Golden Braid",
+    "AuthorNames": [ "Douglas Hofstadter" ],
+    "Description": "A journey through mathematics, symmetry, and intelligence.",
+    "ReleaseYear": 1979,
+    "Publisher": "Basic Books",
+    "Genres": [ "Philosophy", "Science", "Mathematics" ],
+    "Price": 44.99
+  },
+  {
+    "Title": "Dead Souls",
+    "AuthorNames": [ "Nikolai Gogol" ],
+    "Description": "A satirical novel depicting the moral decline of Russian society.",
+    "ReleaseYear": 1842,
+    "Publisher": "The Russian Messenger",
+    "Genres": [ "Satire", "Classic" ],
+    "Price": 14.99
+  },
+  {
+    "Title": "Faust",
+    "AuthorNames": [ "Johann Goethe" ],
+    "Description": "The tragic story of a man who makes a pact with the devil.",
+    "ReleaseYear": 1808,
+    "Publisher": "Cotta",
+    "Genres": [ "Tragedy", "Classic" ],
+    "Price": 12.49
+  },
+  {
+    "Title": "Gatsby",
+    "AuthorNames": [ "Scott Fitzgerald" ],
+    "Description": "A portrait of the Roaring Twenties and the American dream.",
+    "ReleaseYear": 1925,
+    "Publisher": "Charles Scribner's Sons",
+    "Genres": [ "Classic", "Drama" ],
+    "Price": 15.00
+  },
+  {
+    "Title": "Introduction to Algorithms",
+    "AuthorNames": [ "Thomas H. Cormen", "Charles E. Leiserson", "Ronald L. Rivest", "Clifford Stein" ],
+    "Description": "The definitive textbook on algorithms.",
+    "ReleaseYear": 2009,
+    "Publisher": "MIT Press",
+    "Genres": [ "Computer Science" ],
+    "Price": 99.99
+  },
+  {
+    "Title": "Master and Margarita",
+    "AuthorNames": [ "Mikhail Bulgakov" ],
+    "Description": "A complex novel blending fantasy, romance, and political satire.",
+    "ReleaseYear": 1967,
+    "Publisher": "YMCA Press",
+    "Genres": [ "Satire", "Fantasy", "Classic" ],
+    "Price": 18.99
+  },
+  {
+    "Title": "Moby Dick",
+    "AuthorNames": [ "Herman Melville" ],
+    "Description": "The epic tale of Captain Ahab’s obsession with a white whale.",
+    "ReleaseYear": 1851,
+    "Publisher": "Harper & Brothers",
+    "Genres": [ "Adventure", "Classic" ],
+    "Price": 22.50
+  },
+  {
+    "Title": "Old Man and the Sea",
+    "AuthorNames": [ "Ernest Hemingway" ],
+    "Description": "An old fisherman's battle with a giant marlin.",
+    "ReleaseYear": 1952,
+    "Publisher": "Charles Scribner's Sons",
+    "Genres": [ "Literary Fiction", "Classic" ],
+    "Price": 11.25
+  },
+  {
+    "Title": "Power",
+    "AuthorNames": [ "Robert Greene" ],
+    "Description": "A modern guide to power and influence.",
+    "ReleaseYear": 1998,
+    "Publisher": "Viking Press",
+    "Genres": [ "Self-help", "Strategy" ],
+    "Price": 25.00
+  },
+  {
+    "Title": "Thinking, Fast and Slow",
+    "AuthorNames": [ "Daniel Kahneman" ],
+    "Description": "An exploration of two modes of thought and decision-making.",
+    "ReleaseYear": 2011,
+    "Publisher": "Farrar, Straus and Giroux",
+    "Genres": [ "Psychology", "Non-Fiction" ],
+    "Price": 29.99
+  },
+  {
+    "Title": "White Nights",
+    "AuthorNames": [ "Fyodor Dostoevsky" ],
+    "Description": "A story about a dreamer and a brief romantic encounter.",
+    "ReleaseYear": 1848,
+    "Publisher": "Dostoyevsky Publishing",
+    "Genres": [ "Romance", "Classic" ],
+    "Price": 10.00
+  }
+]

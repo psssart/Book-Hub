@@ -124,7 +124,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 // 9. Seeding
-app.Seed();
+await app.SeedAsync();
 
 app.Run();
 

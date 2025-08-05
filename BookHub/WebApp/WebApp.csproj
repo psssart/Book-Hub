@@ -69,4 +69,14 @@
       <UpToDateCheckInput Remove="Views\Contests\Index.cshtml" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <None Include="SeedData\**\*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="wwwroot\img\**\*.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    
 </Project>
