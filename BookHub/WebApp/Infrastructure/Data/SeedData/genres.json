@@ -1,0 +1,20 @@
+﻿[
+  { "Name": "Dystopian", "Description": "Fiction about oppressive societies", "IsMainGenre": true },
+  { "Name": "Political Fiction", "Description": "Fiction focused on political systems and power", "IsMainGenre": false },
+  { "Name": "Computer Science", "Description": "Books about algorithms, computing, and software", "IsMainGenre": true },
+  { "Name": "Non-Fiction", "Description": "Informative books based on real events or knowledge", "IsMainGenre": true },
+  { "Name": "Philosophy", "Description": "Books dealing with questions of existence and reasoning", "IsMainGenre": false },
+  { "Name": "Science", "Description": "Books on scientific discovery and theory", "IsMainGenre": false },
+  { "Name": "Mathematics", "Description": "Books about math concepts and logic", "IsMainGenre": false },
+  { "Name": "Satire", "Description": "Literature that ridicules or criticizes", "IsMainGenre": true },
+  { "Name": "Classic", "Description": "Established literary works", "IsMainGenre": true },
+  { "Name": "Tragedy", "Description": "Drama with sad or fatal events", "IsMainGenre": false },
+  { "Name": "Drama", "Description": "Serious narrative fiction", "IsMainGenre": true },
+  { "Name": "Fantasy", "Description": "Fiction with magical or supernatural elements", "IsMainGenre": true },
+  { "Name": "Adventure", "Description": "Exciting stories with risks or unknown", "IsMainGenre": true },
+  { "Name": "Literary Fiction", "Description": "Character-driven, introspective narratives", "IsMainGenre": false },
+  { "Name": "Self-help", "Description": "Books aimed at personal improvement", "IsMainGenre": false },
+  { "Name": "Strategy", "Description": "Books about tactics, power, and influence", "IsMainGenre": false },
+  { "Name": "Psychology", "Description": "Books about human behavior and thinking", "IsMainGenre": true },
+  { "Name": "Romance", "Description": "Stories of love and emotional relationships", "IsMainGenre": false }
+]

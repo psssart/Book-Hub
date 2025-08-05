@@ -1,0 +1,12 @@
+﻿[
+  { "Name": "MIT Press", "Description": "Academic publisher affiliated with the Massachusetts Institute of Technology." },
+  { "Name": "Viking Press", "Description": "American publishing company known for non-fiction and literary classics." },
+  { "Name": "Farrar, Straus and Giroux", "Description": "Renowned publisher of literary fiction and non-fiction." },
+  { "Name": "Basic Books", "Description": "Publisher of scholarly books in the humanities and social sciences." },
+  { "Name": "Harper & Brothers", "Description": "Historical American publishing house, now HarperCollins." },
+  { "Name": "YMCA Press", "Description": "Russian émigré publishing house in Paris." },
+  { "Name": "Secker & Warburg", "Description": "British publisher famous for Orwell’s books." },
+  { "Name": "Cotta", "Description": "19th-century German publishing house known for Goethe." },
+  { "Name": "Scribner", "Description": "American publisher of F. Scott Fitzgerald and Hemingway." },
+  { "Name": "The Russian Messenger", "Description": "19th-century literary magazine and publisher in Russia." }
+]
