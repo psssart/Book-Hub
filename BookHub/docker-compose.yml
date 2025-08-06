@@ -33,7 +33,7 @@ services:
     command: >
       sh -c "
         dotnet restore &&
-        dotnet watch run --project WebApp/WebApp.csproj --no-launch-profile --no-restore
+        dotnet watch run --project WebApp/WebApp.csproj --no-launch-profile --no-restore --non-interactive
       "
     environment:
       ASPNETCORE_ENVIRONMENT: Development

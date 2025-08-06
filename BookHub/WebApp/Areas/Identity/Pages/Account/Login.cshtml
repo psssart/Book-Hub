@@ -19,51 +19,89 @@
 <body>
 <img src="~/img/svg/Ellipse.svg" alt="background-ellipses" class="image-ellipse-login">
 
-<div class="auth-container">
-
-    <div class="auth-title">Authorisation</div>
-
-    <div class="auth-frame">
-
-        <form id="account" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-element">
-                <label asp-for="Input.Email" class="label-text">Email</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.Email" type="text" placeholder="name@example.com" aria-required="true" autocomplete="username">
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-element">
-                <label asp-for="Input.Password" class="label-text">Password</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.Password" type="password" autocomplete="current-password" aria-required="true" placeholder="Password">
-                    <span asp-validation-for="Input.Password" class="text-danger"></span></div>
-            </div>
-            <button id="login-submit" type="submit" class="login-button">Log in</button>
-            @* <a href="javascript:void(0);" class="login-button" onclick="this.closest('form').submit();"> *@
-            @*     Login in *@
-            @* </a> *@
-            <div class="logo-auth">
-                <a asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/img/svg/BookHub-auth-logo.svg" alt=""></a>
-            </div>
-            @*<div>
-                <p>
-                    <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                </p>
-                <p>
-                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                </p>
-                <p>
-                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                </p>
-            </div>*@
-        </form>
-
+<div class="auth-container container mt-2">
+    
+    <div class="row m-2">
+        <div class="col-12 col-md-9 col-lg-7 auth-title text-center ps-0">
+            Authorisation
+        </div>
+        @if (!ViewData.ModelState.IsValid)
+        {
+        <div class="col-0 col-md-3 col-lg-5 d-none d-md-block errors-title text-start align-self-center ps-4">
+            Errors:
+        </div>
+        }
     </div>
+    
+    <div class="row px-3">
+        <div class="col-12 col-md-9 col-lg-7 auth-frame px-0">
+            
+            <form id="account" method="post" class="container">
+                
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="form-element">
+                            <label asp-for="Input.Email" class="label-text">Email</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.Email" type="text" placeholder="name@example.com" aria-required="true" autocomplete="username">
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-element">
+                            <label asp-for="Input.Password" class="label-text">Password</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.Password" type="password" autocomplete="current-password" aria-required="true" placeholder="Password">
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="small-text">Forgot your password?</a>
+                    </div>
+                    <div class="col-6">
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="small-text">Register as a new user</a>
+                    </div>
+                </div>
+                
+                <button id="login-submit" type="submit" class="login-button w-100 mt-4" onclick="this.closest('form').submit();">Log in</button>
+                
+                <div class="logo-auth m-3">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="d-flex justify-content-center">
+                        <img src="~/img/svg/BookHub-auth-logo.svg" alt="BookHub" class="img-fluid">
+                    </a>
+                </div>
+            </form>
+            
+        </div>
 
-
+        @* Errors block only for desktop *@
+        <div class="col-0 col-md-3 col-lg-5 d-none d-md-block">
+            <div asp-validation-summary="ModelOnly" class="text-danger fs-4" role="alert"></div>
+        </div>
+    </div>
+    
+    @* Errors block only for mobile *@
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="row mt-2 px-4 d-md-none">
+            <div class="col-12 px-0 errors-title text-start align-self-center">
+                Errors:
+            </div>
+        </div>
+        <div class="row px-4 d-md-none">
+            <div class="col-12 px-0">
+                <div asp-validation-summary="ModelOnly" class="text-danger fs-4" role="alert"></div>
+            </div>
+        </div>
+    }
 </div>
 </body>
 </html>

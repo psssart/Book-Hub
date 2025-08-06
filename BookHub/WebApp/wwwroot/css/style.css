@@ -23,24 +23,20 @@
   z-index: -999;
 }
 .auth-container {
-  height: 60%;
-  position: fixed;
-  bottom: 300px;
-  left: 152px;
+  height: 100vh !important;
 }
 .reg-container {
-  height: 815px;
-  position: fixed;
-  bottom: 250px;
-  left: 152px;
+  height: 100vh !important;
 }
-
-.auth-title {
-  position: absolute;
-  top: -120px;
-  left: 90px;
+.errors-title {
   font-family: Gilroy-SemiBold-added;
-  font-size: 96px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: bold;
+  color: #9A2A2A;
+}
+.auth-title {
+  font-family: Gilroy-SemiBold-added;
+  font-size: clamp(2rem, 5vw, 4rem);
   font-weight: bold;
   color: #6474C9;
 }
@@ -54,8 +50,6 @@
   color: #6474C9;
 }
 .auth-frame {
-  width: 715px;
-  height: 612px;
   color: black;
   border: 5px solid #6474C9;
   border-bottom-left-radius: 25px;
@@ -69,31 +63,14 @@
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 25px;
 }
-.logo-auth {
-  position: absolute;
-  bottom: 30px;
-  left: 170px;
-}
-.logo-reg {
-  position: absolute;
-  bottom: -110px;
-  left: 170px;
-}
 input[type="file"] {
   display: none;
 }
 .custom-file-upload {
   border: 3px solid #6474C9;
   display: inline-block;
-  padding: 6px 12px;
   cursor: pointer;
   border-radius: 15px;
-}
-.upload {
-  display: flex;
-  position: absolute;
-  left: 215px;
-  bottom: 110px;
 }
 .input-field {
   width: 80%;
@@ -107,21 +84,23 @@ input[type="file"] {
   font-family: Gilroy-Medium-added;
   font-size: 28px;
 }
-
+.small-text {
+  font-family: Gilroy-light-added;
+  font-size: clamp(1rem, 1vw, 2rem);
+  text-align: center;
+  color: #C9B964;
+  display: block;
+}
 .form-element {
-  margin: 10px 10px 10px 10px;
-  padding-top: 10px;
   font-family: Gilroy-SemiBold-added;
-  font-size: 28px;
+  font-size: clamp(1.5rem, 1vw, 2rem);
   text-align: center;
   color: #6474C9;
   display: block;
 }
 .form-element-reg {
-  margin: 8px 8px 8px 8px;
-  padding-top: 1px;
   font-family: Gilroy-SemiBold-added;
-  font-size: 28px;
+  font-size: clamp(1.5rem, 1vw, 2rem);
   text-align: center;
   color: #6474C9;
   display: block;
@@ -158,9 +137,8 @@ select {
   font-size: 28px;
 }
 .form-element {
-  padding-top: 10px;
   font-family: Gilroy-SemiBold-added;
-  font-size: 28px;
+  font-size: clamp(1rem, 2.5vw, 2rem);
   text-align: center;
   color: #6474C9;
 }
@@ -170,27 +148,18 @@ select {
 }
 .login-button {
   cursor: pointer;
-  position: absolute;
-  left: 0;
-  bottom: 135px;
-  font-size: 64px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  border-radius: 1.2rem;
   color: white;
-  width: 100%;
-  text-align: center;
   background-color: #6474C9;
   outline: none;
   font-family: Gilroy-SemiBold-added;
 }
 .reg-button {
   cursor: pointer;
-  position: absolute;
-  left: 0;
-  bottom: -20px;
-  font-size: 64px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  border-radius: 1.2rem;
   color: white;
-  height: 100px;
-  width: 100%;
-  text-align: center;
   background-color: #6474C9;
   outline: none;
   font-family: Gilroy-SemiBold-added;
@@ -230,62 +199,43 @@ select {
   border-radius: 0 600px 0 0;
 }
 .header {
-  max-width: 1440px;
+  max-height: 15%;
   z-index: 999;
 }
 .box {
-  position: fixed;
-  top: 0;
-  right: 0;
   background: white;
   height: 4.5rem;
-  width: 18.4rem;
+  width: 100%;
   box-shadow:0 4px 4px 0 rgba(0,0,0,0.16);
   border-radius: 5px 0 0 5px;
-}
-
-.text-boxes {
-  display: flex;
-  padding: 12px 17px 10px 13px;
-}
-.text-box {
-  padding-right: 14px;
-}
-.text-box:last-child {
-  padding-right: 0;
 }
 .text-wrapper-blue {
   border-radius: 11px;
   width: 8rem;
-  height: 3rem;
+  height: 100%;
   background: #6474C9;
 
 }
 .text-wrapper-blue:hover {
   opacity: 0.95;
   border-radius: 11px;
-  width: 8.1rem;
-  height: 3.032rem;
+  height: 120%;
   background: #6474C9;
 }
 .text-wrapper-yellow {
   border-radius: 11px;
   width: 8rem;
-  height: 3rem;
+  height: 100%;
   background: #C9B964;
 }
 .text-wrapper-yellow:hover {
   opacity: 0.90;
   border-radius: 11px;
-  width: 8.1rem;
-  height: 3.032rem;
+  height: 120%;
   background: #C9B964;
 }
 .text {
   color: white;
-  padding-top: 16px;
-  padding-bottom: 15px;
-  text-align: center;
   font-family: Gilroy-Medium-added;
   font-size: 1.3rem;
 }
@@ -633,9 +583,6 @@ html, body {
   width: 100%;
   margin-top: 45px;
   margin-bottom: 45px;
-}
-.avatar {
-  margin-left: 15px;
 }
 .right-items-1-admin .dropdown-menu {
   display: none;

@@ -17,71 +17,125 @@
 <body>
 <img src="~/img/svg/Ellipse.svg" alt="background-ellipses" class="image-ellipse-login">
 
-<div class="reg-container">
+<div class="reg-container container mt-2">
 
-    <div class="auth-title-reg">Registration</div>
-
-    <div class="auth-frame-reg">
-
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-element-reg">
-                <label asp-for="Input.FirstName" class="label-text">First Name</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.FirstName" autocomplete="firstname" aria-required="true" placeholder="First Name"/>
-                    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-                </div>
-                
-            </div>
-            <div class="form-element-reg">
-                <label asp-for="Input.LastName" class="label-text">Last name</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.LastName" autocomplete="lastname" aria-required="true" placeholder="Last Name"/>
-                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-element-reg">
-                <label asp-for="Input.Email" class="label-text">Email</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.Email" type="text" autocomplete="username" aria-required="true" placeholder="name@example.com">
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-element-reg">
-                <label asp-for="Input.Password" class="label-text">Password</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.Password" autocomplete="new-password" aria-required="true" placeholder="Password" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-element-reg">
-                <label asp-for="Input.ConfirmPassword" class="label-text">Confirm Password</label>
-                <div class="textbox-align">
-                    <input asp-for="Input.ConfirmPassword" autocomplete="new-password" aria-required="true" placeholder="Confirmation password" />
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span> 
-                </div>
-            </div>
-            <div class="form-element-reg">
-                <div class="upload">
-                    <label for="avatar" asp-for="Input.AvatarImageData" class="custom-file-upload">
-                        Avatar Photo
-                    </label>
-                    <input asp-for="Input.AvatarImageData" type="file" id="avatar">
-                    <img id="avatar-preview" class="avatar" src="~/img/svg/profile-nophoto.svg" alt="">
-                </div>
-            </div>
-            <button id="registerSubmit" type="submit" class="reg-button">Register</button>
-            @* <a href="javascript:void(0);" class="reg-button" onclick="this.closest('form').submit();"> *@
-            @*     Sign in *@
-            @* </a> *@
-        </form>
-        <div class="logo-reg">
-            <a asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="~/img/svg/BookHub-auth-logo.svg" alt=""></a>
+    <div class="row m-2">
+        <div class="col-12 col-md-9 col-lg-7 auth-title text-center ps-0">
+            Registration
         </div>
-
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="col-0 col-md-3 col-lg-5 d-none d-md-block errors-title text-start align-self-center ps-4">
+                Errors:
+            </div>
+        }
     </div>
 
+    <div class="row px-3">
+        <div class="col-12 col-md-9 col-lg-7 auth-frame px-0">
+
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data"
+                  class="container">
+                
+                <div class="row mt-2">
+                    <div class="col-12 col-md-6">
+                        <div class="form-element-reg">
+                            <label asp-for="Input.FirstName" class="label-text">First Name</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.FirstName" autocomplete="firstname" aria-required="true" placeholder="First Name"/>
+                                <span asp-validation-for="Input.FirstName" class="text-danger fs-6"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-element-reg">
+                            <label asp-for="Input.LastName" class="label-text">Last name</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.LastName" autocomplete="lastname" aria-required="true" placeholder="Last Name"/>
+                                <span asp-validation-for="Input.LastName" class="text-danger fs-6"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-element-reg">
+                            <label asp-for="Input.Email" class="label-text">Email</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.Email" type="text" autocomplete="username" aria-required="true" placeholder="name@example.com">
+                                <span asp-validation-for="Input.Email" class="text-danger fs-6"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-element-reg">
+                            <label asp-for="Input.Password" class="label-text">Password</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.Password" autocomplete="new-password" aria-required="true" placeholder="Password"/>
+                                <span asp-validation-for="Input.Password" class="text-danger fs-6"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12 mt-3 col-md-6 order-2 order-md-1 d-flex justify-content-center align-items-center">
+                        <div class="form-element-reg">
+                            <div class="upload d-flex gap-2">
+                                <label for="avatar" asp-for="Input.AvatarImageData" class="custom-file-upload">
+                                    Avatar Photo
+                                </label>
+                                <input asp-for="Input.AvatarImageData" type="file" id="avatar">
+                                <img id="avatar-preview" class="avatar mt-0" src="~/img/svg/profile-nophoto.svg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 order-1 order-md-2">
+                        <div class="form-element-reg">
+                            <label asp-for="Input.ConfirmPassword" class="label-text">Confirm Password</label>
+                            <div class="d-flex justify-content-center">
+                                <input asp-for="Input.ConfirmPassword" autocomplete="new-password" aria-required="true" placeholder="Confirmation password"/>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger fs-6"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="registerSubmit" type="submit" class="reg-button w-100 mt-4">Register</button>
+                @* <a href="javascript:void(0);" class="reg-button" onclick="this.closest('form').submit();"> *@
+                @*     Sign in *@
+                @* </a> *@
+                
+                <div class="logo-reg m-3">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="d-flex justify-content-center">
+                        <img src="~/img/svg/BookHub-auth-logo.svg" alt="" class="img-fluid">
+                    </a>
+                </div>
+            </form>
+        
+        </div>
+        
+        @* Errors block only for desktop *@
+        <div class="col-0 col-md-3 col-lg-5 d-none d-md-block">
+            <div asp-validation-summary="ModelOnly" class="text-danger fs-4" role="alert"></div>
+        </div>
+    </div>
+
+    @* Errors block only for mobile *@
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="row mt-2 px-4 d-md-none">
+            <div class="col-12 px-0 errors-title text-start align-self-center">
+                Errors:
+            </div>
+        </div>
+        <div class="row px-4 d-md-none">
+            <div class="col-12 px-0">
+                <div asp-validation-summary="ModelOnly" class="text-danger fs-4" role="alert"></div>
+            </div>
+        </div>
+    }
 </div>
 </body>
 <script>
