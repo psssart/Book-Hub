@@ -73,7 +73,7 @@ input[type="file"] {
   border-radius: 15px;
 }
 .input-field {
-  width: 80%;
+  width: 90%;
   padding: 12px 20px;
   margin: 8px;
   height: 8%;
@@ -105,7 +105,16 @@ input[type="file"] {
   color: #6474C9;
   display: block;
 }
-
+.input-validation-error {
+  border-color: red !important;
+  /*border-image: repeating-linear-gradient(*/
+  /*        45deg,*/
+  /*        red 0,*/
+  /*        red 4px,*/
+  /*        transparent 4px,*/
+  /*        transparent 8px */
+  /*) 1 !important;*/
+}
 .textbox-align {
   margin-left: 30px;
   width: 100%;

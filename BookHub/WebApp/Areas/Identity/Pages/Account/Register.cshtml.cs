@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using WebApp.Helpers.Validation.File;
 
 namespace WebApp.Areas.Identity.Pages.Account
 {
@@ -99,18 +100,29 @@ namespace WebApp.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
             
+            /// <summary>
+            /// First Name
+            /// </summary>
             [Required]
             [Display(Name = "First name")]
             [StringLength(64, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 1)]
             public string FirstName { get; set; }
 
             
+            /// <summary>
+            /// Last Name
+            /// </summary>
             [Required]
             [Display(Name = "Last name")]
             [StringLength(64, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 1)]
             public string LastName { get; set; }
             
-            [Display(Name = "Image")]
+            /// <summary>
+            /// Profile image
+            /// </summary>
+            [Display(Name = "Avatar Photo")]
+            [AllowedExtensions(new[] { ".jpg", ".jpeg", ".png", ".gif" })]
+            [MaxFileSize(2 * 1024 * 1024)]
             public IFormFile AvatarImageData { get; set; }
         }
 
