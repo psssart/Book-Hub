@@ -87,9 +87,12 @@ input[type="file"] {
 .small-text {
   font-family: Gilroy-light-added;
   font-size: clamp(1rem, 1vw, 2rem);
-  text-align: center;
   color: #C9B964;
-  display: block;
+}
+.small-text-primary {
+  font-family: Gilroy-light-added;
+  font-size: clamp(1rem, 1vw, 2rem);
+  color: #6474C9;
 }
 .form-element {
   font-family: Gilroy-SemiBold-added;
@@ -812,4 +815,35 @@ html, body {
 .main-logo:hover,
 .main-logo:focus {
   transform: scale(1.05);
+}
+
+.btn-primary {
+  background-color: #6474C9;
+  border-color: #7f92e1;
+}
+.btn-primary:hover {
+  background-color: #7d8bd7;
+  border-color: #6474C9;
+}
+
+.code-block {
+  background-color: #1e1e1e;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+
+.info-text {
+  font-family: Gilroy-light-added;
+  color: #1e1e1e;
+}
+
+li a {
+  font-family: Gilroy-SemiBold-added;
+  color: #6474C9 !important;
+}
+
+.nav-link.active {
+  background-color: rgb(206, 192, 115) !important;
 }

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="~/css/style.css">
     <link rel="stylesheet" href="~/css/auth.css">
 
-    <title>Login in</title>
+    <title>@ViewData["Title"]</title>
 
 </head>
 <body>
@@ -68,11 +68,11 @@
                 <div class="row">
                     
                     <div class="col-6">
-                        <a id="forgot-password" asp-page="./ForgotPassword" class="small-text">Forgot your password?</a>
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="small-text d-block text-center">Forgot your password?</a>
                     </div>
                     
                     <div class="col-6">
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="small-text">Register as a new user</a>
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="small-text d-block text-center">Register as a new user</a>
                     </div>
                     
                 </div>

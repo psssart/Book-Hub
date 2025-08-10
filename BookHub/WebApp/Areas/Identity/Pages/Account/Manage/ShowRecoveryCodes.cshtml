@@ -6,20 +6,25 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
+<h3 class="auth-title fs-3">@ViewData["Title"]</h3>
 <div class="alert alert-warning" role="alert">
     <p>
         <strong>Put these codes in a safe place.</strong>
     </p>
-    <p>
+    <p class="mb-2">
         If you lose your device and don't have the recovery codes you will lose access to your account.
     </p>
 </div>
-<div class="row">
-    <div class="col-md-12">
-        @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
-        {
-            <code class="recovery-code">@Model.RecoveryCodes[row]</code><text>&nbsp;</text><code class="recovery-code">@Model.RecoveryCodes[row + 1]</code><br />
-        }
+<div class="row px-2 px-sm-5">
+    <div class="col-md-12 px-2 px-sm-5">
+        <div class="code-block text-center">
+            @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
+            {
+            <code class="recovery-code">@Model.RecoveryCodes[row]</code>
+            <text>&nbsp;</text>
+            <code class="recovery-code">@Model.RecoveryCodes[row + 1]</code>
+            <br/>
+            }
+        </div>
     </div>
 </div>
