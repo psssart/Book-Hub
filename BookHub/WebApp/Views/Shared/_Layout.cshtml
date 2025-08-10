@@ -146,7 +146,12 @@ else
 {
     <header>
             <div class="header">
-                <div class="box d-flex justify-content-end">
+                <div class="box d-flex justify-content-between">
+                    
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="main-logo d-flex p-2">
+                        <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid">
+                    </a>
+
                     <div class="d-flex gap-2 p-3">
                         <div class="text-box">
                             <a asp-area="Identity" asp-page="/Account/Register">
@@ -167,6 +172,7 @@ else
                             </a>
                         </div>
                     </div>
+
                 </div>
             </div>
         </header>

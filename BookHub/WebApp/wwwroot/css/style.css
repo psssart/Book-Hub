@@ -119,8 +119,11 @@ input[type="file"] {
   margin-left: 30px;
   width: 100%;
 }
-.login-button:focus {
-  outline: none;
+.login-button:hover,
+.login-button:focus,
+.reg-button:hover,
+.reg-button:focus {
+  background-color: #7d8bd7;
 }
 .form-field {
   display: block;
@@ -160,8 +163,8 @@ select {
   font-size: clamp(2rem, 5vw, 4rem);
   border-radius: 1.2rem;
   color: white;
-  background-color: #6474C9;
   outline: none;
+  background-color: #6474C9;
   font-family: Gilroy-SemiBold-added;
 }
 .reg-button {
@@ -169,8 +172,8 @@ select {
   font-size: clamp(2rem, 5vw, 4rem);
   border-radius: 1.2rem;
   color: white;
-  background-color: #6474C9;
   outline: none;
+  background-color: #6474C9;
   font-family: Gilroy-SemiBold-added;
 }
 .login-button-reg {
@@ -180,10 +183,10 @@ select {
   bottom: 25px;
   font-size: 64px;
   color: white;
+  outline: none;
   width: 100%;
   text-align: center;
   background-color: #6474C9;
-  outline: none;
   font-family: Gilroy-SemiBold-added;
 }
 .image-ellipse-login {
@@ -806,3 +809,7 @@ html, body {
   display: block;
 }
 
+.main-logo:hover,
+.main-logo:focus {
+  transform: scale(1.05);
+}
