@@ -11,16 +11,66 @@
   font-family: Gilroy-light-added;
   src: url('../fonts/Gilroy-Light.otf');
 }
-/*Main page styles*/
-@media screen and (max-width: 600px) {
-  /* CSS-стили*/;
+.image-text {
+  position: fixed;
+  width: 1450px;
+  max-width: 100%;
+  border-radius: 0 600px 0 0;
 }
-
+@media (max-width: 576px) {
+  .search-form {
+    width: 95% !important;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .logo{
+    width: 80% !important;
+  }
+  .image-text {
+    left: 45px;
+    height: 926px;
+    bottom: 125px;
+    transform: scale(1.15);
+    transform-origin: center;
+  }
+}
+@media (min-width: 576px) {
+  .image-text {
+    left: 67px;
+    height: 389px;
+    bottom: 384px;
+  }
+}
+@media (min-width: 768px) {
+  .image-text {
+    left: 145px;
+    height: 395px;
+  }
+}
+@media (min-width: 992px) {
+  .image-text {
+    left: 185px;
+    height: 382px;
+  }
+}
+@media (min-width: 1200px) {
+  .image-text {
+    left: 144px;
+    height: auto;
+  }
+}
+@media (min-width: 1400px) {
+  .image-text {
+    left: 62px;
+    height: auto;
+  }
+}
 .image-ellipse {
   position: fixed;
   top: 0;
   right: 0;
   z-index: -999;
+  max-width: 100%;
 }
 .auth-container {
   height: 100vh !important;
@@ -202,15 +252,8 @@ select {
   bottom: 0;
   left: 0;
   width: 867px;
-  height: 678px;
-  border-radius: 0 600px 0 0;
-}
-.image-text {
-  position: fixed;
-  bottom: 350px;
-  left: 70px;
-  width: 1450px;
-  height: 544px;
+  max-width: 100%;
+  height: 590px;
   border-radius: 0 600px 0 0;
 }
 .header {
@@ -262,7 +305,8 @@ a {
   left: 0;
   bottom: 40px;
   width: 481px;
-  height: 140px;
+  max-width: 100%;
+  height: auto;
   background: white;
   border-radius: 0 6px 6px 0;
 }
@@ -272,7 +316,7 @@ a {
 .search-form {
   background: #C1CAF4;
   border-radius: 41px;
-  width: 738px;
+  width: 70%;
   height: 107px;
   display: flex;
   align-items: center;
@@ -282,7 +326,7 @@ a {
   z-index: 999;
   position: fixed;
   right: 130px;
-  bottom: 150px;
+  bottom: 211px;
 }
 .search-form-auth {
   background: white;
@@ -302,7 +346,7 @@ a {
   border: none;
   color: white;
   background: #C1CAF4;
-  width: 900px;
+  width: 100%;
   outline: none;
   font-size: 32px;
   padding: 5px;
@@ -811,6 +855,7 @@ html, body {
 .dropdownWar:hover .dropdownWar-content {
   display: block;
 }
+
 
 .main-logo:hover,
 .main-logo:focus {

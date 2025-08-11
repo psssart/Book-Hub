@@ -15,7 +15,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-<img src="img/svg/Ellispes.svg" alt="background-ellipses" class="image-ellipse">
+<img src="img/svg/Ellispes.svg" alt="background-ellipses" class="image-ellipse" loading="lazy" decoding="async">
 @if (Model.ShowResults)
 {
     <div class="search_results">
@@ -199,28 +199,30 @@
 }
 else
 {
-    <img src="img/read-books-in-english.jpeg" alt="background-image" class="image-book-reading">
-    <img src="img/svg/Text.svg" alt="background-text" class="image-text">
+    <img src="img/read-books-in-english.jpeg" alt="background-image" class="image-book-reading" loading="lazy" decoding="async">
+    <img src="img/svg/Text.svg" alt="background-text" class="image-text" loading="lazy" decoding="async">
 }
 
 @if (!Model.ShowResults)
 {
     <div class="logo">
-        <a asp-area="" asp-controller="Home" asp-action="Index"><img src="img/svg/logo_main.svg" alt="Main logo" class="logo-image"></a>
+        <a asp-area="" asp-controller="Home" asp-action="Index">
+            <img src="img/svg/logo_main.svg" alt="Main logo" class="logo-image img-fluid">
+        </a>
+    </div>
+    
+    <div class="search-form">
+        @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100 justify-content-between" }))
+        {
+            <input type="text" name="searchInput" class="search-form-txt flex-grow-1" spellcheck="false" placeholder="Search for book or author" value="@Model.SearchInput">
+            <button type="submit" class="search-form-btn" aria-label="Search">
+                <a href=".">
+                    <img src="img/svg/zoomer.svg" alt="image" class="search-form-image">
+                </a>
+            </button>
+        }
     </div>
 }
-
-<div class="search-form">
-    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "search-form" }))
-    {
-        <input type="text" name="searchInput" class="search-form-txt" spellcheck="false" placeholder="Search for book or author" value="@Model.SearchInput">
-        <button type="submit" class="search-form-btn">
-            <a href=".">
-                <img src="img/svg/zoomer.svg" alt="image" class="search-form-image">
-            </a>
-        </button>
-    }
-</div>
 </body>
 
 <script>
