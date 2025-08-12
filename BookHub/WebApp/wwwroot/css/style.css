@@ -329,16 +329,8 @@ a {
   bottom: 211px;
 }
 .search-form-auth {
-  background: white;
   border-radius: 41px;
-  width: 738px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  border: 3px solid #C1CAF4;
-  padding: 0 15px;
-  margin-left: 200px;
-  z-index: 999;
+  border: 0.2rem solid #C1CAF4;
 }
 
 .search-form-txt {
@@ -356,10 +348,7 @@ a {
   border-radius: 41px;
   border: none;
   color: #C1CAF4;
-  background: white;
-  width: 900px;
   outline: none;
-  font-size: 30px;
   margin: 1px;
   padding: 0;
 }
@@ -376,9 +365,11 @@ a {
 .search-form-btn-auth {
   border: none;
   background: transparent;
-  margin-left: auto;
 }
-
+.search-form-btn-auth:hover,
+.search-form-btn-auth:focus {
+  background-color: #7d8bd7;
+}
 .search-form-image {
   margin-left: auto;
   cursor: pointer;

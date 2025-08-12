@@ -151,7 +151,18 @@ else
                     <a asp-area="" asp-controller="Home" asp-action="Index" class="main-logo d-flex p-2">
                         <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid">
                     </a>
+                
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+                    {
+                        <div class="search-form-auth d-flex align-items-center ps-2">
+                            <input type="text" class="search-form-txt-auth fs-4" name="searchInput" spellcheck="false" placeholder="Search for book or author">
 
+                            <button class="search-form-btn-auth p-0">
+                                <img src="~/img/svg/search-button.svg" alt="image" class="search-form-image">
+                            </button>
+                        </div>
+                    }
+                    
                     <div class="d-flex gap-2 p-3">
                         <div class="text-box">
                             <a asp-area="Identity" asp-page="/Account/Register">
