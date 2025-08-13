@@ -149,16 +149,31 @@ else
             <div class="box row-fluid d-flex">
                 
                 @* Logo section (only for desktop) *@
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="main-logo d-none d-md-flex col-0 col-md-2 p-2">
-                    <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid">
-                </a>
+                <div class="d-none d-md-flex col-0 col-md-2 p-0">
+                    <nav class="d-flex">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
+                        </a>
+                        <ul class="dropdown-menu" style="border: none">
+                            <li class="mb-2 text-center">
+                                Theme
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
 
                 @* Search section *@
                 <div class="col-10 col-md-6 ps-3 ps-md-0 d-flex align-items-center justify-content-center">
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "w-100" }))
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100", @style = "height: 78%;"}))
                     {
                         <div class="search-form-auth w-100 d-flex align-items-center">
-                            <input type="text" class="search-form-txt-auth fs-4 text-center" name="searchInput" spellcheck="false" placeholder="Search for book or author">
+                            @{
+                                var searchInput = ViewContext.HttpContext.Request.Query["searchInput"].ToString();
+                                var showResults = !string.IsNullOrWhiteSpace(searchInput);
+                            }
+                            <input type="text" class="search-form-txt-auth fs-4 text-center h-100" name="searchInput" 
+                                   spellcheck="false" placeholder="Search for book or author"
+                                   value="@(showResults ? searchInput : null)" />
 
                             <button class="search-form-btn-auth d-flex align-items-center justify-content-center p-0">
                                 @* Mobile search button *@
@@ -177,7 +192,9 @@ else
                 <div class="col-2 col-md-4 d-flex justify-content-end">
                     @* For mobile (dropdown) *@
                     <nav class="d-flex d-md-none">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center fs-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"></a>
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid h-75">
+                        </a>
                         <ul class="dropdown-menu" style="border: none">
                             <li class="mb-2">
                                 <a asp-area="Identity" asp-page="/Account/Register" class="d-flex justify-content-center">

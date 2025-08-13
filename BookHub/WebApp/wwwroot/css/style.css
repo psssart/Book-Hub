@@ -349,12 +349,12 @@ a {
 .search-form-txt-auth {
   flex: 1 1 auto;
   min-width: 0;
-  border-radius: 41px;
-  border: none;
+  border-radius: 41px !important;
+  border: none !important;
   color: #C1CAF4;
   outline: none;
-  margin: 1px;
-  padding: 0;
+  margin: 1px !important;
+  padding: 0 !important;
 }
 .search-form-txt-auth::placeholder {
   color: #C1CAF4;
@@ -667,12 +667,22 @@ html, body {
   display: block;
 }
 
-.dropdown-toggle::after {
+.dropdown-toggle::after,
+.custom-dropdown {
   transition: transform 0.3s ease;
 }
 
-.dropdown-toggle[aria-expanded="true"]::after {
+.dropdown-toggle[aria-expanded="true"]::after,
+.custom-dropdown[aria-expanded="true"] {
   transform: rotate(180deg);
+}
+
+.custom-dropdown::after {
+  display: none;
+}
+
+.custom-dropdown:hover img {
+  transform: scale(1.20);
 }
 
 /*------Pablo Redaction Introduce-----*/
