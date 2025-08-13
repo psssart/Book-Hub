@@ -145,26 +145,63 @@
 else
 {
     <header>
-            <div class="header">
-                <div class="box d-flex justify-content-between">
-                    
-                    <a asp-area="" asp-controller="Home" asp-action="Index" class="main-logo d-flex p-2">
-                        <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid">
-                    </a>
+        <div class="header container-fluid p-0 m-0">
+            <div class="box row-fluid d-flex">
                 
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get))
-                    {
-                        <div class="search-form-auth d-flex align-items-center ps-2">
-                            <input type="text" class="search-form-txt-auth fs-4" name="searchInput" spellcheck="false" placeholder="Search for book or author">
+                @* Logo section (only for desktop) *@
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="main-logo d-none d-md-flex col-0 col-md-2 p-2">
+                    <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid">
+                </a>
 
-                            <button class="search-form-btn-auth p-0">
-                                <img src="~/img/svg/search-button.svg" alt="image" class="search-form-image">
+                @* Search section *@
+                <div class="col-10 col-md-6 ps-3 ps-md-0 d-flex align-items-center justify-content-center">
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "w-100" }))
+                    {
+                        <div class="search-form-auth w-100 d-flex align-items-center">
+                            <input type="text" class="search-form-txt-auth fs-4 text-center" name="searchInput" spellcheck="false" placeholder="Search for book or author">
+
+                            <button class="search-form-btn-auth d-flex align-items-center justify-content-center p-0">
+                                @* Mobile search button *@
+                                <svg width="45" height="30" viewBox="0 0 65 60" xmlns="http://www.w3.org/2000/svg"
+                                     class="d-flex d-md-none search-form-image" style="color: rgb(206, 192, 115);">
+                                    <path fill="currentColor" stroke="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M59.3228 58.6442C60.3086 58.9749 62.502 59.3718 63.3892 58.3135C64.2764 57.2551 64.0053 55.8881 63.7589 55.3369L43.4266 36.155C47.9859 30.7532 53.8515 17.2376 40.8388 6.38984C22.3549 -5.51621 4.98013 4.07478 1.28333 17.9652C-0.195409 32.1863 4.24062 35.1628 11.6342 40.4544C19.0278 45.746 31.5969 44.4231 38.9904 39.7929C41.6521 42.1741 53.6543 53.3526 59.3228 58.6442ZM7.56774 17.9652C4.98009 24.2489 8.43033 30.5327 10.8949 32.8477C14.7149 36.8164 25.0166 42.9017 35.6633 35.4935C46.3101 28.0853 42.8104 17.6344 39.7298 13.335C38.0046 10.9097 32.632 6.12526 24.9426 6.38984C15.331 6.72056 10.9416 9.77213 7.56774 17.9652Z"/>
+                                </svg>
+                                @* Desktop search button *@
+                                <img src="~/img/svg/search-button.svg" alt="image" class="d-none d-md-flex search-form-image">
                             </button>
                         </div>
                     }
-                    
-                    <div class="d-flex gap-2 p-3">
-                        <div class="text-box">
+                </div>
+
+                @* Sign up Log in section *@
+                <div class="col-2 col-md-4 d-flex justify-content-end">
+                    @* For mobile (dropdown) *@
+                    <nav class="d-flex d-md-none">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center fs-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"></a>
+                        <ul class="dropdown-menu" style="border: none">
+                            <li class="mb-2">
+                                <a asp-area="Identity" asp-page="/Account/Register" class="d-flex justify-content-center">
+                                    <div class="text-wrapper-yellow">
+                                        <div class="text text-center">
+                                            Sign up
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="Identity" asp-page="/Account/Login" class="d-flex justify-content-center">
+                                    <div class="text-wrapper-blue">
+                                        <div class="text text-center">
+                                            Login in
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    @* For desktop *@
+                    <div class="d-none d-md-flex gap-2 m-3">
+                        <div>
                             <a asp-area="Identity" asp-page="/Account/Register">
                                 <div class="text-wrapper-yellow">
                                     <div class="text text-center">
@@ -173,7 +210,7 @@ else
                                 </div>
                             </a>
                         </div>
-                        <div class="text-box">
+                        <div>
                             <a asp-area="Identity" asp-page="/Account/Login">
                                 <div class="text-wrapper-blue">
                                     <div class="text text-center">
@@ -183,11 +220,11 @@ else
                             </a>
                         </div>
                     </div>
-
                 </div>
+
             </div>
-        </header>
-    
+        </div>
+    </header>
 }
 
 @RenderBody()

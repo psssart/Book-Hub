@@ -27,6 +27,7 @@
     width: 80% !important;
   }
   .image-text {
+    z-index: -999;
     left: 45px;
     height: 926px;
     bottom: 125px;
@@ -183,6 +184,7 @@ input[type="file"] {
   margin: 1rem;
 }
 .image-ellipse-login {
+  z-index: -999;
   position: fixed;
   bottom: 0;
   right: 0;
@@ -269,7 +271,7 @@ select {
 }
 .text-wrapper-blue {
   border-radius: 11px;
-  width: 8rem;
+  width: 7rem;
   height: 100%;
   background: #6474C9;
 
@@ -282,7 +284,7 @@ select {
 }
 .text-wrapper-yellow {
   border-radius: 11px;
-  width: 8rem;
+  width: 7rem;
   height: 100%;
   background: #C9B964;
 }
@@ -345,6 +347,8 @@ a {
 }
 
 .search-form-txt-auth {
+  flex: 1 1 auto;
+  min-width: 0;
   border-radius: 41px;
   border: none;
   color: #C1CAF4;
@@ -363,12 +367,16 @@ a {
   margin-left: auto;
 }
 .search-form-btn-auth {
+  flex: 0 0 auto;
   border: none;
   background: transparent;
 }
-.search-form-btn-auth:hover,
-.search-form-btn-auth:focus {
-  background-color: #7d8bd7;
+.search-form-btn-auth:hover img,
+.search-form-btn-auth:hover svg,
+.search-form-btn-auth:focus img,
+.search-form-btn-auth:focus svg {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
 }
 .search-form-image {
   margin-left: auto;
@@ -659,7 +667,13 @@ html, body {
   display: block;
 }
 
+.dropdown-toggle::after {
+  transition: transform 0.3s ease;
+}
 
+.dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
 
 /*------Pablo Redaction Introduce-----*/
 /*----What's Up, I'am Pablo, homie----*/
@@ -878,6 +892,10 @@ html, body {
 li a {
   font-family: Gilroy-SemiBold-added;
   color: #6474C9 !important;
+}
+
+.nav-link {
+  color: #6474C9;
 }
 
 .nav-link.active {
