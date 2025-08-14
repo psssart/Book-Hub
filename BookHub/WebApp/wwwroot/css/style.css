@@ -690,11 +690,8 @@ html, body {
 .search_results {
   position: fixed;
   left: 0;
-  padding-top: 20px;
-  padding-left: 60px;
-  padding-right: 45px;
-  padding-bottom: 20px;
-  height: 90%;
+  padding: 20px 45px 20px 60px;
+  height: 100%;
   overflow: auto;
 }
 /* Стилизация полосы прокрутки */
@@ -713,15 +710,9 @@ html, body {
 .search_results::-webkit-scrollbar-thumb:hover {
   background: rgb(159, 147, 90); /* Цвет полосы прокрутки при наведении */
 }
-.header2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 .sort_label {
   position: relative; /* Establish relative positioning for the parent container */
   font-size: 16px;
-  margin-right: 200px; /* Add some right margin for better spacing */
 }
 /*.books_results, .authors_results {*/
 /*  margin-left: -350px;*/
@@ -759,7 +750,6 @@ html, body {
   cursor: pointer;
   border-radius: 8px;
   position: relative;
-  top: -6px;
 }
 .pyramid {
   width: 0;
@@ -780,7 +770,6 @@ html, body {
   background-color: rgb(206, 192, 115);
   border: none;border-radius: 8px;
   padding: 4px 12px;
-  margin-right: 210px;
 }
 .filterPanel {
   position: fixed;
@@ -910,4 +899,8 @@ li a {
 
 .nav-link.active {
   background-color: rgb(206, 192, 115) !important;
+}
+
+#sortSelect {
+  border: 2px solid #6474C9 !important;
 }

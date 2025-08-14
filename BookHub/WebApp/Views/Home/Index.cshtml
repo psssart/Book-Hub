@@ -19,28 +19,40 @@
 @if (Model.ShowResults)
 {
     <div class="search_results">
-        <div class="header2">
-            <h3>Books</h3>
-            <span><b>Found: @Model.Books.Count books</b></span>
-            <span class="sort_label">Sort by: 
-                <select id="sortSelect" >
-                    <option value="none"></option>
-                    <option value="rating">Rating</option>
-                    <option value="price">Price</option>
-                    <option value="year">Year</option>
-                </select>
-            </span>
-            <button id="rotateButton"><span class="pyramid"></span></button>
-            <button class="filterMenuButton">Filter</button>
+        <div class="d-flex justify-content-between align-items-center">
+            @* Left table header block *@
+            <div class="d-flex align-items-center gap-3">
+                <h3 class="m-0">Books</h3>
+                <span class="sort_label">Sort by:
+                    <select id="sortSelect" class="fs-6">
+                        <option value="none"></option>
+                        <option value="rating">Rating</option>
+                        <option value="price">Price</option>
+                        <option value="year">Year</option>
+                    </select>
+                </span>
+                <div class="d-flex pt-3">
+                    <button id="rotateButton">
+                        <span class="pyramid"></span>
+                    </button>
+                </div>
+            </div>
+            @* Right table header block *@
+            <div class="d-flex align-items-center gap-3">
+                @{
+                    var foundResults = Model.Books.Count + Model.Authors.Count;
+                }
+                <span><b>Found: @foundResults</b></span>
+                <button class="filterMenuButton">Filter</button>
+            </div>
         </div>
     
+        @* Filters panel *@
         <div id="filterPanel" class="filterPanel">
             <h5 align="center">Filtering Settings</h5>
             <br/>
             <h6 align="center">Books Filter</h6>
             <br/>
-            
-            
             
             <span class="dropdownAut">
                 <button class="dropbtnAut">Authors</button>
