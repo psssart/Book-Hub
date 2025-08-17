@@ -1,14 +1,19 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@{
+var currentTheme = Context.Request.Cookies["theme"] ?? "light";
+}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="@currentTheme">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="color-scheme" content="light dark">
     <title>@ViewData["Title"] - BookHub</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="icon" href="~/img/svg/logo.svg" type="image/svg+xml">
     @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/> *@
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true"/>
     
 </head>
 <body>
@@ -151,17 +156,22 @@ else
                 @* Logo section (only for desktop) *@
                 <div class="d-none d-md-flex col-0 col-md-2 p-0">
                     <nav class="d-flex">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 ps-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu" style="border: none">
-                            <li class="mb-2 text-center">
-                                Theme
-                            </li>
+                        <ul class="dropdown-menu ms-2" style="border: none">
+                            <div class="d-flex justify-content-between text-box mx-2">
+                                <partial name="_ThemeToggle" />
+                                <div class="w-100 d-flex justify-content-center align-items-center">
+                                    <span style="color: var(--text-secondary)">
+                                        Theme
+                                    </span>
+                                </div>
+                            </div>
                         </ul>
                     </nav>
                 </div>
-
+                
                 @* Search section *@
                 <div class="col-10 col-md-6 ps-3 ps-md-0 d-flex align-items-center justify-content-center">
                     @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100", @style = "height: 78%;"}))
@@ -195,7 +205,7 @@ else
                         <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid h-75">
                         </a>
-                        <ul class="dropdown-menu" style="border: none">
+                        <ul class="dropdown-menu dropdown-menu-end" style="border: none">
                             <li class="mb-2">
                                 <a asp-area="Identity" asp-page="/Account/Register" class="d-flex justify-content-center">
                                     <div class="text-wrapper-yellow">
@@ -248,6 +258,7 @@ else
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/theme.js" asp-append-version="true" defer></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

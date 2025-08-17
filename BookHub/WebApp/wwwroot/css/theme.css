@@ -1,0 +1,199 @@
+:root {
+    /* Light theme variables */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    --border-color: #dee2e6;
+    --accent-color: #6474C9;
+    --accent-hover: #5667c7;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+    /* Dark theme variables */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #404040;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
+    --border-color: #404040;
+    --accent-color: #7f92e1;
+    --accent-hover: #8d9de3;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+}
+
+/* Theme toggle button styles */
+.theme-toggle-item {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.theme-toggle-item-unauth {
+    margin: 0;
+    padding: 0;
+}
+
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.theme-toggle-btn:hover {
+    background-color: var(--bg-tertiary);
+    transform: scale(1.1);
+}
+
+.theme-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--text-primary);
+}
+
+/* Apply theme variables to body */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply theme variables to common elements */
+.container-nav,
+.header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar ul li a,
+.navbar ul li button {
+    color: var(--text-primary);
+}
+
+.dropdown-menu {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Search form styling */
+.search-form-auth {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+}
+
+.search-form-txt-auth {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: none;
+}
+
+.search-form-txt-auth::placeholder {
+    color: var(--text-muted);
+}
+
+.search-form-btn-auth {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+}
+
+.search-form-btn-auth:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Text wrapper styling */
+.text-wrapper-yellow,
+.text-wrapper-blue {
+    background-color: var(--accent-color);
+    color: white;
+    border: 1px solid var(--accent-color);
+}
+
+.text-wrapper-yellow:hover,
+.text-wrapper-blue:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+/* Unauthenticated header theme toggle positioning */
+.header .text-boxes {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header .theme-toggle-item-unauth {
+    display: flex;
+    align-items: center;
+}
+
+.header .theme-toggle-btn {
+    background-color: var(--bg-primary);
+    border: 2px solid var(--accent-color);
+    padding: 10px;
+}
+
+.header .theme-toggle-btn:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.header .theme-toggle-btn:hover .theme-icon {
+    color: white;
+}
+
+/* Table styling */
+table {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+th, td {
+    border-color: var(--border-color);
+}
+
+/* Card styling */
+.card {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Modal styling */
+.modal-content {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color);
+}

@@ -68,9 +68,10 @@
 }
 .image-ellipse {
   position: fixed;
+  pointer-events: none;
   top: 0;
   right: 0;
-  z-index: -999;
+  z-index: 999;
   max-width: 100%;
 }
 .auth-container {
@@ -184,7 +185,7 @@ input[type="file"] {
   margin: 1rem;
 }
 .image-ellipse-login {
-  z-index: -999;
+  z-index: 999;
   position: fixed;
   bottom: 0;
   right: 0;
@@ -263,7 +264,7 @@ select {
   z-index: 999;
 }
 .box {
-  background: white;
+  background: var(--bg-secondary);
   height: 4.5rem;
   width: 100%;
   box-shadow:0 4px 4px 0 rgba(0,0,0,0.16);
@@ -641,6 +642,9 @@ html, body {
   width: 100%;
   margin-top: 45px;
   margin-bottom: 45px;
+}
+nav.d-flex {
+  overflow-x: clip;
 }
 .right-items-1-admin .dropdown-menu {
   display: none;

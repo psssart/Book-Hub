@@ -1,0 +1,25 @@
+@{
+    var currentTheme = Context.Request.Cookies["theme"] ?? "light";
+    var isDark = currentTheme == "dark";
+}
+
+@if (User.Identity!.IsAuthenticated)
+{
+    <li class="theme-toggle-item">
+        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle theme">
+            <svg class="theme-icon" width="20" height="20" aria-hidden="true">
+                <use id="themeIcon" href="~/img/theme.svg#@(isDark ? "sun" : "moon")"></use>
+            </svg>
+        </button>
+    </li>
+}
+else
+{
+    <div class="theme-toggle-item-unauth">
+        <button id="theme-toggle-unauth" class="theme-toggle-btn" title="Toggle theme">
+            <svg class="theme-icon" width="20" height="20" aria-hidden="true">
+                <use id="themeIcon" href="~/img/theme.svg#@(isDark ? "sun" : "moon")"></use>
+            </svg>
+        </button>
+    </div>
+}
