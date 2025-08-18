@@ -28,6 +28,7 @@
     --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
 }
 
+/* -------------------------------------------------------------------------------- */
 /* Theme toggle button styles */
 .theme-toggle-item {
     list-style: none;
@@ -63,7 +64,34 @@
     width: 20px;
     height: 20px;
     color: var(--text-primary);
+    fill: none;
+    stroke: currentColor;
 }
+
+.theme-icon use {
+    stroke: var(--text-primary);
+    fill: none;
+}
+
+.theme-toggle-ctl {
+    text-decoration: none;
+    color: inherit;
+    padding: 1px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-primary);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+.theme-toggle-ctl:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--accent-color);
+}
+
+.theme-label {
+    color: var(--text-secondary);
+}
+/* -------------------------------------------------------------------------------- */
 
 /* Apply theme variables to body */
 body {
@@ -113,30 +141,6 @@ body {
 
 .search-form-txt-auth::placeholder {
     color: var(--text-muted);
-}
-
-.search-form-btn-auth {
-    background-color: var(--accent-color);
-    border: none;
-    color: white;
-}
-
-.search-form-btn-auth:hover {
-    background-color: var(--accent-hover);
-}
-
-/* Text wrapper styling */
-.text-wrapper-yellow,
-.text-wrapper-blue {
-    background-color: var(--accent-color);
-    color: white;
-    border: 1px solid var(--accent-color);
-}
-
-.text-wrapper-yellow:hover,
-.text-wrapper-blue:hover {
-    background-color: var(--accent-hover);
-    border-color: var(--accent-hover);
 }
 
 /* Unauthenticated header theme toggle positioning */

@@ -908,3 +908,7 @@ li a {
 #sortSelect {
   border: 2px solid #6474C9 !important;
 }
+
+.dropdown-menu li + li {
+  margin-top: .5rem;
+}

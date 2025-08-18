@@ -159,15 +159,10 @@ else
                         <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 ps-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu ms-2" style="border: none">
-                            <div class="d-flex justify-content-between text-box mx-2">
-                                <partial name="_ThemeToggle" />
-                                <div class="w-100 d-flex justify-content-center align-items-center">
-                                    <span style="color: var(--text-secondary)">
-                                        Theme
-                                    </span>
-                                </div>
-                            </div>
+                        <ul class="dropdown-menu px-3 ms-2" style="border: none">
+                            <li>
+                                <partial name="_ThemeToggle"/>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -202,13 +197,13 @@ else
                 <div class="col-2 col-md-4 d-flex justify-content-end">
                     @* For mobile (dropdown) *@
                     <nav class="d-flex d-md-none">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 pe-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid h-75">
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" style="border: none">
-                            <li class="mb-2">
+                        <ul class="dropdown-menu dropdown-menu-end px-3" style="border: none">
+                            <li>
                                 <a asp-area="Identity" asp-page="/Account/Register" class="d-flex justify-content-center">
-                                    <div class="text-wrapper-yellow">
+                                    <div class="text-wrapper-yellow w-100">
                                         <div class="text text-center">
                                             Sign up
                                         </div>
@@ -217,12 +212,15 @@ else
                             </li>
                             <li>
                                 <a asp-area="Identity" asp-page="/Account/Login" class="d-flex justify-content-center">
-                                    <div class="text-wrapper-blue">
+                                    <div class="text-wrapper-blue w-100">
                                         <div class="text text-center">
                                             Login in
                                         </div>
                                     </div>
                                 </a>
+                            </li>
+                            <li>
+                                <partial name="_ThemeToggle"/>
                             </li>
                         </ul>
                     </nav>

@@ -5,6 +5,8 @@ input[type=text], input[type=password] {
     height: 8%;
     display: block;
     border: 3px solid #6474C9;
+    color: var(--text-secondary);
+    background-color: var(--bg-tertiary);
     border-radius: 15px;
     box-sizing: border-box;
     font-family: Gilroy-Medium-added;
