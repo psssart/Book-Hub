@@ -115,6 +115,26 @@
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 25px;
 }
+kbd {
+  color: var(--bg-primary);
+  background-color: var(--text-primary);
+}
+.alert-success {
+  color: var(--success-text);
+  background-color: var(--success);
+  border-color: var(--success-border);
+}
+.form-control:disabled, .form-control[readonly] {
+  background-color: var(--disabled);
+}
+.form-control {
+  color: var(--text-primary);
+  background-color: var(--bg-input);
+}
+.form-control:focus {
+  background-color: var(--bg-input-focus);
+  border-color: var(--accent-color);
+}
 input[type="file"] {
   display: none;
 }
@@ -889,7 +909,7 @@ nav.d-flex {
 
 .info-text {
   font-family: Gilroy-light-added;
-  color: #1e1e1e;
+  color: var(--text-primary);
 }
 
 li a {
