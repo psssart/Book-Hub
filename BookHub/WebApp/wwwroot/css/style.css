@@ -115,6 +115,9 @@
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 25px;
 }
+.btn:hover {
+  color: var(--secondary-hover);
+}
 kbd {
   color: var(--bg-primary);
   background-color: var(--text-primary);

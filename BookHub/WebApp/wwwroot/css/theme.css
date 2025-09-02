@@ -17,6 +17,7 @@
     --success: #d1e7dd;
     --success-border: #badbcc;
     --success-text: #0f5132;
+    --secondary-hover: #e6d67d;
 }
 
 [data-theme="dark"] {
@@ -38,6 +39,7 @@
     --success: #627c71;
     --success-border: #4b6e5e;
     --success-text: #5cc393;
+    --secondary-hover: #877c44;
 }
 
 /* -------------------------------------------------------------------------------- */
