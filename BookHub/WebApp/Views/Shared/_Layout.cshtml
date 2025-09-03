@@ -19,99 +19,102 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
 <body>
 @if(User.Identity!.IsAuthenticated) {
     <header>
-        <div class="container-nav">
-            <div class="navbar">
-                <nav>
-                    <ul>
-                        <li><a asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/svg/BookHub-logo-v2.svg" alt=""></a></li>
-                        <li>
-                            @using (Html.BeginForm("Index", "Home", FormMethod.Get))
-                            {
-                                <div class="search-form-auth">
-                                    <input type="text" class="search-form-txt-auth" name="searchInput" spellcheck="false" placeholder="Search for book or author">
+        <div class="container-nav container-fluid">
+            <nav class="navbar row-fluid d-flex">
+                <li class="col-3">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">
+                        <img src="~/img/svg/BookHub-logo-v2.svg" alt="">
+                    </a>
+                </li>
+                <li class="col-5 d-flex">
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+                    {
+                        <div class="search-form-auth">
+                            <input type="text" class="search-form-txt-auth" name="searchInput" spellcheck="false" placeholder="Search for book or author">
 
-                                    <button class="search-form-btn-auth">
-                                        <img src="~/img/svg/search-button.svg" alt="image" class="search-form-image">
-                                    </button>
-                                </div>
-                            }
-                        </li>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="right-items-1-admin">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Admin
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Publishers" asp-action="Index">Publishers</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Warehouses" asp-action="Index">Warehouses</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Discussions" asp-action="Index">Discussions</a>
-                                    </li>
-                                </ul>
+                            <button class="search-form-btn-auth">
+                                <img src="~/img/svg/search-button.svg" alt="image" class="search-form-image">
+                            </button>
+                        </div>
+                    }
+                </li>
+                
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="right-items-1-admin">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Admin
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Publishers" asp-action="Index">Publishers</a>
                             </li>
-                            <li class="right-items-2-admin">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Books
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksGenres" asp-action="Index">BookGenre</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksAuthors" asp-action="Index">BookAuthor</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksWarehouses" asp-action="Index">BookWarehouse</a>
-                                    </li>
-                                </ul>
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
                             </li>
-                        }
-                        <li class="right-items-1">
-                            <a asp-area="" asp-controller="PurchasedBooks" asp-action="Index">
-                                <img src="~/img/svg/books.svg" alt="">
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Warehouses" asp-action="Index">Warehouses</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Discussions" asp-action="Index">Discussions</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="right-items-2-admin">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Books
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksGenres" asp-action="Index">BookGenre</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksAuthors" asp-action="Index">BookAuthor</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksWarehouses" asp-action="Index">BookWarehouse</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                
+                <div class="col-4 d-flex">
+                    <li class="right-items-1">
+                        <a asp-area="" asp-controller="PurchasedBooks" asp-action="Index">
+                            <img src="~/img/svg/books.svg" alt="">
+                        </a>
+                    </li>
+                    
+                    <li class="right-items-2">
+                        <a asp-area="" asp-controller="PurchasedBooks" asp-action="Create">
+                            <img src="~/img/svg/cart.svg" alt="">
+                        </a>
+                    </li>
+                    <li class="right-items-3">
+                        <a asp-area="" asp-controller="Discussions" asp-action="Index">
+                            <img src="~/img/svg/Forums.svg" alt="">
+                        </a>
+                    </li>
+                    <li class="right-items-4">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                            <img src="~/img/svg/Profile.svg" alt="">
+                        </a>
+                    </li>
+                    <li class="right-items-5">
+                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})">
+                            <a href="javascript:void(0);" onclick="this.closest('form').submit();">
+                                <img src="~/img/svg/logout.svg" alt="Logout">
                             </a>
-                        </li>
-                        
-                        <li class="right-items-2">
-                            <a asp-area="" asp-controller="PurchasedBooks" asp-action="Create">
-                                <img src="~/img/svg/cart.svg" alt="">
-                            </a>
-                        </li>
-                        <li class="right-items-3">
-                            <a asp-area="" asp-controller="Discussions" asp-action="Index">
-                                <img src="~/img/svg/Forums.svg" alt="">
-                            </a>
-                        </li>
-                        <li class="right-items-4">
-                            <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                                <img src="~/img/svg/Profile.svg" alt="">
-                            </a>
-                        </li>
-                        <li class="right-items-5">
-                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})">
-                                <a href="javascript:void(0);" onclick="this.closest('form').submit();">
-                                    <img src="~/img/svg/logout.svg" alt="Logout">
-                                </a>
-                            </form>
-                        </li>
-                        
-                    </ul>
-                </nav>
-            </div>
+                        </form>
+                    </li>
+                </div>
+            </nav>
         </div>
     </header>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
