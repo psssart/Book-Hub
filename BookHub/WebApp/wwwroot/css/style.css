@@ -412,7 +412,7 @@ a {
 /*Navigation bar*/
 .container-nav {
   background: rgb(118,197,129);
-  background: linear-gradient(304deg, rgba(118,197,129,1) 0%, rgba(147,151,151,1) 97%);
+  background: var(--bg-layout);
   font-size: 1.2rem;
   font-family: "Merriweather Sans", sans-serif;
   height: 8%;
@@ -668,7 +668,8 @@ nav.d-flex {
 }
 
 .custom-dropdown:hover img {
-  transform: scale(1.20);
+  transform: scale(1.10);
+  transition: transform 0.8s ease-in-out;
 }
 
 /*------Pablo Redaction Introduce-----*/
@@ -742,7 +743,7 @@ nav.d-flex {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 22px solid black;
+  border-bottom: 22px solid rgb(206, 192, 115);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -893,4 +894,9 @@ li a {
 
 .dropdown-menu li + li {
   margin-top: .5rem;
+}
+
+.main-nav-btn:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
 }

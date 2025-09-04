@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
-@{
+﻿@{
 var currentTheme = Context.Request.Cookies["theme"] ?? "light";
 }
 <!DOCTYPE html>
@@ -25,33 +24,34 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                 @* Logo section (only for desktop) *@
                 <li class="d-none d-md-flex col-0 col-md-1 col-lg-2">
                     @* Medium display *@
-                    <nav class="d-md-flex d-lg-none">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 px-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <nav class="d-md-flex d-lg-none justify-content-center">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 me-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu px-3 ms-2" style="border: none">
+                        <ul class="dropdown-menu px-3 mt-0" style="border: none; background: var(--bg-layout)">
                             <li>
                                 <partial name="_ThemeToggle"/>
                             </li>
                         </ul>
                     </nav>
                     @* Large display *@
-                    <nav class="d-md-none d-lg-flex">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 px-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <nav class="d-md-none d-lg-flex justify-content-center">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/BookHub-logo-v2.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu px-3 ms-2" style="border: none">
+                        <ul class="dropdown-menu px-3 mt-0" style="border: none; background: var(--bg-layout)">
                             <li>
                                 <partial name="_ThemeToggle"/>
                             </li>
                         </ul>
                     </nav>
                 </li>
-                
-                <li class="col-10 col-md-7 col-lg-6 px-3 ps-md-0 d-flex align-items-center justify-content-center">
+
+                @* Search section *@
+                <li class="col-10 col-md-7 col-lg-6 ps-3 pe-0 pe-md-3 ps-md-0 d-flex align-items-center justify-content-center">
                     @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100", @style = "height: 78%;"}))
                     {
-                        <div class="search-form-auth w-100 d-flex align-items-center">
+                        <div class="search-form-auth w-100 d-flex align-items-center py-2 py-md-0 ps-3 ">
                             @{
                                 var searchInput = ViewContext.HttpContext.Request.Query["searchInput"].ToString();
                                 var showResults = !string.IsNullOrWhiteSpace(searchInput);
@@ -73,6 +73,7 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                     }
                 </li>
 
+                @* Admin section *@
                 @if (User.IsInRole("Admin"))
                 {
                     <li class="right-items-1-admin">
@@ -118,14 +119,18 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                     </li>
                 }
 
+                @* Navigation section *@
                 <div class="col-2 col-md-4 col-lg-4 d-flex justify-content-end">
                     @* For mobile (dropdown) *@
                     <nav class="d-flex d-md-none justify-content-center">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 ms-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid h-75">
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end px-2 text-center" style="border: none; min-width: 0;">
+                        <ul class="dropdown-menu dropdown-menu-end px-2 text-center mt-0" style="border: none; min-width: 0; background: var(--bg-layout)">
                             <li>
+                                <partial name="_ThemeToggle"/>
+                            </li>
+                            <li style="padding-left: 18px;">
                                 <a asp-area="" asp-controller="Discussions" asp-action="Index">
                                     <img src="~/img/svg/Forums.svg" alt="">
                                 </a>
@@ -140,12 +145,12 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                                     <img src="~/img/svg/cart.svg" alt="">
                                 </a>
                             </li>
-                            <li>
+                            <li style="padding-left: 15px;">
                                 <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
                                     <img src="~/img/svg/Profile.svg" alt="">
                                 </a>
                             </li>
-                            <li>
+                            <li style="padding-left: 4px;">
                                 <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                                     <a href="javascript:void(0);" onclick="this.closest('form').submit();">
                                         <img src="~/img/svg/logout.svg" alt="Logout">
@@ -156,28 +161,28 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                     </nav>
                     @* For desktop *@
                     <div class="d-none d-md-flex pt-1">
-                        <li>
+                        <li class="main-nav-btn">
                             <a asp-area="" asp-controller="Discussions" asp-action="Index">
                                 <img src="~/img/svg/Forums.svg" alt="" class="img-fluid">
                             </a>
                         </li>
-                        <li>
+                        <li class="main-nav-btn">
                             <a asp-area="" asp-controller="PurchasedBooks" asp-action="Index">
                                 <img src="~/img/svg/books.svg" alt="" class="img-fluid">
                             </a>
                         </li>
-                        <li class="ms-2">
+                        <li class="ms-3 main-nav-btn">
                             <a asp-area="" asp-controller="PurchasedBooks" asp-action="Create">
                                 <img src="~/img/svg/cart.svg" alt="" class="img-fluid">
                             </a>
                         </li>
-                        <li class="ms-2">
-                            <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                        <li class="ms-3 main-nav-btn">
+                            <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage" class="">
                                 <img src="~/img/svg/Profile.svg" alt="" class="img-fluid">
                             </a>
                         </li>
-                        <li>
-                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <li class="main-nav-btn">
+                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")">
                                 <a href="javascript:void(0);" onclick="this.closest('form').submit();">
                                     <img src="~/img/svg/logout.svg" alt="Logout" class="img-fluid">
                                 </a>

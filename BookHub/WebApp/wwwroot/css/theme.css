@@ -5,6 +5,7 @@
     --bg-tertiary: #e9ecef;
     --bg-input: #c6c6c6;
     --bg-input-focus: #e4e4e4;
+    --bg-layout: linear-gradient(304deg, rgba(118,197,129,1) 0%, rgba(147,151,151,1) 97%);
     --text-primary: #212529;
     --text-secondary: #6c757d;
     --text-muted: #adb5bd;
@@ -27,6 +28,7 @@
     --bg-tertiary: #404040;
     --bg-input: #8f8f8f;
     --bg-input-focus: #575757;
+    --bg-layout: linear-gradient(304deg, rgb(94, 145, 101) 0%, rgba(147,151,151,1) 97%);
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
     --text-muted: #808080;
@@ -75,35 +77,41 @@
 }
 
 .theme-icon {
-    width: 20px;
-    height: 20px;
-    color: var(--text-primary);
+    width: 37px;
+    height: 37px;
+    color: black;
     fill: none;
-    stroke: currentColor;
+    stroke: black;
 }
 
 .theme-icon use {
-    stroke: var(--text-primary);
+    stroke: black;
     fill: none;
+}
+
+.round-div {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .theme-toggle-ctl {
     text-decoration: none;
     color: inherit;
     padding: 1px 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--bg-primary);
+    border-radius: 50%;
+    background: transparent;
     transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
     cursor: pointer;
 }
-.theme-toggle-ctl:hover {
-    background-color: var(--bg-secondary);
-    border-color: var(--accent-color);
-}
 
 .theme-label {
-    color: var(--text-secondary);
+    color: black;
 }
 /* -------------------------------------------------------------------------------- */
 
