@@ -21,24 +21,58 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
     <header>
         <div class="container-nav container-fluid">
             <nav class="navbar row-fluid d-flex">
-                <li class="col-3">
-                    <a asp-area="" asp-controller="Home" asp-action="Index">
-                        <img src="~/img/svg/BookHub-logo-v2.svg" alt="">
-                    </a>
+                
+                @* Logo section (only for desktop) *@
+                <li class="d-none d-md-flex col-0 col-md-1 col-lg-2">
+                    @* Medium display *@
+                    <nav class="d-md-flex d-lg-none">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 px-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
+                        </a>
+                        <ul class="dropdown-menu px-3 ms-2" style="border: none">
+                            <li>
+                                <partial name="_ThemeToggle"/>
+                            </li>
+                        </ul>
+                    </nav>
+                    @* Large display *@
+                    <nav class="d-md-none d-lg-flex">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 px-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="~/img/svg/BookHub-logo-v2.svg" alt="Logo" class="img-fluid" style="height: 85%;">
+                        </a>
+                        <ul class="dropdown-menu px-3 ms-2" style="border: none">
+                            <li>
+                                <partial name="_ThemeToggle"/>
+                            </li>
+                        </ul>
+                    </nav>
                 </li>
-                <li class="col-5 d-flex">
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+                
+                <li class="col-10 col-md-7 col-lg-6 px-3 ps-md-0 d-flex align-items-center justify-content-center">
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100", @style = "height: 78%;"}))
                     {
-                        <div class="search-form-auth">
-                            <input type="text" class="search-form-txt-auth" name="searchInput" spellcheck="false" placeholder="Search for book or author">
+                        <div class="search-form-auth w-100 d-flex align-items-center">
+                            @{
+                                var searchInput = ViewContext.HttpContext.Request.Query["searchInput"].ToString();
+                                var showResults = !string.IsNullOrWhiteSpace(searchInput);
+                            }
+                            <input type="text" class="search-form-txt-auth fs-4 text-center h-100" name="searchInput" 
+                                   spellcheck="false" placeholder="Search for book or author"
+                                   value="@(showResults ? searchInput : null)" />
 
-                            <button class="search-form-btn-auth">
-                                <img src="~/img/svg/search-button.svg" alt="image" class="search-form-image">
+                            <button class="search-form-btn-auth d-flex align-items-center justify-content-center p-0">
+                                @* Mobile search button *@
+                                <svg width="45" height="30" viewBox="0 0 65 60" xmlns="http://www.w3.org/2000/svg"
+                                     class="d-flex d-md-none search-form-image" style="color: rgb(206, 192, 115);">
+                                    <path fill="currentColor" stroke="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M59.3228 58.6442C60.3086 58.9749 62.502 59.3718 63.3892 58.3135C64.2764 57.2551 64.0053 55.8881 63.7589 55.3369L43.4266 36.155C47.9859 30.7532 53.8515 17.2376 40.8388 6.38984C22.3549 -5.51621 4.98013 4.07478 1.28333 17.9652C-0.195409 32.1863 4.24062 35.1628 11.6342 40.4544C19.0278 45.746 31.5969 44.4231 38.9904 39.7929C41.6521 42.1741 53.6543 53.3526 59.3228 58.6442ZM7.56774 17.9652C4.98009 24.2489 8.43033 30.5327 10.8949 32.8477C14.7149 36.8164 25.0166 42.9017 35.6633 35.4935C46.3101 28.0853 42.8104 17.6344 39.7298 13.335C38.0046 10.9097 32.632 6.12526 24.9426 6.38984C15.331 6.72056 10.9416 9.77213 7.56774 17.9652Z"/>
+                                </svg>
+                                @* Desktop search button *@
+                                <img src="~/img/svg/search-button.svg" alt="image" class="d-none d-md-flex search-form-image">
                             </button>
                         </div>
                     }
                 </li>
-                
+
                 @if (User.IsInRole("Admin"))
                 {
                     <li class="right-items-1-admin">
@@ -83,37 +117,75 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                         </ul>
                     </li>
                 }
-                
-                <div class="col-4 d-flex">
-                    <li class="right-items-1">
-                        <a asp-area="" asp-controller="PurchasedBooks" asp-action="Index">
-                            <img src="~/img/svg/books.svg" alt="">
+
+                <div class="col-2 col-md-4 col-lg-4 d-flex justify-content-end">
+                    @* For mobile (dropdown) *@
+                    <nav class="d-flex d-md-none justify-content-center">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid h-75">
                         </a>
-                    </li>
-                    
-                    <li class="right-items-2">
-                        <a asp-area="" asp-controller="PurchasedBooks" asp-action="Create">
-                            <img src="~/img/svg/cart.svg" alt="">
-                        </a>
-                    </li>
-                    <li class="right-items-3">
-                        <a asp-area="" asp-controller="Discussions" asp-action="Index">
-                            <img src="~/img/svg/Forums.svg" alt="">
-                        </a>
-                    </li>
-                    <li class="right-items-4">
-                        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                            <img src="~/img/svg/Profile.svg" alt="">
-                        </a>
-                    </li>
-                    <li class="right-items-5">
-                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})">
-                            <a href="javascript:void(0);" onclick="this.closest('form').submit();">
-                                <img src="~/img/svg/logout.svg" alt="Logout">
+                        <ul class="dropdown-menu dropdown-menu-end px-2 text-center" style="border: none; min-width: 0;">
+                            <li>
+                                <a asp-area="" asp-controller="Discussions" asp-action="Index">
+                                    <img src="~/img/svg/Forums.svg" alt="">
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="PurchasedBooks" asp-action="Index">
+                                    <img src="~/img/svg/books.svg" alt="">
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="PurchasedBooks" asp-action="Create">
+                                    <img src="~/img/svg/cart.svg" alt="">
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                                    <img src="~/img/svg/Profile.svg" alt="">
+                                </a>
+                            </li>
+                            <li>
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                    <a href="javascript:void(0);" onclick="this.closest('form').submit();">
+                                        <img src="~/img/svg/logout.svg" alt="Logout">
+                                    </a>
+                                </form>
+                            </li>
+                        </ul>
+                    </nav>
+                    @* For desktop *@
+                    <div class="d-none d-md-flex pt-1">
+                        <li>
+                            <a asp-area="" asp-controller="Discussions" asp-action="Index">
+                                <img src="~/img/svg/Forums.svg" alt="" class="img-fluid">
                             </a>
-                        </form>
-                    </li>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="PurchasedBooks" asp-action="Index">
+                                <img src="~/img/svg/books.svg" alt="" class="img-fluid">
+                            </a>
+                        </li>
+                        <li class="ms-2">
+                            <a asp-area="" asp-controller="PurchasedBooks" asp-action="Create">
+                                <img src="~/img/svg/cart.svg" alt="" class="img-fluid">
+                            </a>
+                        </li>
+                        <li class="ms-2">
+                            <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                                <img src="~/img/svg/Profile.svg" alt="" class="img-fluid">
+                            </a>
+                        </li>
+                        <li>
+                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                <a href="javascript:void(0);" onclick="this.closest('form').submit();">
+                                    <img src="~/img/svg/logout.svg" alt="Logout" class="img-fluid">
+                                </a>
+                            </form>
+                        </li>
+                    </div>
                 </div>
+                
             </nav>
         </div>
     </header>

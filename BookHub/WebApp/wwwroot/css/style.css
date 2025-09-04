@@ -449,31 +449,7 @@ html, body {
   right: 400px;
   margin-left: 1110px;
 }
-.right-items-1 {
-  position: absolute;
-  right: 310px;
-  margin-left: 1110px;
-}
-.right-items-2 {
-  position: absolute;
-  right: 240px;
-  margin-left: 1110px;
-}
-.right-items-3 {
-  position: absolute;
-  right: 140px;
-  margin-left: 1110px;
-}
-.right-items-4 {
-  position: absolute;
-  right: 70px;
-  margin-left: 1110px;
-}
-.right-items-5 {
-  position: absolute;
-  right: 0;
 
-}
 /*Book item*/
 .book-items {
   display: grid;
