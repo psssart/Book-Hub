@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using WebApp.Infrastructure.Email;
 
 namespace WebApp.Areas.Identity.Pages.Account.Manage
 {
@@ -21,15 +22,18 @@ namespace WebApp.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IEmailTemplateService _templates;
 
         public EmailModel(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IEmailTemplateService templates)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _templates = templates;
         }
 
         /// <summary>
@@ -160,10 +164,13 @@ namespace WebApp.Areas.Identity.Pages.Account.Manage
                 pageHandler: null,
                 values: new { area = "Identity", userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            
+            var html = await _templates.RenderConfirmEmailAsync(callbackUrl);
+            await _emailSender.SendEmailAsync(email, "Email confirmation", html);
+            // await _emailSender.SendEmailAsync(
+            //     email,
+            //     "Confirm your email",
+            //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToPage();
