@@ -7,6 +7,8 @@
     {
         ViewData["ThemeSpriteInjected"] = true;
     }
+    
+    var textColor = (string?)ViewData["TextColor"] ?? "black";
 }
 
 @if (!spriteInjected)
@@ -38,7 +40,7 @@
         </svg>
     </div>
     <div class="w-100 d-flex justify-content-center align-items-center">
-        <span class="theme-label">
+        <span class="theme-label" style="color: @textColor;">
             Theme
         </span>
     </div>

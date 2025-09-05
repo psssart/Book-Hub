@@ -7,28 +7,32 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="color-scheme" content="light dark">
-    <title>@ViewData["Title"] - BookHub</title>
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="icon" href="~/img/svg/logo.svg" type="image/svg+xml">
     @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/> *@
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true"/>
     
+    <title>@ViewData["Title"] - BookHub</title>
+    
 </head>
 <body>
 @if(User.Identity!.IsAuthenticated) {
+    @* Authenticated layout *@
     <header>
         <div class="container-nav container-fluid">
+            
             <nav class="navbar row-fluid d-flex">
-                
                 @* Logo section (only for desktop) *@
                 <li class="d-none d-md-flex col-0 col-md-1 col-lg-2">
                     @* Medium display *@
                     <nav class="d-md-flex d-lg-none justify-content-center">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 me-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0 me-1"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu px-3 mt-0" style="border: none; background: var(--bg-layout)">
+                        <ul class="dropdown-menu px-3 mt-0" style="border: none; min-width: 0; background: var(--bg-layout)">
                             <li>
                                 <partial name="_ThemeToggle"/>
                             </li>
@@ -36,10 +40,11 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                     </nav>
                     @* Large display *@
                     <nav class="d-md-none d-lg-flex justify-content-center">
-                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-0" href="#"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/BookHub-logo-v2.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu px-3 mt-0" style="border: none; background: var(--bg-layout)">
+                        <ul class="dropdown-menu px-3 mt-0" style="border: none; min-width: 0; background: var(--bg-layout)">
                             <li>
                                 <partial name="_ThemeToggle"/>
                             </li>
@@ -49,16 +54,17 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
 
                 @* Search section *@
                 <li class="col-10 col-md-7 col-lg-6 ps-3 pe-0 pe-md-3 ps-md-0 d-flex align-items-center justify-content-center">
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100", @style = "height: 78%;"}))
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get,
+                                new { @class = "d-flex w-100", @style = "height: 78%;" }))
                     {
                         <div class="search-form-auth w-100 d-flex align-items-center py-2 py-md-0 ps-3 ">
                             @{
                                 var searchInput = ViewContext.HttpContext.Request.Query["searchInput"].ToString();
                                 var showResults = !string.IsNullOrWhiteSpace(searchInput);
                             }
-                            <input type="text" class="search-form-txt-auth fs-4 text-center h-100" name="searchInput" 
+                            <input type="text" class="search-form-txt-auth fs-4 text-center h-100" name="searchInput"
                                    spellcheck="false" placeholder="Search for book or author"
-                                   value="@(showResults ? searchInput : null)" />
+                                   value="@(showResults ? searchInput : null)"/>
 
                             <button class="search-form-btn-auth d-flex align-items-center justify-content-center p-0">
                                 @* Mobile search button *@
@@ -72,52 +78,6 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                         </div>
                     }
                 </li>
-
-                @* Admin section *@
-                @if (User.IsInRole("Admin"))
-                {
-                    <li class="right-items-1-admin">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Admin
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Publishers" asp-action="Index">Publishers</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Warehouses" asp-action="Index">Warehouses</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Discussions" asp-action="Index">Discussions</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="right-items-2-admin">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Books
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksGenres" asp-action="Index">BookGenre</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksAuthors" asp-action="Index">BookAuthor</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksWarehouses" asp-action="Index">BookWarehouse</a>
-                            </li>
-                        </ul>
-                    </li>
-                }
 
                 @* Navigation section *@
                 <div class="col-2 col-md-4 col-lg-4 d-flex justify-content-end">
@@ -190,45 +150,84 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                         </li>
                     </div>
                 </div>
-                
             </nav>
+
+            @* Admin section *@
+            @if (User.IsInRole("Admin"))
+            {
+                <nav class="navbar row-fluid d-flex justify-content-end">
+                    <div class="col-3 d-flex justify-content-end align-items-center gap-3">
+                        <li>
+                            <a class="nav-link-admin dropdown-toggle no-caret-space p-0" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end mt-0" style="border: none; background: var(--bg-layout);">
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Publishers" asp-action="Index">
+                                        Publishers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">
+                                        Books
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">
+                                        Authors
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">
+                                        Genres
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Warehouses" asp-action="Index">
+                                        Warehouses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Discussions" asp-action="Index">
+                                        Discussions
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="nav-link-admin dropdown-toggle no-caret-space p-0" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                Books
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end mt-0" style="border: none; background: var(--bg-layout);">
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksGenres" asp-action="Index">
+                                        BookGenre
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksAuthors" asp-action="Index">
+                                        BookAuthor
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="BooksWarehouses" asp-action="Index">
+                                        BookWarehouse
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </div>
+                </nav>
+            }
+
         </div>
     </header>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @* <header> *@
-    @*     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" style="height: 100px"> *@
-    @*         <div class="container-fluid"> *@
-    @*             $1$ Temporary button #1# *@
-    @*             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BookHub</a> *@
-    @*             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" *@
-    @*                     aria-expanded="false" aria-label="Toggle navigation"> *@
-    @*                 <span class="navbar-toggler-icon"></span> *@
-    @*             </button> *@
-    @*             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> *@
-    @*                 <ul class="navbar-nav flex-grow-1"> *@
-    @* *@
-    @*                         <li> *@
-    @*                             <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="PurchasedBooks" asp-action="Index">My Books</a> *@
-    @*                         </li> *@
-    @*                         <li> *@
-    @*                             <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="PurchasedBooks" asp-action="Create">Cart</a> *@
-    @*                         </li> *@
-    @*                         <li> *@
-    @*                             <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Discussions" asp-action="Index">Forums</a> *@
-    @*                         </li> *@
-    
-    @* *@
-    @*                 </ul> *@
-    @* *@
-    @*                 <partial name="_LoginPartial"/> *@
-    @*             </div> *@
-    @*         </div> *@
-    @*     </nav> *@
-    @* </header> *@
 }
 else
 {
+    @* Unauthenticated layout *@
     <header>
         <div class="header container-fluid p-0 m-0">
             <div class="box row-fluid d-flex">
@@ -239,9 +238,9 @@ else
                         <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 ps-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
                         </a>
-                        <ul class="dropdown-menu px-3 ms-2" style="border: none">
-                            <li>
-                                <partial name="_ThemeToggle"/>
+                        <ul class="dropdown-menu px-3 ms-2 mt-1" style="border: none; min-width: 0; background-color: var(--bg-secondary)">
+                            <li class="hover">
+                                <partial name="_ThemeToggle" view-data='new ViewDataDictionary(ViewData) { ["TextColor"] = "var(--text-primary)" }' />
                             </li>
                         </ul>
                     </nav>
@@ -280,10 +279,10 @@ else
                         <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 pe-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid h-75">
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end px-3" style="border: none">
+                        <ul class="dropdown-menu dropdown-menu-end px-3 mt-1" style="border: none; min-width: 0; background-color: var(--bg-secondary)">
                             <li>
                                 <a asp-area="Identity" asp-page="/Account/Register" class="d-flex justify-content-center">
-                                    <div class="text-wrapper-yellow w-100">
+                                    <div class="text-wrapper-yellow w-100 px-3">
                                         <div class="text text-center">
                                             Sign up
                                         </div>
@@ -292,15 +291,15 @@ else
                             </li>
                             <li>
                                 <a asp-area="Identity" asp-page="/Account/Login" class="d-flex justify-content-center">
-                                    <div class="text-wrapper-blue w-100">
+                                    <div class="text-wrapper-blue w-100 px-3">
                                         <div class="text text-center">
                                             Login in
                                         </div>
                                     </div>
                                 </a>
                             </li>
-                            <li>
-                                <partial name="_ThemeToggle"/>
+                            <li class="hover">
+                                <partial name="_ThemeToggle" view-data='new ViewDataDictionary(ViewData) { ["TextColor"] = "var(--text-primary)" }' />
                             </li>
                         </ul>
                     </nav>
@@ -336,6 +335,7 @@ else
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/theme.js" asp-append-version="true" defer></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

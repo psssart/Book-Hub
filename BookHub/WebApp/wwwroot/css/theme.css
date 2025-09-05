@@ -140,13 +140,9 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
-.dropdown-item {
-    color: var(--text-primary);
-}
-
+.dropdown-item:focus,
 .dropdown-item:hover {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
+    background-color: var(--text-secondary);
 }
 
 /* Search form styling */
