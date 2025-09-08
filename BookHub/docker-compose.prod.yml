@@ -28,6 +28,7 @@
         max-file: 3
     environment:
       ConnectionStrings__DefaultConnection: "Host=bookhub-sql;Port=5432;Database=bookhub;Username=postgres;Password=postgres"
+      Smtp__Password: 'APP_PSW'
     depends_on:
       - sql
 

@@ -41,6 +41,7 @@ services:
       ASPNETCORE_URLS: "https://+:443;http://+:80"
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/bookhub.pfx
       ASPNETCORE_Kestrel__Certificates__Default__Password: "MyPassword"
+      Smtp__Password: 'APP_PSW'
     depends_on:
       sql:
         condition: service_healthy
