@@ -18,155 +18,173 @@
 <img src="img/svg/Ellispes.svg" alt="background-ellipses" class="image-ellipse" loading="lazy" decoding="async">
 @if (Model.ShowResults)
 {
-    <div class="search_results">
-        <div class="d-flex justify-content-between align-items-center">
-            @* Left table header block *@
-            <div class="d-flex align-items-center gap-3">
+    <div class="search_results container-xxl py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            @* Left header block *@
+            <div class="d-flex flex-wrap align-items-center gap-3">
                 <h3 class="m-0">Books</h3>
-                <span class="sort_label">Sort by:
-                    <select id="sortSelect" class="fs-6">
+
+                <div class="d-flex align-items-center gap-2">
+                    <label for="sortSelect" class="sort_label m-0">Sort by:</label>
+                    <select id="sortSelect" class="form-select form-select-sm w-auto">
                         <option value="none"></option>
                         <option value="rating">Rating</option>
                         <option value="price">Price</option>
                         <option value="year">Year</option>
                     </select>
-                </span>
-                <div class="d-flex pt-3">
-                    <button id="rotateButton">
+                    <button id="rotateButton" type="button" class="btn btn-outline-secondary btn-sm" title="Toggle sort direction">
                         <span class="pyramid"></span>
                     </button>
                 </div>
             </div>
-            @* Right table header block *@
+
+            @* Right header block *@
             <div class="d-flex align-items-center gap-3">
                 @{
                     var foundResults = Model.Books.Count + Model.Authors.Count;
                 }
-                <span><b>Found: @foundResults</b></span>
-                <button class="filterMenuButton">Filter</button>
+                <span class="fw-semibold">Found: @foundResults</span>
+                <button class="filterMenuButton btn btn-primary btn-sm">Filter</button>
             </div>
         </div>
-    
-        @* Filters panel *@
+        
         <div id="filterPanel" class="filterPanel">
-            <h5 align="center">Filtering Settings</h5>
+            <h5 class="text-center">Filtering Settings</h5>
             <br/>
-            <h6 align="center">Books Filter</h6>
+            <h6 class="text-center">Books Filter</h6>
             <br/>
             
-            <span class="dropdownAut">
-                <button class="dropbtnAut">Authors</button>
+            <span class="dropdownAut me-2">
+                <button class="dropbtnAut btn btn-outline-secondary btn-sm">Authors</button>
                 <div class="dropdownAut-content">
                     @foreach (var bookAuthor in Model.BookAuthors.Select(ba => ba.Author).Distinct())
                     {
-                        <label><input type="checkbox" value="@bookAuthor!.Id"/>@bookAuthor.Name</label>
+                        <label class="d-block"><input type="checkbox" value="@bookAuthor!.Id"/> @bookAuthor.Name</label>
                     }
                 </div>
             </span>
-            <span class="filterReset">
-                <button class="filterResetbtn">Reset</button>
+
+            <span class="filterReset me-2">
+                <button class="filterResetbtn btn btn-link btn-sm">Reset</button>
             </span>
-            <span class="dropdownGen">
-                <button class="dropbtnGen">Genres</button>
+
+            <span class="dropdownGen me-2">
+                <button class="dropbtnGen btn btn-outline-secondary btn-sm">Genres</button>
                 <div class="dropdownGen-content">
                     @foreach (var bookGenre in Model.BookGenres.Select(bg => bg.Genre).Distinct())
                     {
-                        <label><input type="checkbox" value="@bookGenre!.Id"/>@bookGenre.Name</label>
+                        <label class="d-block"><input type="checkbox" value="@bookGenre!.Id"/> @bookGenre.Name</label>
                     }
                 </div>
             </span>
             <br/>
-            <span class="dropdownPub">
-                <button class="dropbtnPub">Publishers</button>
+
+            <span class="dropdownPub me-2">
+                <button class="dropbtnPub btn btn-outline-secondary btn-sm">Publishers</button>
                 <div class="dropdownPub-content">
                     @foreach (var bookPub in Model.Books.Select(b => b.Publisher).Distinct())
                     {
-                        <label><input type="checkbox" value="@bookPub!.Id"/>@bookPub.Name</label>
+                        <label class="d-block"><input type="checkbox" value="@bookPub!.Id"/> @bookPub.Name</label>
                     }
                 </div>
             </span>
-            <span class="dropdownWar">
-                <button class="dropbtnWar">Warehouses</button>
+
+            <span class="dropdownWar me-2">
+                <button class="dropbtnWar btn btn-outline-secondary btn-sm">Warehouses</button>
                 <div class="dropdownWar-content">
                     @foreach (var bookWar in Model.BookWarehouses.Select(bw => bw.Warehouse).Distinct())
                     {
-                        <label><input type="checkbox" value="@bookWar!.Id"/>@bookWar.Name</label>
+                        <label class="d-block"><input type="checkbox" value="@bookWar!.Id"/> @bookWar.Name</label>
                     }
                 </div>
             </span>
+
             <br/><br/><br/><br/>
-            <h6 align="center">Authors Filter</h6>
+            <h6 class="text-center">Authors Filter</h6>
             <br/>
         </div>
     
+        @* BOOKS AS CARDS *@
         @if (Model.Books.Any())
         {
             <div class="books_results">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th></th>
-                        <th>Price</th>
-                        @if (!Model.BookAuthors.IsNullOrEmpty()) {<th>Authors</th>}
-                        <th>Release Year</th>
-                        <th>Rating</th>
-                        @if (!Model.BookGenres.IsNullOrEmpty()) {<th>Genres</th>}
-                        @if (!Model.BookWarehouses.IsNullOrEmpty()) {<th>Warehouses</th>}
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                     @foreach (var book in Model.Books)
                     {
-                        <tr>
-                            <td id="book_picture">
-                                <img src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" width="260px" height="320px" alt=""/>
-                            </td>
-                            <td id="book_tittle"><a asp-area="" asp-controller="Books" asp-action="Details" asp-route-id="@book.Id">@book.Tittle</a></td>
-                            <td>@book.Price$</td>
-                            @if (!Model.BookAuthors.IsNullOrEmpty())
-                            {
-                                string authors = string.Join(", ", Model.BookAuthors
-                                    .Where(ba => ba.BookId.Equals(book.Id))
-                                    .Select(bookAuthor => bookAuthor.Author!.Name));
-                                <td>@authors</td>
-                            }
-                            <td>@book.ReleaseYear</td>
-                            <td>
-                                @{
-                                    var ratingsForBook = Model.Ratings.Where(r => r.BookId == book.Id).ToList();
-                                    int quantity = ratingsForBook.Count();
-                                    float sum = ratingsForBook.Sum(r => r.Value);
-                                }
-                                @{
-                                    float averageRating = quantity > 0 ? sum / quantity : 0;
-                                    string formattedRating = averageRating.ToString("0.0");
-                                    int roundedRating = (int)Math.Round(averageRating); // Closest integer
-                                }
-                                @* Stars for rating and rating value *@
-                                <div style="font-size: x-large">@GenerateStarIcons(Convert.ToInt32(roundedRating))</div>
-                                <span style="text-align: center;">@formattedRating</span>
-                            </td>
-                            @if (!Model.BookGenres.IsNullOrEmpty())
-                            {
-                                string genres = string.Join(", ", Model.BookGenres
-                                    .Where(bg => bg.BookId.Equals(book.Id))
-                                    .Select(bookGenre => bookGenre.Genre!.Name));
-                                <td id="book_genres">@genres</td>
-                            }
-                        
-                            @if (!Model.BookWarehouses.IsNullOrEmpty())
-                            {
-                                string warehouses = string.Join(", ", Model.BookWarehouses
-                                    .Where(bw => bw.BookId.Equals(book.Id))
-                                    .Select(bookWarehouse => bookWarehouse.Warehouse!.Name));
-                                <td>@warehouses</td>
-                            }
-                        
-                        </tr>
+                        var authorsForBook = Model.BookAuthors
+                            .Where(ba => ba.BookId.Equals(book.Id))
+                            .Select(ba => ba.Author!)
+                            .Distinct()
+                            .ToList();
+
+                        var genresForBook = Model.BookGenres
+                            .Where(bg => bg.BookId.Equals(book.Id))
+                            .Select(bg => bg.Genre!.Name)
+                            .Distinct()
+                            .ToList();
+
+                        var ratingsForBook = Model.Ratings.Where(r => r.BookId == book.Id).ToList();
+                        int quantity = ratingsForBook.Count();
+                        float sum = ratingsForBook.Sum(r => r.Value);
+                        float averageRating = quantity > 0 ? sum / quantity : 0;
+                        string formattedRating = averageRating.ToString("0.0");
+                        int roundedRating = (int)Math.Round(averageRating);
+
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <img class="card-img-top" src="data:image;base64,@Convert.ToBase64String(@book.imageData!)"
+                                     alt="@book.Tittle"
+                                     style="height: 240px; object-fit: cover;">
+
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-center mb-2">
+                                        <a asp-area="" asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" class="text-decoration-none">
+                                            @book.Tittle
+                                        </a>
+                                    </h5>
+
+                                    <div class="mt-auto">
+                                        <div class="row small text-muted mb-1 align-items-center">
+                                            <div class="col-9 text-truncate">
+                                                @if (authorsForBook.Any())
+                                                {
+                                                    var last = authorsForBook.Last();
+                                                    foreach (var a in authorsForBook)
+                                                    {
+                                                        <a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@a.Id" class="text-decoration-none">@a.Name</a>@(a != last ? ", " : "")
+                                                    }
+                                                }
+                                                else
+                                                { <span>Unknown author</span> }
+                                            </div>
+                                            <div class="col-3 text-end">
+                                                <span>@book.ReleaseYear</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row small align-items-center">
+                                            <div class="col-6 pe-0 ps-1">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
+                                                    <span>@formattedRating</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 text-end text-truncate">
+                                                @if (genresForBook.Any())
+                                                {
+                                                    //TODO Tooltip, if it is truncated
+                                                    <span >@string.Join(", ", genresForBook)</span>
+                                                }
+                                                else
+                                                { <span class="text-muted">No genres</span> }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     }
-                    </tbody>
-                </table>
+                </div>
             </div>
         }
         else
@@ -176,25 +194,29 @@
             </div>
         }
 
-        <h3>Authors</h3>
+        <h3 class="mt-4">Authors</h3>
         @if (Model.Authors.Any())
         {
-            <div class="authors_results">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Age</th>
-                        <th>Biography</th>
-                    </tr>
+            <div class="authors_results table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Biography</th>
+                        </tr>
                     </thead>
                     <tbody>
                     @foreach (var author in Model.Authors)
                     {
                         <tr>
-                            <td><a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@author.Id">@author.Name</a></td>
+                            <td>
+                                <a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@author.Id">
+                                    @author.Name
+                                </a>
+                            </td>
                             <td>@author.Age</td>
-                            <td>@author.Biography</td>
+                            <td class="text-truncate" style="max-width: 480px;">@author.Biography</td>
                         </tr>
                     }
                     </tbody>
@@ -213,10 +235,7 @@ else
 {
     <img src="img/read-books-in-english.jpeg" alt="background-image" class="image-book-reading" loading="lazy" decoding="async">
     <img src="img/svg/Text.svg" alt="background-text" class="image-text" loading="lazy" decoding="async">
-}
 
-@if (!Model.ShowResults)
-{
     <div class="logo">
         <a asp-area="" asp-controller="Home" asp-action="Index">
             <img src="img/svg/logo_main.svg" alt="Main logo" class="logo-image img-fluid">

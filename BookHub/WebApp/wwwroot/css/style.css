@@ -72,7 +72,7 @@
   pointer-events: none;
   top: 0;
   right: 0;
-  z-index: 999;
+  z-index: 0 !important;
   max-width: 100%;
 }
 .auth-container {
@@ -326,7 +326,11 @@ select {
   font-size: 1.3rem;
 }
 a {
+  color: var(--accent-color);
   text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
 }
 .logo {
   position: fixed;
