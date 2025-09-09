@@ -6,6 +6,8 @@
     --bg-input: #c6c6c6;
     --bg-input-focus: #e4e4e4;
     --bg-layout: linear-gradient(304deg, rgba(118,197,129,1) 0%, rgba(147,151,151,1) 97%);
+    --bg-translucent: rgba(255, 255, 255, 0.8);
+    --bg-mid-translucent: rgba(214, 214, 214, 0.96);
     --text-primary: #212529;
     --text-secondary: #6c757d;
     --text-muted: #adb5bd;
@@ -29,6 +31,8 @@
     --bg-input: #8f8f8f;
     --bg-input-focus: #575757;
     --bg-layout: linear-gradient(304deg, rgb(94, 145, 101) 0%, rgba(147,151,151,1) 97%);
+    --bg-translucent: rgba(179, 179, 179, 0.8);
+    --bg-mid-translucent: rgba(179, 179, 179, 0.96);
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
     --text-muted: #808080;

@@ -48,61 +48,82 @@
         </div>
         
         @* Filter panel *@
-        <div id="filterPanel" class="filterPanel">
-            <h5 class="text-center">Filtering Settings</h5>
-            <br/>
-            <h6 class="text-center">Books Filter</h6>
-            <br/>
-            
-            <span class="dropdownAut me-2">
-                <button class="dropbtnAut btn btn-outline-secondary btn-sm">Authors</button>
-                <div class="dropdownAut-content">
-                    @foreach (var bookAuthor in Model.BookAuthors.Select(ba => ba.Author).Distinct())
-                    {
-                        <label class="d-block"><input type="checkbox" value="@bookAuthor!.Id"/> @bookAuthor.Name</label>
-                    }
-                </div>
-            </span>
+        <div id="filterPanel" class="container filterPanel">
+            <div class="row">
+                <h5 class="col-12 text-center mt-2">
+                    Filtering Settings
+                </h5>
+            </div>
+            <div class="row mt-3">
+                <h6 class="col-12 text-center">
+                    Books Filter
+                </h6>
+            </div>
 
-            <span class="filterReset me-2">
-                <button class="filterResetbtn btn btn-link btn-sm">Reset</button>
-            </span>
+            <div class="row mt-2 text-center">
+                <span class="col-5">
+                  <div class="dropdown dropdown-filter">
+                    <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Authors</button>
+                    <div class="dropdown-content dropdown-filter-content dropdown-right dropdownAut-content px-3 gap-2">
+                      @foreach (var bookAuthor in Model.BookAuthors.Select(ba => ba.Author).Distinct())
+                        {
+                        <label class="d-flex justify-content-start gap-2"><input type="checkbox" value="@bookAuthor!.Id" /> @bookAuthor.Name</label>
+                        }
+                    </div>
+                  </div>
+                </span>
+                
+                <span class="col-2 p-0">
+                    <button class="filterResetbtn btn btn-link btn-sm">
+                        Reset
+                    </button>
+                </span>
+                
+                <span class="col-5">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Genres</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-left dropdownGen-content px-3 gap-2">
+                            @foreach (var bookGenre in Model.BookGenres.Select(bg => bg.Genre).Distinct())
+                            {
+                                <label class="d-flex justify-content-end gap-2">@bookGenre!.Name <input type="checkbox" value="@bookGenre!.Id"/></label>
+                            }
+                        </div>
+                    </div>
+                </span>
+            </div>
 
-            <span class="dropdownGen me-2">
-                <button class="dropbtnGen btn btn-outline-secondary btn-sm">Genres</button>
-                <div class="dropdownGen-content">
-                    @foreach (var bookGenre in Model.BookGenres.Select(bg => bg.Genre).Distinct())
-                    {
-                        <label class="d-block"><input type="checkbox" value="@bookGenre!.Id"/> @bookGenre.Name</label>
-                    }
-                </div>
-            </span>
-            <br/>
+            <div class="row mt-3 text-center">
+                <span class="col-6">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Publishers</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-right dropdownPub-content px-3 gap-2">
+                            @foreach (var bookPub in Model.Books.Select(b => b.Publisher).Distinct())
+                            {
+                                <label class="d-flex justify-content-start gap-2"><input type="checkbox" value="@bookPub!.Id"/> @bookPub.Name</label>
+                            }
+                        </div>
+                    </div>
+                </span>
 
-            <span class="dropdownPub me-2">
-                <button class="dropbtnPub btn btn-outline-secondary btn-sm">Publishers</button>
-                <div class="dropdownPub-content">
-                    @foreach (var bookPub in Model.Books.Select(b => b.Publisher).Distinct())
-                    {
-                        <label class="d-block"><input type="checkbox" value="@bookPub!.Id"/> @bookPub.Name</label>
-                    }
-                </div>
-            </span>
+                <span class="col-6">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Warehouses</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-left dropdownWar-content px-3 gap-2">
+                            @foreach (var bookWar in Model.BookWarehouses.Select(bw => bw.Warehouse).Distinct())
+                            {
+                                <label class="d-flex justify-content-end gap-2">@bookWar!.Name <input type="checkbox" value="@bookWar!.Id"/></label>
+                            }
+                        </div>
+                    </div>
+                </span>
+            </div>
 
-            <span class="dropdownWar me-2">
-                <button class="dropbtnWar btn btn-outline-secondary btn-sm">Warehouses</button>
-                <div class="dropdownWar-content">
-                    @foreach (var bookWar in Model.BookWarehouses.Select(bw => bw.Warehouse).Distinct())
-                    {
-                        <label class="d-block"><input type="checkbox" value="@bookWar!.Id"/> @bookWar.Name</label>
-                    }
-                </div>
-            </span>
-
-            <br/><br/><br/><br/>
-            <h6 class="text-center">Authors Filter</h6>
-            <br/>
-        </div>
+            <div class="row mt-3">
+                <h6 class="col-12 text-center">
+                    Authors Filter
+                </h6>
+            </div>
+        </div> <!-- /filterPanel -->
     
         @* BOOKS AS CARDS *@
         @if (Model.Books.Any())
@@ -299,6 +320,21 @@ var selectedGenresGuids = [];
 var selectedPublishersGuids = [];
 var selectedWarehousesGuids = [];
 $(document).ready(function() {
+    
+    $(document).on('click', '.dropdown-filter > .dropbtn', function(e) {
+        e.stopPropagation();
+        const $dropdown = $(this).closest('.dropdown-filter');
+        $('.dropdown-filter').not($dropdown).removeClass('open');
+        $dropdown.toggleClass('open');
+    });
+    
+    $(document).on('click', '.dropdown-filter-content', function(e) {
+        e.stopPropagation();
+    });
+    
+    $(document).on('click', function() {
+        $('.dropdown-filter').removeClass('open');
+    });
     
     // Watching for publishers selection for filtering
     $('.dropdownPub-content input[type="checkbox"]').change(function() {

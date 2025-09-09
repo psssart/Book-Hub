@@ -684,7 +684,7 @@ nav.d-flex {
   position: fixed;
   left: 0;
   padding: 20px 45px 20px 60px;
-  height: 100%;
+  height: 91%;
   overflow: auto;
 }
 /* Стилизация полосы прокрутки */
@@ -764,94 +764,33 @@ nav.d-flex {
   padding: 4px 12px;
 }
 .filterPanel {
+  z-index: 999;
   position: fixed;
-  top: 100px; /* Adjusted top position */
+  top: 73px; /* Adjusted top position */
   right: -300px; /* Initially hide the panel */
   width: 300px;
-  height: calc(100% - 100px); /* Subtract 91 pixels from the height */
-  background-color: rgba(255, 255, 255, 0.8); /* Translucent background */
-  border-left: 1px solid #ccc; /* Add a border for better visibility */
+  height: 100%;
+  background-color: var(--bg-mid-translucent); /* Translucent background */
+  border-left: 1px solid var(--bg-tertiary); /* Add a border for better visibility */
   transition: right 0.3s ease; /* Add smooth transition effect */
 }
-.dropdownAut {
-  margin-left: 15px;
-  margin-bottom: 30px;
-  padding-bottom: 30px;
-}
-.dropdownGen {
-  margin-left: 30px;
-}
-.dropdownGen-content {
-  margin-left: 140px;
-}
-.dropdownWar {
-  position: relative;
-  top: 30px;
-  margin-left: 70px;
-}
-.dropdownWar-content {
-  margin-left: 100px;
-}
-.dropdownAut-content {
-  margin-left: 15px;
-}
-.dropdownPub {
-  position: relative;
-  top: 30px;
-  margin-left: 15px;
-}
-.dropdownPub-content {
-  margin-left: 15px;
-}
 /* Style the dropdown button */
-.dropbtnAut, .dropbtnGen, .dropbtnPub, .dropbtnWar {
-  background-color: rgb(108, 123, 204);
+.dropbtn {
+  background-color: var(--accent-color);
   color: white;
-  padding: 10px;
   font-size: 16px;
   border: none;
 }
-.filterReset {
-  margin-left: 30px;
+.dropbtn {
+  background-color: var(--accent-hover);
 }
 .filterResetbtn {
   background-color: rgb(206, 192, 115);
   color: white;
-  padding: 10px;
   font-size: 16px;
   border: none;
+  text-decoration: none;
 }
-
-/* Style the dropdown content (hidden by default) */
-.dropdownAut-content, .dropdownGen-content, .dropdownPub-content, .dropdownWar-content{
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 200px;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-/* Style the checkboxes */
-.dropdownAut-content label, .dropdownGen-content label, .dropdownPub-content label, .dropdownWar-content label {
-  display: block;
-  padding: 8px 16px;
-}
-
-/* Show the dropdown content when the dropdown button is clicked */
-.dropdownAut:hover .dropdownAut-content {
-  display: block;
-}
-.dropdownGen:hover .dropdownGen-content {
-  display: block;
-}
-.dropdownPub:hover .dropdownPub-content {
-  display: block;
-}
-.dropdownWar:hover .dropdownWar-content {
-  display: block;
-}
-
 
 .main-logo:hover,
 .main-logo:focus {
@@ -932,4 +871,39 @@ nav.d-flex {
   object-fit: cover;
   transform: translate(-50%, -50%);
   transition: width 0.6s ease-in-out, height 0.6s ease-in-out, box-shadow 0.2s;
+}
+
+.dropdown-filter {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-filter-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  min-width: 200px;
+  background-color: var(--bg-secondary);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 8px 0;
+  z-index: 1001;
+}
+
+.dropdown-right {
+  left: 0;
+}
+
+.dropdown-left {
+  right: 0;
+}
+
+.dropdown-filter-content label {
+  color: var(--text-primary);
+}
+
+.dropdown-filter:hover .dropdown-filter-content,
+.dropdown-filter.open .dropdown-filter-content {
+  display: flex;
+  flex-direction: column;
 }
