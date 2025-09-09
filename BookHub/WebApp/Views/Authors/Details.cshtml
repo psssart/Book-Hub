@@ -13,15 +13,21 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
+            Image
+        </dt>
+        <dd class = "col-sm-10">
+            <img class="author-page-image" src="data:image;base64,@Convert.ToBase64String(Model.imageData)" width="285px" height="438px" alt="Picture not found!"/>
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Age)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Age)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Biography)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Biography)
         </dd>
         <dt class="col-sm-2">

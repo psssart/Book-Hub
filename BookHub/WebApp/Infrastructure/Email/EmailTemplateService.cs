@@ -14,7 +14,7 @@ public sealed class EmailTemplateService : IEmailTemplateService
 {
     private readonly string _root;
     public EmailTemplateService(IWebHostEnvironment env) =>
-        _root = Path.Combine(env.ContentRootPath, "Templates", "EmailTemplates");
+        _root = Path.Combine(env.ContentRootPath, "Infrastructure", "Email", "EmailTemplates");
 
     public async Task<string> RenderAsync(string templateName, IDictionary<string, string> vars, CancellationToken ct = default)
     {
