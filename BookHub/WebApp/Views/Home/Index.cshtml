@@ -148,7 +148,7 @@
 
                                     <div class="mt-auto">
                                         <div class="row small text-muted mb-1 align-items-center">
-                                            <div class="col-9 text-truncate pe-0">
+                                            <div class="col-9 pe-0">
                                                 @if (authorsForBook.Any())
                                                 {
                                                     var last = authorsForBook.Last();
@@ -172,17 +172,21 @@
                                         </div>
 
                                         <div class="row small align-items-center">
-                                            <div class="col-6 pe-0 ps-1">
+                                            <div class="col-6 pe-0 ps-3">
                                                 <div class="d-flex align-items-center gap-1">
                                                     <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
                                                     <span>@formattedRating</span>
                                                 </div>
                                             </div>
-                                            <div class="col-6 text-end text-truncate">
+                                            <div class="col-6 text-end">
                                                 @if (genresForBook.Any())
                                                 {
-                                                    //TODO Tooltip, if it is truncated
-                                                    <span >@string.Join(", ", genresForBook)</span>
+                                                    var genresText = string.Join(", ", genresForBook);
+                                                    <span class="d-inline-block text-muted pt-1" title="@genresText"
+                                                          style="display: -webkit-box !important; -webkit-line-clamp: 2; 
+                                                          -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">
+                                                        @genresText
+                                                    </span>
                                                 }
                                                 else
                                                 {
