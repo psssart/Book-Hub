@@ -23,9 +23,9 @@
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <h3 class="m-0">Books</h3>
 
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 pt-2">
                     <label for="sortSelect" class="sort_label m-0">Sort by:</label>
-                    <select id="sortSelect" class="form-select form-select-sm w-auto">
+                    <select id="sortSelect" class="form-select form-select-sm w-auto me-0" style="background-color: var(--bg-input);">
                         <option value="none"></option>
                         <option value="rating">Rating</option>
                         <option value="price">Price</option>
@@ -172,13 +172,13 @@
                                         </div>
 
                                         <div class="row small align-items-center">
-                                            <div class="col-6 pe-0 ps-3">
-                                                <div class="d-flex align-items-center gap-1">
+                                            <div class="col-5 text-nowrap pe-0 ps-3">
+                                                <div class="d-flex flex-column">
                                                     <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
-                                                    <span>@formattedRating</span>
+                                                    <span class="ms-4 ps-2">@formattedRating</span>
                                                 </div>
                                             </div>
-                                            <div class="col-6 text-end">
+                                            <div class="col-7 text-end">
                                                 @if (genresForBook.Any())
                                                 {
                                                     var genresText = string.Join(", ", genresForBook);

@@ -731,10 +731,9 @@ nav.d-flex {
   text-align: left;
 }
 #rotateButton {
+  background: transparent;
+  border: none;
   margin: 0;
-  background-color: white; /* Green */
-  border: 1px solid black;
-  color: white;
   padding: 12px 12px;
   text-align: center;
   text-decoration: none;
