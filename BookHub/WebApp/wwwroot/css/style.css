@@ -781,7 +781,8 @@ nav.d-flex {
   font-size: 16px;
   border: none;
 }
-.dropbtn {
+.dropbtn:hover {
+  color: white;
   background-color: var(--accent-hover);
 }
 .filterResetbtn {
@@ -901,9 +902,25 @@ nav.d-flex {
 .dropdown-filter-content label {
   color: var(--text-primary);
 }
+.dropdown-filter-content label:hover {
+  text-shadow:
+          1px 1px 2px var(--text-primary),
+          0 0 1em var(--text-secondary),
+          0 0 0.2em var(--text-secondary);
+}
 
 .dropdown-filter:hover .dropdown-filter-content,
 .dropdown-filter.open .dropdown-filter-content {
   display: flex;
   flex-direction: column;
+}
+
+.transparent-round-btn {
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 50%;
+}
+
+.transparent-round-btn:hover {
+  background-color: #6c757d;
 }

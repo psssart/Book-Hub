@@ -123,6 +123,14 @@
                     Authors Filter
                 </h6>
             </div>
+            
+            <div class="row h-50">
+                <div class="col-12 flex-column align-items-center align-content-center">
+                    <button type="button" id="hidePanelBtn" class="fs-1 transparent-round-btn p-0 pb-1">
+                        >
+                    </button>
+                </div>
+            </div>
         </div> <!-- /filterPanel -->
     
         @* BOOKS AS CARDS *@
@@ -337,7 +345,7 @@ $(document).ready(function() {
     });
     
     // Watching for publishers selection for filtering
-    $('.dropdownPub-content input[type="checkbox"]').change(function() {
+    $(document).on('change', '.dropdownPub-content input[type="checkbox"]', function(){
       let publisherId = $(this).val();
         
       if($(this).prop('checked')) {
@@ -352,7 +360,7 @@ $(document).ready(function() {
     });
     
     // Watching for authors selection for filtering
-    $('.dropdownAut-content input[type="checkbox"]').change(function() {
+    $(document).on('change', '.dropdownAut-content input[type="checkbox"]', function() {
       let authorId = $(this).val();
         
       if($(this).prop('checked')) {
@@ -368,7 +376,7 @@ $(document).ready(function() {
     });
     
     // Watching for genres selection for filtering
-    $('.dropdownGen-content input[type="checkbox"]').change(function() {
+    $(document).on('change', '.dropdownGen-content input[type="checkbox"]', function() {
       let genreId = $(this).val();
         
       if($(this).prop('checked')) {
@@ -383,21 +391,33 @@ $(document).ready(function() {
     });
     
     // Show filtering menu
-    $('.filterMenuButton').on('click', function() {
-        // Toggle the visibility of the filter panel
-        if ($('#filterPanel').css('right') === '0px') {
-            //Save filter panel state
-            showFilterMenuButton = false;
-            // Hide panel
+    $(document).on('click', '.filterMenuButton', function (e) {
+        e.stopPropagation();
+        const $panel = $('#filterPanel');
+        const isOpen = $panel.css('right') === '0px';
+        showFilterMenuButton = !isOpen;
+        $panel.css('right', isOpen ? '-300px' : '0px');
+    });
+
+    $(document).on('click', '#filterPanel', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', function (e) {
+        const $t = $(e.target);
+        if (!$t.closest('#filterPanel, .filterMenuButton').length) {
             $('#filterPanel').css('right', '-300px');
-        } else {
-            showFilterMenuButton = true;
-            $('#filterPanel').css('right', '0px');
+            showFilterMenuButton = false;
         }
+    });
+
+    $(document).on('click', '#hidePanelBtn', function (e) {
+        $('#filterPanel').css('right', '-300px');
+        showFilterMenuButton = false;
     });
     
     // Reset filtering settings
-    $('.filterResetbtn').on('click', function() {
+    $(document).on('click', '.filterResetbtn', function() {
         selectedAuthorsGuids = [];
         selectedGenresGuids = [];
         selectedPublishersGuids = [];
@@ -406,7 +426,7 @@ $(document).ready(function() {
     });    
     
     // Event listener for sorting selection change
-    $('#sortSelect').change(function() {
+    $(document).on('change', '#sortSelect', function() {
         let sortBy = $(this).val();
         let sortDirection = getSortDirection();
         sendSortingRequest(sortBy, sortDirection);
@@ -483,7 +503,7 @@ $(document).ready(function() {
     }
     
     // Function to handle button click event
-    $('#rotateButton').click(function() {
+    $(document).on('click', '#rotateButton', function() {
         rotatePyramid();
         // Retrieve sorting criteria and direction
         let sortBy = $('#sortSelect').val();
