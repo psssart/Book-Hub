@@ -54,9 +54,8 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
 
                 @* Search section *@
                 <li class="col-10 col-md-7 col-lg-6 ps-3 pe-0 pe-md-3 ps-md-0 d-flex align-items-center justify-content-center">
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get,
-                                new { @class = "d-flex w-100", @style = "height: 78%;" }))
-                    {
+                    <form asp-area="" asp-controller="Home" asp-action="Index" method="get"
+                          class="d-flex w-100" style="height: 78%;">
                         <div class="search-form-auth w-100 d-flex align-items-center py-2 py-md-0 ps-3 ">
                             @{
                                 var searchInput = ViewContext.HttpContext.Request.Query["searchInput"].ToString();
@@ -76,7 +75,7 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
                                 <img src="~/img/svg/search-button.svg" alt="image" class="d-none d-md-flex search-form-image">
                             </button>
                         </div>
-                    }
+                    </form>
                 </li>
 
                 @* Navigation section *@
@@ -248,8 +247,8 @@ else
                 
                 @* Search section *@
                 <div class="col-10 col-md-6 ps-3 ps-md-0 d-flex align-items-center justify-content-center">
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "d-flex w-100", @style = "height: 78%;"}))
-                    {
+                    <form asp-area="" asp-controller="Home" asp-action="Index" method="get"
+                          class="d-flex w-100" style="height: 78%;">
                         <div class="search-form-auth w-100 d-flex align-items-center">
                             @{
                                 var searchInput = ViewContext.HttpContext.Request.Query["searchInput"].ToString();
@@ -269,7 +268,7 @@ else
                                 <img src="~/img/svg/search-button.svg" alt="image" class="d-none d-md-flex search-form-image">
                             </button>
                         </div>
-                    }
+                    </form>
                 </div>
 
                 @* Sign up Log in section *@
