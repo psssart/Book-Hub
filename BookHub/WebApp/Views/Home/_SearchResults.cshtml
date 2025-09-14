@@ -21,7 +21,7 @@
                             
                             var genresForBook = Model.BookGenres
                                 .Where(bg => bg.BookId.Equals(book.Id))
-                                .Select(bg => bg.Genre!.Name)
+                                .Select(bg => bg.Genre!)
                                 .Distinct()
                                 .ToList();
 
@@ -58,9 +58,7 @@
                                                         {
                                                             <a asp-area="" asp-controller="Authors" asp-action="Details"
                                                                asp-route-id="@a.Id" class="text-decoration-none">
-                                                                @a.Name
-                                                            </a>
-                                                            @(a != last ? ", " : "")
+                                                                @a.Name</a>@(a != last ? ", " : "")
                                                         }
                                                     }
                                                     else
@@ -83,11 +81,20 @@
                                                 <div class="col-7 text-end">
                                                     @if (genresForBook.Any())
                                                     {
+                                                        var last = genresForBook.Last();
                                                         var genresText = string.Join(", ", genresForBook);
                                                         <span class="d-inline-block text-muted pt-1" title="@genresText"
                                                               style="display: -webkit-box !important; -webkit-line-clamp: 2; 
-                                                          -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">
-                                                            @genresText
+                                                              -webkit-box-orient: vertical; overflow: hidden; 
+                                                              white-space: normal;">
+                                                            @foreach (var g in genresForBook)
+                                                            { 
+                                                                <a href="#"
+                                                                   class="genre-chip"
+                                                                   data-id="@g.Id">
+                                                                    @g.Name@(g.Id != last.Id ? ", " : "")
+                                                                </a>
+                                                            }
                                                         </span>
                                                     }
                                                     else

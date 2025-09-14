@@ -890,3 +890,5 @@ nav.d-flex {
 .transparent-round-btn:hover {
   background-color: #6c757d;
 }
+
+.genre-chip.active-genre { text-decoration: underline !important; }

@@ -281,15 +281,14 @@ $(document).ready(function() {
 
     // Function to send AJAX request for sorting
     function sendSortingRequest(sortBy, sortDirection) {
-        const hasQuery = $('.search-form-txt-auth').val()?.trim().length > 0;
-        if (!hasQuery) return;
+        const searchInput = "@Model.SearchInput";
 
         $.ajax({
             url: '/Home/Index',
             method: 'GET',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             data: {
-                searchInput: $('.search-form-txt-auth').val(),
+                searchInput: searchInput,
                 sortBy,
                 sortDirection,
                 selectedAuthorsGuidsJson: JSON.stringify(selectedAuthorsGuids),
@@ -318,6 +317,8 @@ $(document).ready(function() {
                 $('.dropdownWar-content input[type=checkbox]').each(function() {
                     $(this).prop('checked', selectedWarehousesGuids.includes($(this).val()));
                 });
+
+                syncChipsHighlight();
             },
             error: function (xhr, status, error) {
                 console.log("status:", status, "error:", error);
@@ -360,6 +361,24 @@ $(document).ready(function() {
         });
     });
 
+    // Books genre click handle - filter & show
+    $(document).on('click', '.genre-chip', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        const $cb = $('.dropdownGen-content input[type="checkbox"][value="' + id + '"]');
+        if (!$cb.length) return;
+        const checked = !$cb.prop('checked');
+        $cb.prop('checked', checked).trigger('change');
+
+        $('.genre-chip[data-id="' + id + '"]').toggleClass('active-genre', checked);
+    });
+
+    function syncChipsHighlight() {
+        $('.genre-chip').removeClass('active-genre');
+        selectedGenresGuids.forEach(function(id){
+            $('.genre-chip[data-id="' + id + '"]').addClass('active-genre');
+        });
+    }
 
 });
 
