@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using App.Domain.Address_Tables;
+﻿using App.Domain.Address_Tables;
 using App.Domain.Entities;
 
 namespace WebApp.Models
@@ -14,5 +13,6 @@ namespace WebApp.Models
         public List<Rating> Ratings { get; set; } = default!;
         public string SearchInput { get; set; } = default!;
         public bool ShowResults { get; set; } = default!;
+        public bool WithAuthors { get; set; } = true;
     }
 }

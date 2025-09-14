@@ -40,7 +40,10 @@ public class HomeController : Controller
             IQueryable<BookGenre> bookGenres = _context.BooksGenres.Include(bg => bg.Genre);
             IQueryable<BookWarehouses> bookWarehouses = _context.BooksWarehouses.Include(bw => bw.Warehouse);
 
-            if (!string.IsNullOrWhiteSpace(searchInput) || User.Identity?.IsAuthenticated == true)
+            bool? userAuthenticated = User.Identity?.IsAuthenticated;
+            bool emptySearchInput = string.IsNullOrWhiteSpace(searchInput);
+            
+            if (!emptySearchInput || userAuthenticated == true)
             {
                 // books by title
                 books = books.Where(b => EF.Functions.ILike(b.Tittle, $"%{searchInput}%"));
@@ -153,7 +156,8 @@ public class HomeController : Controller
                 BookGenres = bookGenres.ToList(),
                 BookWarehouses = bookWarehouses.ToList(),
                 SearchInput = searchInput,
-                ShowResults = booksList.Any() || authors.Any()
+                ShowResults = (userAuthenticated == false && !emptySearchInput) || 
+                              (userAuthenticated == true && (booksList.Any() || authors.Any()))
             };
 
             var isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest",
@@ -162,7 +166,7 @@ public class HomeController : Controller
             if (isAjax)
                 return PartialView("_SearchResults", vm);
 
-            if (User.Identity?.IsAuthenticated == true)
+            if (userAuthenticated == true)
                 return View("Index_auth", vm);
 
             return View(vm);

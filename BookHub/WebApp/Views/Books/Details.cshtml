@@ -31,26 +31,26 @@
     <title>Book List</title>
 </head>
 <body>
-<div class="container">
+<div class="container mt-4">
     <div class="row align-items-center">
         
-        <div class="col-4 text-center">
+        <div class="col-12 col-lg-4 text-center">
             <img class="book-page-image" src="data:image;base64,@Convert.ToBase64String(Model.imageData)" width="285px" height="438px" alt="Picture not found!"/>
         </div>
         
-        <div class="col-auto">
-            <div class="vr h-100"></div>
+        <div class="col-0 d-none col-lg-auto d-lg-flex">
+            <div class="vr" style="height: 435px;"></div>
         </div>
         
-        <div class="col-4">
+        <div class="col-12 col-lg-4">
             @* <img class="vertical-line" src="~/img/svg/vertical-line.svg" alt=""> *@
             <div class="d-flex flex-column">
-                <div class="author-name">@Model.Tittle</div>
-                <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
-                @Model.Description
+                <div class="author-name border-bottom">@Model.Tittle</div>
+                <div class="pt-1 pb-3">
+                    @Model.Description
+                </div>
                 <div class="row-element">
-                    <div class="sub-header">Score</div>
-                    <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+                    <div class="sub-header border-bottom">Score</div>
                     @for (var i = 0; i < 5; i++)
                     {
                         if (i < roundedRating)
@@ -67,10 +67,9 @@
 
                 </div>
                 <div class="row-element">
-                    <div class="sub-header">
+                    <div class="sub-header border-bottom">
                         Authors
                     </div>
-                    <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
                     <div class="author-frame">
                         <div class="author-frame-name">
                             @if (ViewData["BookAuthors"] != null && ((List<BookAuthor>)ViewData["BookAuthors"]!).Any())
@@ -88,8 +87,7 @@
 
                 </div>
                 <div class="row-element">
-                    <div class="sub-header">Genres</div>
-                    <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
+                    <div class="sub-header border-bottom">Genres</div>
                     @if (ViewData["BookGenres"] != null && ((List<BookGenre>)ViewData["BookGenres"]!).Any())
                     {
                         var bookGenres = ViewData["BookGenres"] as List<BookGenre>;
@@ -101,14 +99,14 @@
                         <p>No genres found for this book.</p>
                     }
                 </div>
-                <div class="row-element">
-                    <div class="sub-header">Reviews</div>
+                @* Reviews on center (only on desktop) *@
+                <div class="row-element d-none d-lg-flex border-bottom">
+                    <div class="sub-header">Reviews - @(((List<Rating>)ViewData["Ratings"]!).Count)</div>
                     @if (ViewData["Ratings"] != null && ((List<Rating>)ViewData["Ratings"]!).Any())
                     {
                         @foreach (var rating in (List<Rating>)ViewData["Ratings"]!)
                         {
-                            <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
-                            <div class="author-frame">
+                            <div class="author-frame border-top">
                                 @if (rating.AppUser!.AvatarImageData != null)
                                 {
                                     <img class="author-image" src="data:image;base64,@Convert.ToBase64String(rating.AppUser!.AvatarImageData)" width="285px" height="438px" alt="Picture not found!"/>
@@ -122,53 +120,78 @@
                             </div>
                         }
                     }
-                    <img class="line-delimiter" src="~/img/svg/book-line-vertical.svg" alt="">
                 </div>
 
             </div>
         </div>
 
-        <div class="col-auto">
-            <div class="vr h-100"></div>
+        <div class="col-0 d-none col-lg-auto d-lg-flex">
+            <div class="vr" style="height: 435px;"></div>
         </div>
         
-        <div class="col-3">
+        <div class="col-12 col-lg-3">
             @* <img class="vertical-line" src="~/img/svg/vertical-line.svg" alt=""> *@
             <div class="d-flex flex-column">
-                <div class="price">30.21 € Physical</div>
-                <a href="">
-                    <div class="text-wrapper-blue-purchase">
-                        <div class="text-white">
-                            Check availability
+                <div class="price fs-3">30.21 € Physical</div>
+                <div class="d-flex flex-column gap-3 mx-4 pb-4 border-bottom">
+                    <a href="">
+                        <div class="login-button">
+                            <div class="text-white">
+                                Check availability
+                            </div>
                         </div>
-                    </div>
-                </a>
-                <a href="">
-                    <div class="text-wrapper-gray-purchase">
-                        <div class="text-black">
-                            Order
+                    </a>
+                    <a href="">
+                        <div class="login-button" style="background-color: #D9D9D9;">
+                            <div class="text-black">
+                                Order
+                            </div>
                         </div>
-                    </div>
-                </a>
-                <img class="line-delimiter-purchase" src="~/img/svg/line-delimeter-horisontal.svg" alt="">
-                <div class="price">@Html.DisplayFor(model => model.Price)€ eBook</div>
-                <a href="">
-                    <div class="text-wrapper-blue-purchase">
-                        <div class="text-white">
-                            Check availability
+                    </a>
+                </div>
+                <div class="price fs-3 mt-2">@Html.DisplayFor(model => model.Price) € eBook</div>
+                <div class="d-flex flex-column gap-3 mx-4">
+                    <a href="">
+                        <div class="login-button">
+                            <div class="text-white">
+                                Check availability
+                            </div>
                         </div>
-                    </div>
-                </a>
-                <form asp-controller="Books" asp-action="AddToTempCart" method="post">
-                    <input type="hidden" name="id" value="@Model.Id"/>
-                    <div class="text-wrapper-gray-purchase" style="cursor: pointer;" onclick="this.closest('form').submit();">
-                        <div class="text-black">
-                            Add to cart
+                    </a>
+                    <form asp-controller="Books" asp-action="AddToTempCart" method="post">
+                        <input type="hidden" name="id" value="@Model.Id"/>
+                        <div class="login-button" style="cursor: pointer; background-color: #D9D9D9;" onclick="this.closest('form').submit();">
+                            <div class="text-black">
+                                Add to cart
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
 
             </div>
+        </div>
+
+        @* Reviews on the bottom (only on mobile) *@
+        <div class="col-12 d-flex col-lg-0 d-lg-none my-2">
+            <div class="sub-header fs-3">Reviews - @(((List<Rating>)ViewData["Ratings"]!).Count)</div>
+            @if (ViewData["Ratings"] != null && ((List<Rating>)ViewData["Ratings"]!).Any())
+            {
+            @foreach (var rating in (List<Rating>)ViewData["Ratings"]!)
+            {
+            <div class="author-frame border-top">
+                @if (rating.AppUser!.AvatarImageData != null)
+                {
+                <img class="author-image" src="data:image;base64,@Convert.ToBase64String(rating.AppUser!.AvatarImageData)" width="285px" height="438px" alt="Picture not found!"/>
+                }
+                else
+                {
+                <img class="author-image" src="~/img/svg/profile-nophoto.svg" width="285px" height="438px" alt="Picture not found!"/>
+                }
+
+                <div class="author-frame-name-review">@rating.AppUser!.UserName: "@rating.Comment”</div>
+            </div>
+            }
+            }
         </div>
         
     </div>
