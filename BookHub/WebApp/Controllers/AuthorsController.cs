@@ -40,6 +40,7 @@ namespace WebApp.Controllers
         
         var books = await _context.BooksAuthors
             .AsNoTracking()
+            .Where(ba => ba.AuthorId == author.Id)
             .Include(ba => ba.Book)
             .Select(ba => ba.Book)
             .Where(b => b != null)

@@ -82,7 +82,7 @@
                                                     @if (genresForBook.Any())
                                                     {
                                                         var last = genresForBook.Last();
-                                                        var genresText = string.Join(", ", genresForBook);
+                                                        var genresText = string.Join(", ", genresForBook.Select(g => g.Name));
                                                         <span class="d-inline-block text-muted pt-1" title="@genresText"
                                                               style="display: -webkit-box !important; -webkit-line-clamp: 2; 
                                                               -webkit-box-orient: vertical; overflow: hidden; 
