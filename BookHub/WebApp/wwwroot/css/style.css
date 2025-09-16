@@ -892,3 +892,13 @@ nav.d-flex {
 }
 
 .genre-chip.active-genre { text-decoration: underline !important; }
+
+.delete-btn {
+  color: red;
+  border-radius: 50%;
+  background-color: var(--bg-translucent);
+}
+
+.delete-btn:hover, .delete-btn:focus {
+  transform: scale(1.1);
+}

@@ -167,9 +167,38 @@ namespace WebApp.Controllers
             }
             
             List<Guid> tempCart = GetTempCart();
+
+            var books = await _context.Books.Where(b => tempCart.Contains(b.Id)).ToListAsync();
+            
+            var bookIds = books.Select(b => b!.Id).ToList();
+            
+            var ratings = bookIds.Count == 0
+                ? new List<Rating>()
+                : await _context.Ratings
+                    .AsNoTracking()
+                    .Where(r => bookIds.Contains(r.BookId))
+                    .ToListAsync();
+            var bookAuthors = bookIds.Count == 0
+                ? new List<BookAuthor>()
+                : await _context.BooksAuthors
+                    .AsNoTracking()
+                    .Where(ba => bookIds.Contains(ba.BookId))
+                    .Include(ba => ba.Author)
+                    .ToListAsync();
+            var genres = bookIds.Count == 0
+                ? new List<BookGenre>()
+                : await _context.BooksGenres
+                    .AsNoTracking()
+                    .Where(bg => bookIds.Contains(bg.BookId))
+                    .Include(bg => bg.Genre)
+                    .ToListAsync();
+            
             var viewModel = new CartModel()
             {
-                Books = await _context.Books.Where(b => tempCart.Contains(b.Id)).ToListAsync(),
+                Books = books,
+                Ratings = ratings,
+                BookAuthors = bookAuthors,
+                BookGenres = genres,
                 IsBought = false
             };
             
