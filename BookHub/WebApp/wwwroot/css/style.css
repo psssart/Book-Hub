@@ -19,6 +19,9 @@
   z-index: 999;
 }
 @media (max-width: 576px) {
+  :root {
+    --cart-width: 91%;
+  }
   .search-form {
     width: 95% !important;
     left: 50%;
@@ -44,6 +47,9 @@
   }
 }
 @media (min-width: 768px) {
+  :root {
+    --cart-width: 740px;
+  }
   .image-text {
     left: 145px;
     height: 395px;
@@ -902,3 +908,6 @@ nav.d-flex {
 .delete-btn:hover, .delete-btn:focus {
   transform: scale(1.1);
 }
+
+@keyframes spin-cw   { to { transform: rotate(360deg); } }
+@keyframes spin-ccw  { to { transform: rotate(-360deg);} }

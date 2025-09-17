@@ -12,148 +12,153 @@
 
 <div class="container mt-5">
     <div class="row">
-    @if (Model.Books.Any())
-    {
-        <div class="books_results col-10">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-                @foreach (var book in Model.Books)
-                {
-                    var authorsForBook = Model.BookAuthors
-                        .Where(ba => ba.BookId.Equals(book.Id))
-                        .Select(ba => ba.Author!)
-                        .Distinct()
-                        .ToList();
+        <div class="books_results col-10 books_results">
+            
+            <div id="cartSvgWrapper" class="cart-svg-wrapper mb-5 pb-5" style="z-index: -1;"></div>
+            @if (Model.Books.Any())
+            {
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                    @foreach (var book in Model.Books)
+                    {
+                        var authorsForBook = Model.BookAuthors
+                            .Where(ba => ba.BookId.Equals(book.Id))
+                            .Select(ba => ba.Author!)
+                            .Distinct()
+                            .ToList();
 
-                    var genresForBook = Model.BookGenres
-                        .Where(bg => bg.BookId.Equals(book.Id))
-                        .Select(bg => bg.Genre!)
-                        .Distinct()
-                        .ToList();
+                        var genresForBook = Model.BookGenres
+                            .Where(bg => bg.BookId.Equals(book.Id))
+                            .Select(bg => bg.Genre!)
+                            .Distinct()
+                            .ToList();
 
-                    var ratingsForBook = Model.Ratings.Where(r => r.BookId == book.Id).ToList();
-                    int quantity = ratingsForBook.Count();
-                    float sum = ratingsForBook.Sum(r => r.Value);
-                    float averageRating = quantity > 0 ? sum / quantity : 0;
-                    string formattedRating = averageRating.ToString("0.0");
-                    int roundedRating = (int)Math.Round(averageRating);
+                        var ratingsForBook = Model.Ratings.Where(r => r.BookId == book.Id).ToList();
+                        int quantity = ratingsForBook.Count();
+                        float sum = ratingsForBook.Sum(r => r.Value);
+                        float averageRating = quantity > 0 ? sum / quantity : 0;
+                        string formattedRating = averageRating.ToString("0.0");
+                        int roundedRating = (int)Math.Round(averageRating);
 
-                    <div class="col">
-                        <div class="card shadow-sm" style="height: 15rem; max-width: 11rem;">
-                            <a asp-area="" asp-controller="Books" asp-action="Details"
-                               asp-route-id="@book.Id" class="text-decoration-none img-wrapper" style="height: 280px;">
-                                <img class="card-img-top img-hover"
-                                     src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" alt="@book.Tittle">
-                            </a>
+                        <div class="col">
+                            <div class="card shadow-sm" style="height: 15rem; max-width: 11rem;">
+                                <a asp-area="" asp-controller="Books" asp-action="Details"
+                                   asp-route-id="@book.Id" class="text-decoration-none img-wrapper" style="height: 280px;">
+                                    <img class="card-img-top img-hover"
+                                         src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" alt="@book.Tittle">
+                                </a>
 
-                            <div class="card-body d-flex flex-column p-2 pb-1">
-                                <h5 class="card-title text-center mb-2 fs-6">
-                                    <a asp-area="" asp-controller="Books" asp-action="Details"
-                                       asp-route-id="@book.Id" class="text-decoration-none">
-                                        @book.Tittle
-                                    </a>
-                                </h5>
+                                <div class="card-body d-flex flex-column p-2 pb-1">
+                                    <h5 class="card-title text-center mb-2 fs-6">
+                                        <a asp-area="" asp-controller="Books" asp-action="Details"
+                                           asp-route-id="@book.Id" class="text-decoration-none">
+                                            @book.Tittle
+                                        </a>
+                                    </h5>
 
-                                <div class="mt-auto">
-                                    <div class="row small align-items-center text-center">
-                                        <div class="col-7 text-nowrap pe-5">
-                                            $@book.Price
-                                        </div>
-                                        <div class="col-5">
-                                            <form asp-controller="PurchasedBooks" asp-action="RemoveFromTempCart" method="post">
-                                                <input type="hidden" name="id" value="@book.Id"/>
-                                                <button type="submit" class="delete-btn">X</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    
-                                    <button type="button" class="toggle-btn btn btn-link p-0 col-12 mt-2 shadow-none" style="height: 1.2rem;">
-                                        <i class="bi bi-chevron-down" style="color: var(--accent-color)"></i>
-                                    </button>
-                                    
-                                    <div class="details-section collapse">
-                                        <div class="row small text-muted mb-1 align-items-center">
-                                            <div class="col-9 pe-0 text-truncate">
-                                                @if (authorsForBook.Any())
-                                                {
-                                                    var last = authorsForBook.Last();
-                                                    var authorsText = string.Join(", ", authorsForBook.Select(g => g.Name));
-                                                    <span title="@authorsText">
-                                                      @foreach (var a in authorsForBook)
-                                                      {
-                                                          <a asp-area="" asp-controller="Authors" asp-action="Details"
-                                                           asp-route-id="@a.Id" class="text-decoration-none">
-                                                            @a.Name</a>@(a != last ? ", " : "")
-                                                      }
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span>Unknown author</span>
-                                                }
+                                    <div class="mt-auto">
+                                        <div class="row small align-items-center text-center">
+                                            <div class="col-7 text-nowrap pe-5">
+                                                $@book.Price
                                             </div>
-                                            <div class="col-3 text-end text-nowrap ps-0">
-                                                <span>@book.ReleaseYear</span>
+                                            <div class="col-5">
+                                                <form asp-controller="PurchasedBooks" asp-action="RemoveFromTempCart" method="post">
+                                                    <input type="hidden" name="id" value="@book.Id"/>
+                                                    <button type="submit" class="delete-btn">X</button>
+                                                </form>
                                             </div>
                                         </div>
 
-                                        <div class="row small align-items-center mb-1">
-                                            <div class="col-5 text-nowrap pe-0 ps-3">
-                                                <div class="d-flex flex-column">
-                                                    <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
-                                                    <span class="ms-4 ps-2">@formattedRating</span>
+                                        <button type="button" class="toggle-btn btn btn-link p-0 col-12 mt-2 shadow-none" style="height: 1.2rem;">
+                                            <i class="bi bi-chevron-down" style="color: var(--accent-color)"></i>
+                                        </button>
+
+                                        <div class="details-section collapse">
+                                            <div class="row small text-muted mb-1 align-items-center">
+                                                <div class="col-9 pe-0 text-truncate">
+                                                    @if (authorsForBook.Any())
+                                                    {
+                                                        var last = authorsForBook.Last();
+                                                        var authorsText = string.Join(", ", authorsForBook.Select(g => g.Name));
+                                                        <span title="@authorsText">
+                                                            @foreach (var a in authorsForBook)
+                                                            {
+                                                                <a asp-area="" asp-controller="Authors" asp-action="Details"
+                                                                   asp-route-id="@a.Id" class="text-decoration-none">
+                                                                    @a.Name</a>
+                                                                @(a != last ? ", " : "")
+                                                            }
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Unknown author</span>
+                                                    }
+                                                </div>
+                                                <div class="col-3 text-end text-nowrap ps-0">
+                                                    <span>@book.ReleaseYear</span>
                                                 </div>
                                             </div>
-                                            <div class="col-7 text-end">
-                                                @if (genresForBook.Any())
-                                                {
-                                                    var last = genresForBook.Last();
-                                                    var genresText = string.Join(", ", genresForBook.Select(g => g.Name));
-                                                    <span class="d-inline-block text-muted pt-1" title="@genresText"
-                                                          style="display: -webkit-box !important; -webkit-line-clamp: 2; 
+
+                                            <div class="row small align-items-center mb-1">
+                                                <div class="col-5 text-nowrap pe-0 ps-3">
+                                                    <div class="d-flex flex-column">
+                                                        <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
+                                                        <span class="ms-4 ps-2">@formattedRating</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-7 text-end">
+                                                    @if (genresForBook.Any())
+                                                    {
+                                                        var last = genresForBook.Last();
+                                                        var genresText = string.Join(", ", genresForBook.Select(g => g.Name));
+                                                        <span class="d-inline-block text-muted pt-1" title="@genresText"
+                                                              style="display: -webkit-box !important; -webkit-line-clamp: 2; 
                                                               -webkit-box-orient: vertical; overflow: hidden; 
                                                               white-space: normal;">
-                                                        @foreach (var g in genresForBook)
-                                                        {
-                                                            <a href="#"
-                                                               class="genre-chip"
-                                                               data-id="@g.Id">
-                                                                @g.Name@(g.Id != last.Id ? ", " : "")
-                                                            </a>
-                                                        }
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">No genres</span>
-                                                }
+                                                            @foreach (var g in genresForBook)
+                                                            {
+                                                                <a href="#"
+                                                                   class="genre-chip"
+                                                                   data-id="@g.Id">
+                                                                    @g.Name@(g.Id != last.Id ? ", " : "")
+                                                                </a>
+                                                            }
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">No genres</span>
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center mt-5">
+                    <p>No books in the cart.</p>
+                </div>
+            }
         </div>
 
         <div class="col-auto d-flex flex-column gap-2 text-center mt-5">
+        @if (Model.Books.Any())
+        {
             <div>
                 <div>Total:</div>
                 <div>$@totalValue</div>
             </div>
             <form asp-controller="PurchasedBooks" asp-action="CreatePur" method="post">
-                <button type="submit">Buy</button>
+                <button type="submit" data-buy-btn>Buy</button>
             </form>
+        }
         </div>
-        
-    }
-    else
-    {
-        <div class="books_results col-12">
-            <p>No books in the cart.</p>
-        </div>
-    }
     </div>
 </div>
 
@@ -176,6 +181,83 @@
                     }
                 });
             });
+            
+            const wrapper = document.getElementById("cartSvgWrapper");
+            if(!wrapper) return;
+
+            fetch("/img/svg/cart_wheels.svg", { cache:"force-cache" })
+                .then(r => r.text())
+                .then(svgText => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgText, "image/svg+xml");
+                    const svg = doc.documentElement;
+
+                    // нормализация атрибутов
+                    const vb = svg.getAttribute("viewBox") || svg.getAttribute("viewbox");
+                    if(!svg.getAttribute("viewBox") && vb) svg.setAttribute("viewBox", vb);
+                    const pa = svg.getAttribute("preserveAspectRatio") || svg.getAttribute("preserveaspectratio");
+                    if(!svg.getAttribute("preserveAspectRatio") && pa) svg.setAttribute("preserveAspectRatio", pa);
+
+                    svg.classList.add("cart-svg");
+                    svg.setAttribute("aria-hidden","true");
+                    svg.setAttribute("focusable","false");
+
+                    wrapper.innerHTML = "";
+                    wrapper.appendChild(svg);
+
+                    const wl = svg.querySelector("#wheel-left");
+                    const wr = svg.querySelector("#wheel-right");
+
+                    // 1) Удаляем конфликтные инлайновые стили/fill у корпуса и колёс,
+                    //    чтобы CSS-правила с !important сработали наверняка.
+                    const killAttrs = (root) => {
+                        if(!root) return;
+                        root.querySelectorAll("[fill], [style]").forEach(el => {
+                            // убираем только fill из style, оставляя прочее
+                            const style = el.getAttribute("style");
+                            if(style){
+                                const newStyle = style
+                                    .split(";")
+                                    .map(s => s.trim())
+                                    .filter(s => s && !/^fill\s*:/i.test(s))
+                                    .join("; ");
+                                if(newStyle) el.setAttribute("style", newStyle);
+                                else el.removeAttribute("style");
+                            }
+                            if(el.hasAttribute("fill")) el.removeAttribute("fill");
+                        });
+                    };
+                    killAttrs(svg.querySelector("#cart-body"));
+                    killAttrs(wl);
+                    killAttrs(wr);
+
+                    // 2) Внутри каждого колеса создаём "ротор", чтобы вращение не сдвигало колесо
+                    [wl, wr].forEach(w => {
+                        if(!w) return;
+                        const rotor = document.createElementNS("http://www.w3.org/2000/svg","g");
+                        rotor.setAttribute("data-wheel-rotor","");
+                        while(w.firstChild) rotor.appendChild(w.firstChild);
+                        w.appendChild(rotor);
+                        rotor.style.transformBox = "fill-box";
+                        rotor.style.transformOrigin = "50% 50%";
+                    });
+
+                    // 3) Привязка к кнопке Buy
+                    const buyBtn = document.querySelector("[data-buy-btn]");
+                    if(buyBtn){
+                        buyBtn.addEventListener("mouseenter", () => {
+                            svg.classList.add("cart-nudge","cart-rolling");
+                        });
+                        buyBtn.addEventListener("mouseleave", () => {
+                            svg.classList.remove("cart-nudge","cart-rolling");
+                        });
+                        buyBtn.addEventListener("click", () => {
+                            svg.classList.remove("cart-nudge");
+                            svg.classList.add("cart-exit");
+                        });
+                    }
+                })
+                .catch(()=>{ /* без тележки, так без тележки */ });
         });
     </script>
 }
@@ -200,3 +282,47 @@
         return stars.ToString();
     }
 }
+
+<style>
+  /* Центрируем SVG над сеткой товаров, поверх, но не мешаем кликам */
+  .cart-svg-wrapper{
+      position:absolute; inset:0; display:grid; place-items:center;
+      pointer-events:none; z-index:1;
+  }
+
+  /* Сам SVG: плавные трансформации */
+  .cart-svg{
+      width: var(--cart-width);
+      height: auto;
+      transform: translateX(0) scaleX(-1);
+      transition: transform 220ms ease, opacity 220ms ease;
+      will-change: transform;
+  }
+
+  /* Небольшой толчок при hover на Buy */
+  .cart-nudge{
+      transform: translateX(-13px) scaleX(-1);
+  }
+
+  /* Уезжает за экран при клике Buy */
+  .cart-exit{
+      transform: translateX(-120vw) scaleX(-1);
+      transition: transform 600ms cubic-bezier(.22,.61,.36,1);
+      opacity:.95;
+  }
+
+  .cart-rolling [data-wheel-rotor]{ animation: spin-ccw 700ms linear infinite; }
+  .cart-exit    [data-wheel-rotor]{ animation: spin-ccw 600ms linear infinite; }
+
+  /* Раскраска частей SVG по id/структуре */
+  /* Корпус */
+  .cart-svg #cart-body { fill: var(--accent-color) !important; stroke: none; !important }
+  /* Левое колесо */
+  .cart-svg #wheel-left [id="parts"] { fill: var(--accent-color) !important; }
+  .cart-svg #wheel-left [id="outer_wheel"] { fill: var(--secondary-hover) !important; }
+  .cart-svg #wheel-left [id="g5"] { fill: var(--secondary-hover) !important; }
+  /* Правое колесо */
+  .cart-svg #wheel-right [id="parts"] { fill: var(--accent-color) !important; }
+  .cart-svg #wheel-right [id="outer_wheel"] { fill: var(--secondary-hover) !important; }
+  .cart-svg #parts [id="g11"] { fill: var(--secondary-hover) !important; }
+</style>
