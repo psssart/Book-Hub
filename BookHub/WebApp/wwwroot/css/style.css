@@ -20,12 +20,15 @@
 }
 .card-shopping-cart {
   height: 15rem; 
-  max-width: 10rem; 
+  width: 10rem; 
   background-color: var(--bg-translucent) !important;
+}
+.books-on-cart {
+  width: 91%;
 }
 @media (max-width: 576px) {
   :root {
-    --cart-width: 91%;
+    --cart-width: 430px;
   }
   .search-form {
     width: 95% !important;
@@ -50,9 +53,6 @@
     height: 389px;
     bottom: 384px;
   }
-  .card-shopping-cart {
-    max-width: 11rem;
-  }
 }
 @media (min-width: 768px) {
   :root {
@@ -62,14 +62,14 @@
     left: 145px;
     height: 395px;
   }
+  .books-on-cart {
+    width: 700px;
+  }
 }
 @media (min-width: 992px) {
   .image-text {
     left: 185px;
     height: 382px;
-  }
-  .card-shopping-cart {
-    max-width: 12rem;
   }
 }
 @media (min-width: 1200px) {
