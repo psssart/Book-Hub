@@ -186,6 +186,7 @@
             
             const wrapper = document.getElementById("cartSvgWrapper");
             if(!wrapper) return;
+            let svgEl;
 
             fetch("/img/svg/cart_wheels.svg", { cache:"force-cache" })
                 .then(r => r.text())
@@ -205,6 +206,7 @@
 
                     wrapper.innerHTML = "";
                     wrapper.appendChild(svg);
+                    svgEl = svg;
 
                     const wl = svg.querySelector("#wheel-left");
                     const wr = svg.querySelector("#wheel-right");
@@ -243,14 +245,16 @@
                     const results = document.querySelector(".books_results");
                     if(buyBtn){
                         buyBtn.addEventListener("mouseenter", () => {
-                            if(wrapper.firstElementChild) wrapper.firstElementChild.classList.add("cart-nudge","cart-rolling");
+                            if (results) results.classList.add("nudge");
+                            if (svgEl) svgEl.classList.add("cart-rolling");
                         });
                         buyBtn.addEventListener("mouseleave", () => {
-                            if(wrapper.firstElementChild) wrapper.firstElementChild.classList.remove("cart-nudge","cart-rolling");
+                            if (results) results.classList.remove("nudge");
+                            if (svgEl) svgEl.classList.remove("cart-rolling");
                         });
                         buyBtn.addEventListener("click", () => {
                             if (results) results.classList.add("results-exit");
-                            if (wrapper.firstElementChild) wrapper.firstElementChild.classList.add("cart-rolling");
+                            if (svgEl) svgEl.classList.add("cart-rolling");
 
                             e.preventDefault();
                             const form = buyBtn.closest("form");
@@ -295,6 +299,10 @@
         transition: transform 600ms cubic-bezier(.22,.61,.36,1), opacity 220ms ease;
     }
 
+    .books_results.nudge{
+        transform: translateX(-13px);
+    }
+    
     .books_results.results-exit{
         transform: translateX(-120vw);
         opacity: .95;
@@ -304,7 +312,7 @@
   /* Центрируем SVG над сеткой товаров, поверх, но не мешаем кликам */
   .cart-svg-wrapper{
       position:fixed;
-      bottom: 135px;
+      /*bottom: 135px;*/
       pointer-events:none;
       z-index:1;
   }
@@ -319,7 +327,7 @@
   }
 
   /* Небольшой толчок при hover на Buy */
-  .cart-nudge{
+  .nudge{
       transform: translateX(-13px) scaleX(-1);
   }
 
