@@ -48,6 +48,9 @@
   }
 }
 @media (min-width: 576px) {
+  :root {
+    --cart-width: 585px;
+  }
   .image-text {
     left: 67px;
     height: 389px;

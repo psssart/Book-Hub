@@ -151,7 +151,7 @@
         @if (Model.Books.Any())
         {
         <div class="auth-frame d-flex flex-column gap-2 text-center mt-5 px-0 w-100" 
-             style="background-color: var(--bg-translucent); max-width: 600px;">
+             style="background-color: var(--bg-translucent); max-width: 600px; z-index: 99999;">
                 <div>
                     <div class="form-element">Total:</div>
                     <div class="small-text fs-3 px-2">$@totalValue</div>
@@ -262,7 +262,7 @@
                         });
                     }
                 })
-                .catch(()=>{ /* без тележки, так без тележки */ });
+                .catch(()=>{  });
         });
     </script>
 }
@@ -309,15 +309,13 @@
         pointer-events: none;
     }
     
-  /* Центрируем SVG над сеткой товаров, поверх, но не мешаем кликам */
   .cart-svg-wrapper{
       position:fixed;
       /*bottom: 135px;*/
       pointer-events:none;
       z-index:1;
   }
-
-  /* Сам SVG: плавные трансформации */
+  
   .cart-svg{
       width: var(--cart-width);
       height: auto;
@@ -325,23 +323,20 @@
       transition: transform 220ms ease, opacity 220ms ease;
       will-change: transform;
   }
-
-  /* Небольшой толчок при hover на Buy */
+  
   .nudge{
       transform: translateX(-13px) scaleX(-1);
   }
 
   .cart-rolling [data-wheel-rotor]{ animation: spin-ccw 700ms linear infinite; }
   .cart-exit    [data-wheel-rotor]{ animation: spin-ccw 600ms linear infinite; }
-
-  /* Раскраска частей SVG по id/структуре */
-  /* Корпус */
+  
   .cart-svg #cart-body { fill: var(--accent-color) !important; stroke: none; !important }
-  /* Левое колесо */
+
   .cart-svg #wheel-left [id="parts"] { fill: var(--accent-color) !important; }
   .cart-svg #wheel-left [id="outer_wheel"] { fill: var(--secondary-hover) !important; }
   .cart-svg #wheel-left [id="g5"] { fill: var(--secondary-hover) !important; }
-  /* Правое колесо */
+
   .cart-svg #wheel-right [id="parts"] { fill: var(--accent-color) !important; }
   .cart-svg #wheel-right [id="outer_wheel"] { fill: var(--secondary-hover) !important; }
   .cart-svg #parts [id="g11"] { fill: var(--secondary-hover) !important; }
