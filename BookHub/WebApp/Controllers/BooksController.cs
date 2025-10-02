@@ -11,6 +11,7 @@ using System.Text.Json;
 using App.Contracts.DAL;
 using App.Domain.Address_Tables;
 using App.Domain.Identity;
+using App.Web.Infrastructure;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
@@ -217,7 +218,7 @@ namespace WebApp.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                TempData["AlertMessage"] = "You are unauthorized!";
+                TempData.Error("You are unauthorized");
                 return RedirectToAction("Details", new { id = id }); // Redirect to the Details page with the specified book ID
             }
             
@@ -226,7 +227,7 @@ namespace WebApp.Controllers
                 .AnyAsync(pb => pb.Purchase!.AppUserId == currentUser.Id && pb.BookId == id);
             if (isBookBought)
             {
-                TempData["CartMessage"] = "You already bought this book!";
+                TempData.Info("You already bought this book");
                 return RedirectToAction("Details", new { id = id });
             }
             
@@ -236,7 +237,7 @@ namespace WebApp.Controllers
             // Check if book is already in the shopping cart
             if (tempCart.Contains(id))
             {
-                TempData["CartMessage"] = "Book is already in your cart!";
+                TempData.Info("Book is already in your cart");
                 return RedirectToAction("Details", new { id = id });
             }
             
@@ -245,9 +246,8 @@ namespace WebApp.Controllers
 
             // Save the updated cart in the session
             SetTempCart(tempCart);
-
-            // Set the message to TempData
-            TempData["CartMessage"] = "Book added to Cart";
+            
+            TempData.Success("Book added to cart");
             
             return RedirectToAction("Details", new { id = id });
         }
@@ -259,8 +259,8 @@ namespace WebApp.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                TempData["AlertMessage"] = "You are unauthorized!";
-                return RedirectToAction("Details", new { id = id }); // Redirect to the Details page with the specified book ID
+                TempData.Error("You are unauthorized");
+                return RedirectToPage("./Login");
             }
             
             // Check if there is an existing UserSubscription with the same AppUserId and BookId
@@ -269,7 +269,7 @@ namespace WebApp.Controllers
             
             if (subscriptionExists)
             {
-                TempData["CartMessage"] = "You are already subscribed";
+                TempData.Info("You are already subscribed");
                 return RedirectToAction("Details", new { id = id });
             }
             

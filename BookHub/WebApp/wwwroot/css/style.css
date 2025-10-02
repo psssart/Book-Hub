@@ -11,6 +11,7 @@
   font-family: Gilroy-light-added;
   src: url('../fonts/Gilroy-Light.otf');
 }
+.bg-opacity-90 { --bs-bg-opacity: 0.9; }
 .image-text {
   position: fixed;
   width: 1450px;
@@ -45,6 +46,13 @@
     bottom: 125px;
     transform: scale(1.15);
     transform-origin: center;
+  }
+  .toast { 
+    width: calc(100vw - 2rem); 
+    min-width: unset; 
+  }
+  .toast-container-fixed { 
+    left: 1rem; right: 1rem; 
   }
 }
 @media (min-width: 576px) {
@@ -925,3 +933,16 @@ nav.d-flex {
 
 @keyframes spin-cw   { to { transform: rotate(360deg); } }
 @keyframes spin-ccw  { to { transform: rotate(-360deg);} }
+
+.toast-container-fixed {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1080;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.toast { 
+  min-width: 320px; 
+}
