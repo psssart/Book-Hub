@@ -946,3 +946,18 @@ nav.d-flex {
 .toast { 
   min-width: 320px; 
 }
+
+.book {
+  width: 95px;
+  height: 115px;
+  transition: transform 0.3s ease;
+}
+
+.book:hover {
+  transform: translateY(-10px) rotate(-3deg);
+}
+
+.open-book {
+  width: 180px;
+  height: auto;
+}

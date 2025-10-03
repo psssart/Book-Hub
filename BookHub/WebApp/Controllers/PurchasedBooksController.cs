@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
 using App.Contracts.DAL;
 using App.Domain.Entities;
+using App.Web.Infrastructure;
 using WebApp.Models;
 
 namespace WebApp.Controllers
@@ -40,6 +41,7 @@ namespace WebApp.Controllers
 
             if (!tempCart.Any())
             {
+                TempData.Error("Empty cart");
                 return RedirectToAction("Index");
             }
 
@@ -77,6 +79,7 @@ namespace WebApp.Controllers
             // Clear session after completing purchase
             HttpContext.Session.Remove("TempCart");
 
+            TempData.Success("Books purchased successfully");
             return RedirectToAction("Index");
         }
         [HttpPost]
@@ -111,29 +114,65 @@ namespace WebApp.Controllers
         // GET: PurchasedBooks
         public async Task<IActionResult> Index()
         {
-            // var appDbContext = _context.PurchasedBooks.Include(p => p.Book).Include(p => p.Purchase);
-            // return View(await appDbContext.ToListAsync());
-            
             // Get current user
             var currentUser = await _userManager.GetUserAsync(User);
-
             if (currentUser == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
 
             // Get all the user's purchased books
-            var purchasedBooks = await _context.PurchasedBooks
+            var purchasedItems = await _context.PurchasedBooks
+                .AsNoTracking()
                 .Include(pb => pb.Book)
                 .Include(pb => pb.Purchase)
                 .Where(pb => pb.Purchase!.AppUserId == currentUser.Id)
                 .ToListAsync();
-
-            /*var reviews = await _uow.Ratings.GetAllAsync(currentUser.Id);*/
-             var reviews = await _context.Ratings.Where(r => r.AppUserId == currentUser.Id).ToListAsync();
             
-            ViewData["Reviews"] = reviews.ToList();
-            return View(purchasedBooks);
+            var books = purchasedItems
+                .Select(pb => pb.Book!)
+                .DistinctBy(b => b.Id)
+                .ToList();
+
+            var bookIds = books.Select(b => b.Id).ToList();
+            
+            var purchasesByBookId = purchasedItems
+                .GroupBy(pb => pb.BookId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.Purchase!).ToList()
+                );
+            var ratings = bookIds.Count == 0
+                ? new List<Rating>()
+                : await _context.Ratings
+                    .AsNoTracking()
+                    .Where(r => bookIds.Contains(r.BookId))
+                    .ToListAsync();
+            var bookAuthors = bookIds.Count == 0
+                ? new List<BookAuthor>()
+                : await _context.BooksAuthors
+                    .AsNoTracking()
+                    .Where(ba => bookIds.Contains(ba.BookId))
+                    .Include(ba => ba.Author)
+                    .ToListAsync();
+            var genres = bookIds.Count == 0
+                ? new List<BookGenre>()
+                : await _context.BooksGenres
+                    .AsNoTracking()
+                    .Where(bg => bookIds.Contains(bg.BookId))
+                    .Include(bg => bg.Genre)
+                    .ToListAsync();
+            
+            var viewModel = new MyBooksModel()
+            {
+                Books = books,
+                Ratings = ratings,
+                BookAuthors = bookAuthors,
+                BookGenres = genres,
+                PurchasesByBookId = purchasesByBookId
+            };
+            
+            return View(viewModel);
         }
 
         // GET: PurchasedBooks/Details/5
