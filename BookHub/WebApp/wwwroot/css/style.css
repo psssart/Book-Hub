@@ -950,10 +950,11 @@ nav.d-flex {
 .book {
   width: 95px;
   height: 115px;
+}
+.book-wrapper {
   transition: transform 0.3s ease;
 }
-
-.book:hover {
+.book-wrapper:hover {
   transform: translateY(-10px) rotate(-3deg);
 }
 
