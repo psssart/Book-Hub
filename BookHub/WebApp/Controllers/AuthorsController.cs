@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
+using App.Domain.Address_Tables;
 using App.Domain.Entities;
+using WebApp.Models;
 
 namespace WebApp.Controllers
 {
@@ -25,33 +27,70 @@ namespace WebApp.Controllers
             return View(await _context.Authors.ToListAsync());
         }
 
-        // GET: Authors/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+    // GET: Authors/Details/5
+    public async Task<IActionResult> Details(Guid? id)
+    {
+        if (id == null) return NotFound();
+
+        var author = await _context.Authors
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id.Value);
+
+        if (author == null) return NotFound();
+        
+        var books = await _context.BooksAuthors
+            .AsNoTracking()
+            .Where(ba => ba.AuthorId == author.Id)
+            .Include(ba => ba.Book)
+            .Select(ba => ba.Book)
+            .Where(b => b != null)
+            .Distinct()
+            .ToListAsync();
+
+        var bookIds = books.Select(b => b!.Id).ToList();
+        
+        var ratings = bookIds.Count == 0
+            ? new List<Rating>()
+            : await _context.Ratings
+                .AsNoTracking()
+                .Where(r => bookIds.Contains(r.BookId))
+                .ToListAsync();
+
+        var bookAuthors = bookIds.Count == 0
+            ? new List<BookAuthor>()
+            : await _context.BooksAuthors
+                .AsNoTracking()
+                .Where(ba => bookIds.Contains(ba.BookId))
+                .Include(ba => ba.Author)
+                .ToListAsync();
+
+        var genres = bookIds.Count == 0
+            ? new List<BookGenre>()
+            : await _context.BooksGenres
+                .AsNoTracking()
+                .Where(bg => bookIds.Contains(bg.BookId))
+                .Include(bg => bg.Genre)
+                .ToListAsync();
+
+        var vm = new AuthorDetailsViewModel
         {
-            if (id == null)
+            Author = author,
+            Search = new HomeViewModel
             {
-                return NotFound();
+                Books = books!,
+                Ratings = ratings,
+                BookAuthors = bookAuthors,
+                BookGenres = genres,
+                BookWarehouses = [],
+                Authors = new List<Author> { author },
+                SearchInput = string.Empty,
+                ShowResults = true,
+                WithAuthors = false
             }
+        };
 
-            var author = await _context.Authors
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
-            {
-                return NotFound();
-            }
-
-            var authorsBooks = await _context.BooksAuthors.Include(ba => ba.Book).Where(ba => ba.AuthorId == author.Id).Select(ba => ba.Book).ToListAsync();
-            if (authorsBooks.Any())
-            {
-                // Получаем все BookId из booksQuery
-                var bookIds = authorsBooks.Select(b => b!.Id);
-                // Оставляем в ratingsQuery только те записи, где BookId присутствует в bookIds
-                var ratings = await _context.Ratings.Where(r => bookIds.Contains(r.BookId)).ToListAsync();
-                ViewData["Ratings"] = ratings;
-            }
-            ViewData["AuthorsBooks"] = authorsBooks;
-            return View(author);
-        }
+        return View(vm);
+    }
 
         // GET: Authors/Create
         public IActionResult Create()

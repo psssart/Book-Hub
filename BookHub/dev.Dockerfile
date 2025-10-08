@@ -30,7 +30,8 @@ RUN dotnet restore
 
 # Settings for development
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true \
-    DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER=true
+    DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER=true \
+    DOTNET_HOTRELOAD_AUTORESTART=1
 
 # Expose the development ports
 EXPOSE 80 443

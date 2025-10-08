@@ -1,3 +1,4 @@
+@using System.Text
 @model WebApp.Models.CartModel
 
 @{
@@ -5,49 +6,334 @@
     double totalValue = Model.Books.Sum(b => b.Price);
 }
 
-<h1>Shopping Cart</h1>
-
-@if (Model.Books.Any())
-{
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th></th>
-            <th>Price</th>
-            <th>Remove from Cart</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var purchasedBook in Model.Books)
+<div class="d-flex flex-column justify-content-between gap-3 flex-grow-1 mt-5 mx-0 mb-4">
+    <div class="books_results d-flex justify-content-center position-relative">
+        
+        <div id="cartSvgWrapper" class="cart-svg-wrapper" style="z-index: -1;"></div>
+        @if (Model.Books.Any())
         {
-            <tr>
-                <td>
-                    <img src="data:image;base64,@Convert.ToBase64String(@purchasedBook.imageData)" width="100px" height="130" alt=""/>
-                </td>
-                <td>@purchasedBook.Tittle</td>
-                <td>@purchasedBook.Price$</td>
-                <td>
-                    <form asp-controller="PurchasedBooks" asp-action="RemoveFromTempCart" method="post">
-                        <input type="hidden" name="id" value="@purchasedBook.Id"/>
-                        <button type="submit">Remove</button>
-                    </form>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+            <div class="books-on-cart d-flex gap-4 flex-row flex-wrap justify-content-center">
+                @foreach (var book in Model.Books)
+                {
+                    var authorsForBook = Model.BookAuthors
+                        .Where(ba => ba.BookId.Equals(book.Id))
+                        .Select(ba => ba.Author!)
+                        .Distinct()
+                        .ToList();
 
-    <form asp-controller="PurchasedBooks" asp-action="CreatePur" method="post">
-        <button type="submit">Buy</button>
-    </form>
-    <span>Total: @totalValue$</span>
-}
-else
-{
-    <p>No items in the cart.</p>
-}
+                    var genresForBook = Model.BookGenres
+                        .Where(bg => bg.BookId.Equals(book.Id))
+                        .Select(bg => bg.Genre!)
+                        .Distinct()
+                        .ToList();
+
+                    var ratingsForBook = Model.Ratings.Where(r => r.BookId == book.Id).ToList();
+                    int quantity = ratingsForBook.Count();
+                    float sum = ratingsForBook.Sum(r => r.Value);
+                    float averageRating = quantity > 0 ? sum / quantity : 0;
+                    string formattedRating = averageRating.ToString("0.0");
+                    int roundedRating = (int)Math.Round(averageRating);
+
+                    <div class="d-flex">
+                        <div class="card shadow-sm card-shopping-cart">
+                            <a asp-area="" asp-controller="Books" asp-action="Details"
+                               asp-route-id="@book.Id" class="text-decoration-none img-wrapper" style="height: 280px;">
+                                <img class="card-img-top img-hover"
+                                     src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" alt="@book.Tittle">
+                            </a>
+
+                            <div class="card-body d-flex flex-column p-2 pb-1">
+                                <h5 class="card-title text-center mb-2 fs-6">
+                                    <a asp-area="" asp-controller="Books" asp-action="Details"
+                                       asp-route-id="@book.Id" class="text-decoration-none">
+                                        @book.Tittle
+                                    </a>
+                                </h5>
+
+                                <div class="mt-auto">
+                                    <div class="row small align-items-center text-center">
+                                        <div class="col-7 text-nowrap pe-5">
+                                            $@book.Price
+                                        </div>
+                                        <div class="col-5">
+                                            <form asp-controller="PurchasedBooks" asp-action="RemoveFromTempCart" method="post">
+                                                <input type="hidden" name="id" value="@book.Id"/>
+                                                <button type="submit" class="delete-btn">X</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" class="toggle-btn btn btn-link p-0 col-12 mt-2 shadow-none" style="height: 1.2rem;">
+                                        <i class="bi bi-chevron-down" style="color: var(--accent-color)"></i>
+                                    </button>
+
+                                    <div class="details-section collapse">
+                                        <div class="row small text-muted mb-1 align-items-center">
+                                            <div class="col-9 pe-0 text-truncate">
+                                                @if (authorsForBook.Any())
+                                                {
+                                                    var last = authorsForBook.Last();
+                                                    var authorsText = string.Join(", ", authorsForBook.Select(g => g.Name));
+                                                    <span title="@authorsText">
+                                                        @foreach (var a in authorsForBook)
+                                                        {
+                                                            <a asp-area="" asp-controller="Authors" asp-action="Details"
+                                                               asp-route-id="@a.Id" class="text-decoration-none">
+                                                                @a.Name</a>
+                                                            @(a != last ? ", " : "")
+                                                        }
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Unknown author</span>
+                                                }
+                                            </div>
+                                            <div class="col-3 text-end text-nowrap ps-0">
+                                                <span>@book.ReleaseYear</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row small align-items-center mb-1">
+                                            <div class="col-5 text-nowrap pe-0 ps-3">
+                                                <div class="d-flex flex-column">
+                                                    <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
+                                                    <span class="ms-4 ps-2">@formattedRating</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-7 text-end">
+                                                @if (genresForBook.Any())
+                                                {
+                                                    var last = genresForBook.Last();
+                                                    var genresText = string.Join(", ", genresForBook.Select(g => g.Name));
+                                                    <span class="d-inline-block text-muted pt-1" title="@genresText"
+                                                          style="display: -webkit-box !important; -webkit-line-clamp: 2; 
+                                                          -webkit-box-orient: vertical; overflow: hidden; 
+                                                          white-space: normal;">
+                                                        @foreach (var g in genresForBook)
+                                                        {
+                                                            <a href="#"
+                                                               class="genre-chip"
+                                                               data-id="@g.Id">
+                                                                @g.Name@(g.Id != last.Id ? ", " : "")
+                                                            </a>
+                                                        }
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No genres</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center mt-5">
+                <p class="info-text rounded-pill border-primary py-1 px-2" style="background-color: var(--bg-mid-translucent);">
+                    Nothing in the cart.
+                </p>
+            </div>
+        }
+    </div>
+    <div class="d-flex justify-content-center align-items-center mx-4">
+        @if (Model.Books.Any())
+        {
+        <div class="auth-frame d-flex flex-column gap-2 text-center mt-5 px-0 w-100" 
+             style="background-color: var(--bg-translucent); max-width: 600px; z-index: 99999;">
+                <div>
+                    <div class="form-element">Total:</div>
+                    <div class="small-text fs-3 px-2">$@totalValue</div>
+                </div>
+                <form asp-controller="PurchasedBooks" asp-action="CreatePur" method="post">
+                    <button type="submit" class="login-button w-100 fs-3" data-buy-btn>Buy</button>
+                </form>
+        </div>
+        }
+    </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".toggle-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const details = this.nextElementSibling;
+                    const icon = this.querySelector("i");
+                    details.classList.toggle("collapse");
+                    if (details.classList.contains("collapse")) {
+                        icon.classList.remove("bi-chevron-up");
+                        icon.classList.add("bi-chevron-down");
+                    } else {
+                        icon.classList.remove("bi-chevron-down");
+                        icon.classList.add("bi-chevron-up");
+                    }
+                });
+            });
+            
+            const wrapper = document.getElementById("cartSvgWrapper");
+            if(!wrapper) return;
+            let svgEl;
+
+            fetch("/img/svg/cart_wheels.svg", { cache:"force-cache" })
+                .then(r => r.text())
+                .then(svgText => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgText, "image/svg+xml");
+                    const svg = doc.documentElement;
+                    
+                    const vb = svg.getAttribute("viewBox") || svg.getAttribute("viewbox");
+                    if(!svg.getAttribute("viewBox") && vb) svg.setAttribute("viewBox", vb);
+                    const pa = svg.getAttribute("preserveAspectRatio") || svg.getAttribute("preserveaspectratio");
+                    if(!svg.getAttribute("preserveAspectRatio") && pa) svg.setAttribute("preserveAspectRatio", pa);
+
+                    svg.classList.add("cart-svg");
+                    svg.setAttribute("aria-hidden","true");
+                    svg.setAttribute("focusable","false");
+
+                    wrapper.innerHTML = "";
+                    wrapper.appendChild(svg);
+                    svgEl = svg;
+
+                    const wl = svg.querySelector("#wheel-left");
+                    const wr = svg.querySelector("#wheel-right");
+                    
+                    const killAttrs = (root) => {
+                        if(!root) return;
+                        root.querySelectorAll("[fill], [style]").forEach(el => {
+                            const style = el.getAttribute("style");
+                            if(style){
+                                const newStyle = style
+                                    .split(";")
+                                    .map(s => s.trim())
+                                    .filter(s => s && !/^fill\s*:/i.test(s))
+                                    .join("; ");
+                                if(newStyle) el.setAttribute("style", newStyle);
+                                else el.removeAttribute("style");
+                            }
+                            if(el.hasAttribute("fill")) el.removeAttribute("fill");
+                        });
+                    };
+                    killAttrs(svg.querySelector("#cart-body"));
+                    killAttrs(wl);
+                    killAttrs(wr);
+                    
+                    [wl, wr].forEach(w => {
+                        if(!w) return;
+                        const rotor = document.createElementNS("http://www.w3.org/2000/svg","g");
+                        rotor.setAttribute("data-wheel-rotor","");
+                        while(w.firstChild) rotor.appendChild(w.firstChild);
+                        w.appendChild(rotor);
+                        rotor.style.transformBox = "fill-box";
+                        rotor.style.transformOrigin = "50% 50%";
+                    });
+                    
+                    const buyBtn = document.querySelector("[data-buy-btn]");
+                    const results = document.querySelector(".books_results");
+                    if(buyBtn){
+                        buyBtn.addEventListener("mouseenter", () => {
+                            if (results) results.classList.add("nudge");
+                            if (svgEl) svgEl.classList.add("cart-rolling");
+                        });
+                        buyBtn.addEventListener("mouseleave", () => {
+                            if (results) results.classList.remove("nudge");
+                            if (svgEl) svgEl.classList.remove("cart-rolling");
+                        });
+                        buyBtn.addEventListener("click", () => {
+                            if (results) results.classList.add("results-exit");
+                            if (svgEl) svgEl.classList.add("cart-rolling");
+
+                            e.preventDefault();
+                            const form = buyBtn.closest("form");
+                            setTimeout(() => form && form.submit(), 1000);
+                        });
+                    }
+                })
+                .catch(()=>{  });
+        });
+    </script>
 }
+
+@functions
+{
+    // Helper function to generate star icons based on the rating value
+    string GenerateStarIcons(int rating)
+    {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < rating)
+            {
+                stars.Append("★"); // Full star
+            }
+            else
+            {
+                stars.Append("☆"); // Empty star
+            }
+        }
+        return stars.ToString();
+    }
+}
+
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+     
+    .books_results{
+        transition: transform 600ms cubic-bezier(.22,.61,.36,1), opacity 220ms ease;
+    }
+
+    .books_results.nudge{
+        transform: translateX(-13px);
+    }
+    
+    .books_results.results-exit{
+        transform: translateX(-120vw);
+        opacity: .95;
+        pointer-events: none;
+    }
+    
+  .cart-svg-wrapper{
+      position:fixed;
+      /*bottom: 135px;*/
+      pointer-events:none;
+      z-index:1;
+  }
+  
+  .cart-svg{
+      width: var(--cart-width);
+      height: auto;
+      transform: translateX(0) scaleX(-1);
+      transition: transform 220ms ease, opacity 220ms ease;
+      will-change: transform;
+  }
+  
+  .nudge{
+      transform: translateX(-13px) scaleX(-1);
+  }
+
+  .cart-rolling [data-wheel-rotor]{ animation: spin-ccw 700ms linear infinite; }
+  .cart-exit    [data-wheel-rotor]{ animation: spin-ccw 600ms linear infinite; }
+  
+  .cart-svg #cart-body { fill: var(--accent-color) !important; stroke: none; !important }
+
+  .cart-svg #wheel-left [id="parts"] { fill: var(--accent-color) !important; }
+  .cart-svg #wheel-left [id="outer_wheel"] { fill: var(--secondary-hover) !important; }
+  .cart-svg #wheel-left [id="g5"] { fill: var(--secondary-hover) !important; }
+
+  .cart-svg #wheel-right [id="parts"] { fill: var(--accent-color) !important; }
+  .cart-svg #wheel-right [id="outer_wheel"] { fill: var(--secondary-hover) !important; }
+  .cart-svg #parts [id="g11"] { fill: var(--secondary-hover) !important; }
+</style>

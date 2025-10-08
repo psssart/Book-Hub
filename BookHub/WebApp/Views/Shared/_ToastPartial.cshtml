@@ -1,0 +1,70 @@
+﻿@using System.Text.Json
+@using App.Web.Infrastructure
+@{
+    const string Key = "__Toasts__";
+    var toasts = new List<(ToastLevel Level, string Message)>();
+
+    if (TempData.TryGetValue(Key, out var raw) && raw is string json && !string.IsNullOrWhiteSpace(json))
+    {
+        var items = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json);
+        if (items != null)
+        {
+            foreach (var i in items)
+            {
+                var levelStr = i["level"]?.ToString();
+                var msg = i["message"]?.ToString() ?? "";
+                if (Enum.TryParse<ToastLevel>(levelStr, ignoreCase: true, out var lvl))
+                    toasts.Add((lvl, msg));
+            }
+        }
+        TempData.Remove(Key);
+    }
+
+    string BgClass(ToastLevel level) => level switch {
+        ToastLevel.Success => "bg-success text-white",
+        ToastLevel.Warning => "bg-warning",
+        ToastLevel.Error   => "bg-danger text-white",
+        _                  => "bg-info text-white"
+    };
+    string IconClass(ToastLevel level) => level switch {
+        ToastLevel.Success => "bi-check-circle",
+        ToastLevel.Warning => "bi-exclamation-triangle",
+        ToastLevel.Error   => "bi-x-circle",
+        _                  => "bi-info-circle"
+    };
+    int Delay(ToastLevel level) => level switch {
+        ToastLevel.Error   => 7000,
+        ToastLevel.Warning => 6000,
+        ToastLevel.Success => 4500,
+        _                  => 3500
+    };
+}
+
+@if (toasts.Any())
+{
+    <div class="toast-container-fixed" aria-live="polite" aria-atomic="true">
+        @foreach (var t in toasts)
+        {
+            var bg = BgClass(t.Level);
+            var icon = IconClass(t.Level);
+            <div class="toast border-0 show bg-transparent rounded-3 overflow-hidden shadow-lg" role="status" aria-live="polite" aria-atomic="true"
+                 data-bs-autohide="true" data-bs-delay="@Delay(t.Level)">
+                <div class="toast-header border-0 bg-gradient bg-opacity-90 @bg">
+                    <i class="bi @icon me-2"></i>
+                    <strong class="me-auto fs-5">@t.Message</strong>
+                    <button type="button" class="btn-close @(bg.Contains("text-white") ? "btn-close-white" : "")"
+                            data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <script>
+        (function(){
+            if (!window.bootstrap || !bootstrap.Toast) return;
+            document.querySelectorAll('.toast').forEach(function (el) {
+                new bootstrap.Toast(el).show();
+            });
+        })();
+    </script>
+}

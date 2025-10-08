@@ -1,0 +1,225 @@
+:root {
+    /* Light theme variables */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --bg-input: #c6c6c6;
+    --bg-input-focus: #e4e4e4;
+    --bg-layout: linear-gradient(304deg, rgba(118,197,129,1) 0%, rgba(147,151,151,1) 97%);
+    --bg-translucent: rgba(255, 255, 255, 0.8);
+    --bg-mid-translucent: rgba(214, 214, 214, 0.96);
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    --border-color: #dee2e6;
+    --accent-color: #6474C9;
+    --accent-hover: #5667c7;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --disabled: #bca6a6;
+    --success: #d1e7dd;
+    --success-border: #badbcc;
+    --success-text: #0f5132;
+    --secondary-hover: #e6d67d;
+}
+
+[data-theme="dark"] {
+    /* Dark theme variables */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #404040;
+    --bg-input: #8f8f8f;
+    --bg-input-focus: #575757;
+    --bg-layout: linear-gradient(304deg, rgb(94, 145, 101) 0%, rgba(147,151,151,1) 97%);
+    --bg-translucent: rgba(57, 57, 57, 0.8);
+    --bg-mid-translucent: rgba(179, 179, 179, 0.96);
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
+    --border-color: #404040;
+    --accent-color: #7f92e1;
+    --accent-hover: #8d9de3;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+    --disabled: rgba(147, 130, 130, 0.69);
+    --success: #627c71;
+    --success-border: #4b6e5e;
+    --success-text: #5cc393;
+    --secondary-hover: #877c44;
+}
+
+/* -------------------------------------------------------------------------------- */
+/* Theme toggle button styles */
+.theme-toggle-item {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.theme-toggle-item-unauth {
+    margin: 0;
+    padding: 0;
+}
+
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.theme-toggle-btn:hover {
+    background-color: var(--bg-tertiary);
+    transform: scale(1.1);
+}
+
+.theme-icon {
+    width: 37px;
+    height: 37px;
+    color: black;
+    fill: none;
+    stroke: black;
+}
+
+.theme-icon use {
+    stroke: black;
+    fill: none;
+}
+
+.round-div {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-ctl {
+    text-decoration: none;
+    color: inherit;
+    padding: 1px 10px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+
+.theme-label {
+    color: black;
+}
+/* -------------------------------------------------------------------------------- */
+
+/* Apply theme variables to body */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply theme variables to common elements */
+.container-nav,
+.header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar ul li a,
+.navbar ul li button {
+    color: var(--text-primary);
+}
+
+.dropdown-menu {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+    background-color: var(--text-secondary);
+}
+
+/* Search form styling */
+.search-form-auth {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+}
+
+.search-form-txt-auth {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: none;
+}
+
+.search-form-txt-auth::placeholder {
+    color: var(--text-muted);
+}
+
+/* Unauthenticated header theme toggle positioning */
+.header .text-boxes {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header .theme-toggle-item-unauth {
+    display: flex;
+    align-items: center;
+}
+
+.header .theme-toggle-btn {
+    background-color: var(--bg-primary);
+    border: 2px solid var(--accent-color);
+    padding: 10px;
+}
+
+.header .theme-toggle-btn:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.header .theme-toggle-btn:hover .theme-icon {
+    color: white;
+}
+
+/* Table styling */
+table {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+th, td {
+    border-color: var(--border-color);
+}
+
+/* Card styling */
+.card {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Modal styling */
+.modal-content {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color);
+}

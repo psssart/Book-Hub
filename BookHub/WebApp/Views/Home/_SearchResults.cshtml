@@ -1,0 +1,208 @@
+﻿@using System.Text
+@model WebApp.Models.HomeViewModel
+
+<div id="results-root">
+    @if (Model.ShowResults)
+    {
+        <div class="search_results container-xxl py-3">
+
+            @* BOOKS AS CARDS *@
+            @if (Model.Books.Any())
+            {
+                <div class="books_results">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                        @foreach (var book in Model.Books)
+                        {
+                            var authorsForBook = Model.BookAuthors
+                                .Where(ba => ba.BookId.Equals(book.Id))
+                                .Select(ba => ba.Author!)
+                                .Distinct()
+                                .ToList();
+                            
+                            var genresForBook = Model.BookGenres
+                                .Where(bg => bg.BookId.Equals(book.Id))
+                                .Select(bg => bg.Genre!)
+                                .Distinct()
+                                .ToList();
+
+                            var ratingsForBook = Model.Ratings.Where(r => r.BookId == book.Id).ToList();
+                            int quantity = ratingsForBook.Count();
+                            float sum = ratingsForBook.Sum(r => r.Value);
+                            float averageRating = quantity > 0 ? sum / quantity : 0;
+                            string formattedRating = averageRating.ToString("0.0");
+                            int roundedRating = (int)Math.Round(averageRating);
+
+                            <div class="col">
+                                <div class="card h-100 shadow-sm">
+                                    <a asp-area="" asp-controller="Books" asp-action="Details"
+                                       asp-route-id="@book.Id" class="text-decoration-none img-wrapper" style="height: 280px;">
+                                        <img class="card-img-top img-hover"
+                                             src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" alt="@book.Tittle">
+                                    </a>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title text-center mb-2">
+                                            <a asp-area="" asp-controller="Books" asp-action="Details"
+                                               asp-route-id="@book.Id" class="text-decoration-none">
+                                                @book.Tittle
+                                            </a>
+                                        </h5>
+
+                                        <div class="mt-auto">
+                                            <div class="row small text-muted mb-1 align-items-center">
+                                                <div class="col-9 pe-0">
+                                                    @if (authorsForBook.Any())
+                                                    {
+                                                        var last = authorsForBook.Last();
+                                                        foreach (var a in authorsForBook)
+                                                        {
+                                                            <a asp-area="" asp-controller="Authors" asp-action="Details"
+                                                               asp-route-id="@a.Id" class="text-decoration-none">
+                                                                @a.Name</a>@(a != last ? ", " : "")
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Unknown author</span>
+                                                    }
+                                                </div>
+                                                <div class="col-3 text-end">
+                                                    <span>@book.ReleaseYear</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="row small align-items-center">
+                                                <div class="col-5 text-nowrap pe-0 ps-3">
+                                                    <div class="d-flex flex-column">
+                                                        <span class="fs-5">@GenerateStarIcons(Convert.ToInt32(roundedRating))</span>
+                                                        <span class="ms-4 ps-2">@formattedRating</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-7 text-end">
+                                                    @if (genresForBook.Any())
+                                                    {
+                                                        var last = genresForBook.Last();
+                                                        var genresText = string.Join(", ", genresForBook.Select(g => g.Name));
+                                                        <span class="d-inline-block text-muted pt-1" title="@genresText"
+                                                              style="display: -webkit-box !important; -webkit-line-clamp: 2; 
+                                                              -webkit-box-orient: vertical; overflow: hidden; 
+                                                              white-space: normal;">
+                                                            @foreach (var g in genresForBook)
+                                                            { 
+                                                                <a href="#"
+                                                                   class="genre-chip"
+                                                                   data-id="@g.Id">
+                                                                    @g.Name@(g.Id != last.Id ? ", " : "")
+                                                                </a>
+                                                            }
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">No genres</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="books_results">
+                    <p>No book results found.</p>
+                </div>
+            }
+
+            @if (Model.WithAuthors)
+            {
+                <h3 class="mt-4">Authors</h3>
+                @if (Model.Authors.Any())
+                {
+                    <div class="authors_results">
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                            @foreach (var author in Model.Authors)
+                            {
+                                <div class="col">
+                                    <div class="card h-100 shadow-sm">
+                                        <a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@author.Id"
+                                           class="text-decoration-none img-wrapper" style="height: 240px;">
+                                            <img class="card-img-top img-hover"
+                                                 src="data:image;base64,@Convert.ToBase64String(@author.imageData!)"
+                                                 alt="@author.Name">
+                                        </a>
+
+                                        <div class="card-body d-flex flex-column">
+
+                                            <div class="row align-items-center mb-2">
+                                                <div class="col-8 pe-0">
+                                                    <h6 class="card-title mb-0 text-truncate">
+                                                        <a asp-area="" asp-controller="Authors" asp-action="Details"
+                                                           asp-route-id="@author.Id" class="text-decoration-none">
+                                                            @author.Name
+                                                        </a>
+                                                    </h6>
+                                                </div>
+                                                <div class="col-4 text-end">
+                                                    <span class="badge text-dark" style="background-color: #b0b0b0;">
+                                                        @author.Age&nbsp;yo
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <p class="card-text small text-muted mb-0"
+                                                       style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                                        @author.Biography
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                        </div> <!-- /card-body -->
+                                    </div> <!-- /card -->
+                                </div>
+                                <!-- /col -->
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="authors_results">
+                        <p>No author results found.</p>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="search_results container-xxl py-3" hidden></div>
+    }
+</div>
+
+@functions
+{
+    // Helper function to generate star icons based on the rating value
+    string GenerateStarIcons(int rating)
+    {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < rating)
+            {
+                stars.Append("★"); // Full star
+            }
+            else
+            {
+                stars.Append("☆"); // Empty star
+            }
+        }
+        return stars.ToString();
+    }
+}

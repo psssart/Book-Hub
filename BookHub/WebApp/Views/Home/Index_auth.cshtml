@@ -1,289 +1,352 @@
-@using System.Text
-@using Microsoft.IdentityModel.Tokens
-@model WebApp.Models.HomeViewModel
-
 @{
-    ViewData["Title"] = "Books";
+    ViewData["Title"] = "Home";
 }
-@* @if (!Model.ShowResults) { *@
-@*     <div class="book-items"> *@
-@*     @foreach (var item in Model.Books) *@
-@*     { *@
-@*         <div class="book-item"> *@
-@*             <div class="book-item-box"> *@
-@*                 <img src="data:image;base64,@Convert.ToBase64String(item.imageData)" width="175px" height="260px" alt="Picture not found!"/> *@
-@*                 <div class="book-rating"> *@
-@*                     <img class="rating-star" src="img/svg/rating-unchecked.svg" width="24px" height="24px" alt=""> *@
-@*                     <div class="rating-score"> *@
-@*                         @{ *@
-@*                             int quantity = 0; *@
-@*                             float sum = 0; *@
-@*                         } *@
-@*                         @foreach (var rating in Model.Ratings) *@
-@*                         { *@
-@*                             if (rating.BookId == item.Id) *@
-@*                             { *@
-@*                                 quantity++; *@
-@*                                 sum += rating.Value; *@
-@*                             } *@
-@*                         } *@
-@*                         @{ *@
-@*                             float averageRating = quantity > 0 ? sum / quantity : 0; *@
-@*                             string formattedRating = averageRating.ToString("0.0"); *@
-@*                             int roundedRating = (int)Math.Round(averageRating); // Closest integer *@
-@*                         } *@
-@*                         $1$ Stars for rating and rating value #1# *@
-@*                         <span style="text-align: center;">@formattedRating</span> *@
-@*                     </div> *@
-@*                     <div class="book-title">@Html.DisplayFor(modelItem => item.Tittle)</div> *@
-@*                 </div> *@
-@*                 <div class="author"> *@
-@*                     @{ *@
-@*                         var author = Model.BookAuthors.Where(ba => ba.BookId.Equals(item.Id)).Select(ba => ba.Author).ToList().FirstOrDefault(); *@
-@*                     } *@
-@*                     @if (author != null) *@
-@*                     { *@
-@*                         <span>@author.Name</span> *@
-@*                     } *@
-@* *@
-@*                 </div> *@
-@*             </div> *@
-@*         </div> *@
-@* *@
-@*     } *@
-@* </div> *@
-@* } else { *@
-    <div class="search_results">
-        <div class="header2">
-            <h3>Books</h3>
-            <span><b>Found: @Model.Books.Count books</b></span>
-            <span class="sort_label">Sort by:
-                <select id="sortSelect" >
-                    <option value="none"></option>
-                    <option value="rating">Rating</option>
-                    <option value="price">Price</option>
-                    <option value="year">Year</option>
-                </select>
-                <button id="rotateButton"><span class="pyramid"></span></button>
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                <button class="filterMenuButton">Filter</button>
-            </span>
+@model WebApp.Models.HomeViewModel
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="~/img/svg/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <title>Bookhub</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body style="overflow-x: hidden;">
+<img src="img/svg/Ellispes.svg" alt="background-ellipses" class="image-ellipse" loading="lazy" decoding="async" style="z-index: -1 !important;">
+
+<div id="landing-root">
+    <div class="container-xxl mx-2 ps-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            @* Left header block *@
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <h3 class="m-0">Books</h3>
+
+                <div class="d-flex align-items-center gap-2 pt-2">
+                    <label for="sortSelect" class="sort_label m-0">Sort by:</label>
+                    <select id="sortSelect" class="form-select form-select-sm w-auto me-0" style="background-color: var(--bg-input);">
+                        <option value="none"></option>
+                        <option value="rating">Rating</option>
+                        <option value="price">Price</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <button id="rotateButton" type="button" class="btn btn-outline-secondary btn-sm" title="Toggle sort direction">
+                        <span class="pyramid"></span>
+                    </button>
+                </div>
+            </div>
+
+            @* Right header block *@
+            <div class="d-flex align-items-center gap-3">
+                @{
+                    var foundResults = Model.Books.Count + Model.Authors.Count;
+                }
+                <span class="fw-semibold">Found: @foundResults</span>
+                <button class="filterMenuButton btn btn-primary btn-sm">Filter</button>
+            </div>
         </div>
 
-        <div id="filterPanel" class="filterPanel">
-            <h5 align="center">Filtering Settings</h5>
-            <br/>
-            <h6 align="center">Books Filter</h6>
-            <br/>
+        @* Filter panel *@
+        <div id="filterPanel" class="container filterPanel" style="top: 89px;">
+            <div class="row">
+                <h5 class="col-12 text-center mt-2">
+                    Filtering Settings
+                </h5>
+            </div>
+            <div class="row mt-3">
+                <h6 class="col-12 text-center">
+                    Books Filter
+                </h6>
+            </div>
 
-
-
-            <span class="dropdownAut">
-                <button class="dropbtnAut">Authors</button>
-                <div class="dropdownAut-content">
-                    @foreach (var bookAuthor in Model.BookAuthors.Select(ba => ba.Author).Distinct())
-                    {
-                        <label><input type="checkbox" value="@bookAuthor!.Id"/>@bookAuthor.Name</label>
-                    }
-                </div>
-            </span>
-            <span class="filterReset">
-                <button class="filterResetbtn">Reset</button>
-            </span>
-            <span class="dropdownGen">
-                <button class="dropbtnGen">Genres</button>
-                <div class="dropdownGen-content">
-                    @foreach (var bookGenre in Model.BookGenres.Select(bg => bg.Genre).Distinct())
-                    {
-                        <label><input type="checkbox" value="@bookGenre!.Id"/>@bookGenre.Name</label> 
-                    }
-                </div>
-            </span>
-            <br/>
-            <span class="dropdownPub">
-                <button class="dropbtnPub">Publishers</button>
-                <div class="dropdownPub-content">
-                    @foreach (var bookPub in Model.Books.Select(b => b.Publisher).Distinct())
-                    {
-                        <label><input type="checkbox" value="@bookPub!.Id"/>@bookPub.Name</label>
-                    }
-                </div>
-            </span>
-            <span class="dropdownWar">
-                <button class="dropbtnWar">Warehouses</button>
-                <div class="dropdownWar-content">
-                    @*@foreach (var bookWar in Model.BookWarehouses.Select(bw => bw.Warehouse).Distinct())
-                    {
-                        <label><input type="checkbox" value="@bookWar!.Id"/>@bookWar.Name</label>
-                    }*@
-                </div>
-            </span>
-            <br/><br/><br/><br/>
-            <h6 align="center">Authors Filter</h6>
-            <br/>
-        </div>
-
-        @if (Model.Books.Any())
-        {
-            <div class="books_results">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th></th>
-                        <th>Price</th>
-                        @if (!Model.BookAuthors.IsNullOrEmpty()) {<th>Authors</th>}
-                        <th>Release Year</th>
-                        <th>Rating</th>
-                        @if (!Model.BookGenres.IsNullOrEmpty()) {<th>Genres</th>}
-                        @*@if (!Model.BookWarehouses.IsNullOrEmpty()) {<th>Warehouses</th>}*@
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var book in Model.Books)
-                    {
-                        <tr>
-                            <td id="book_picture">
-                                <img src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" width="260px" height="320px" alt=""/>
-                            </td>
-                            <td id="book_tittle"><a asp-area="" asp-controller="Books" asp-action="Details" asp-route-id="@book.Id">@book.Tittle</a></td>
-                            <td>@book.Price$</td>
-                            @if (!Model.BookAuthors.IsNullOrEmpty())
+            <div class="row mt-2 text-center">
+                <span class="col-5">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Authors</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-right dropdownAut-content px-3 gap-2">
+                            @foreach (var bookAuthor in Model.BookAuthors.Select(ba => ba.Author).Distinct())
                             {
-                                string authors = string.Join(", ", Model.BookAuthors
-                                    .Where(ba => ba.BookId.Equals(book.Id))
-                                    .Select(bookAuthor => bookAuthor.Author!.Name));
-                                <td>@authors</td>
+                                <label class="d-flex justify-content-start gap-2"><input type="checkbox" value="@bookAuthor!.Id"/> @bookAuthor.Name</label>
                             }
-                            <td>@book.ReleaseYear</td>
-                            <td>
-                                @{
-                                    int quantity = 0;
-                                    float sum = 0;
-                                }
-                                @foreach (var rating in Model.Ratings)
-                                {
-                                    if (rating.BookId == book.Id)
-                                    {
-                                        quantity++;
-                                        sum += rating.Value;
-                                    }
-                                }
-                                @{
-                                    float averageRating = quantity > 0 ? sum / quantity : 0;
-                                    string formattedRating = averageRating.ToString("0.0");
-                                    int roundedRating = (int)Math.Round(averageRating); // Closest integer
-                                }
-                                @* Stars for rating and rating value *@
-                                <div style="font-size: x-large">@GenerateStarIcons(Convert.ToInt32(roundedRating))</div>
-                                <span style="text-align: center;">@formattedRating</span>
-                            </td>
+                        </div>
+                    </div>
+                </span>
 
-                            @if (!Model.BookGenres.IsNullOrEmpty())
+                <span class="col-2 p-0">
+                    <button class="filterResetbtn btn btn-link btn-sm">
+                        Reset
+                    </button>
+                </span>
+
+                <span class="col-5">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Genres</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-left dropdownGen-content px-3 gap-2">
+                            @foreach (var bookGenre in Model.BookGenres.Select(bg => bg.Genre).Distinct())
                             {
-                                string genres = string.Join(", ", Model.BookGenres
-                                    .Where(bg => bg.BookId.Equals(book.Id))
-                                    .Select(bookGenre => bookGenre.Genre!.Name));
-                                <td id="book_genres">@genres</td>
+                                <label class="d-flex justify-content-end gap-2">@bookGenre!.Name <input type="checkbox" value="@bookGenre!.Id"/></label>
                             }
+                        </div>
+                    </div>
+                </span>
+            </div>
 
-                            @*@if (!Model.BookWarehouses.IsNullOrEmpty())
+            <div class="row mt-3 text-center">
+                <span class="col-6">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Publishers</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-right dropdownPub-content px-3 gap-2">
+                            @foreach (var bookPub in Model.Books.Select(b => b.Publisher).Distinct())
                             {
-                                string warehouses = string.Join(", ", Model.BookWarehouses
-                                    .Where(bw => bw.BookId.Equals(book.Id))
-                                    .Select(bookWarehouse => bookWarehouse.Warehouse!.Name));
-                                <td>@warehouses</td>
-                            }*@
+                                <label class="d-flex justify-content-start gap-2"><input type="checkbox" value="@bookPub!.Id"/> @bookPub.Name</label>
+                            }
+                        </div>
+                    </div>
+                </span>
 
-                        </tr>
-                    }
-                    </tbody>
-                </table>
+                <span class="col-6">
+                    <div class="dropdown dropdown-filter">
+                        <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Warehouses</button>
+                        <div class="dropdown-content dropdown-filter-content dropdown-left dropdownWar-content px-3 gap-2">
+                            @foreach (var bookWar in Model.BookWarehouses.Select(bw => bw.Warehouse).Distinct())
+                            {
+                                <label class="d-flex justify-content-end gap-2">@bookWar!.Name <input type="checkbox" value="@bookWar!.Id"/></label>
+                            }
+                        </div>
+                    </div>
+                </span>
             </div>
-        }
-        else
-        {
-            <div class="books_results">
-                <p>No book results found.</p>
-            </div>
-        }
 
-        <h3>Authors</h3>
-        @if (Model.Authors.Any())
-        {
-            <div class="authors_results">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Age</th>
-                        <th>Biography</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var author in Model.Authors)
-                    {
-                        <tr>
-                            <td><a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@author.Id">@author.Name</a></td>
-                            <td>@author.Age</td>
-                            <td>@author.Biography</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
+            <div class="row mt-3">
+                <h6 class="col-12 text-center">
+                    Authors Filter
+                </h6>
             </div>
-        }
-        else
-        {
-            <div class="authors_results">
-                <p>No author results found.</p>
+
+            <div class="row h-50">
+                <div class="col-12 flex-column align-items-center align-content-center">
+                    <button type="button" id="hidePanelBtn" class="fs-1 transparent-round-btn p-0 pb-1">
+                        >
+                    </button>
+                </div>
             </div>
-        }
+        </div> <!-- /filterPanel -->
     </div>
+</div>
 
+@await Html.PartialAsync("_SearchResults", Model)
 
-@functions
-{
-    // Helper function to generate star icons based on the rating value
-    string GenerateStarIcons(int rating)
-    {
-        StringBuilder stars = new StringBuilder();
-        for (int i = 0; i < 5; i++)
-        {
-            if (i < rating)
-            {
-                stars.Append("★"); // Full star
-            }
-            else
-            {
-                stars.Append("☆"); // Empty star
-            }
+</body>
+
+<script>
+var showFilterMenuButton;
+var selectedAuthorsGuids = [];
+var selectedGenresGuids = [];
+var selectedPublishersGuids = [];
+var selectedWarehousesGuids = [];
+$(document).ready(function() {
+    
+    $(document).on('click', '.dropdown-filter > .dropbtn', function(e) {
+        e.stopPropagation();
+        const $dropdown = $(this).closest('.dropdown-filter');
+        $('.dropdown-filter').not($dropdown).removeClass('open');
+        $dropdown.toggleClass('open');
+    });
+    
+    $(document).on('click', '.dropdown-filter-content', function(e) {
+        e.stopPropagation();
+    });
+    
+    $(document).on('click', function() {
+        $('.dropdown-filter').removeClass('open');
+    });
+    
+    // Watching for publishers selection for filtering
+    $(document).on('change', '.dropdownPub-content input[type="checkbox"]', function(){
+      let publisherId = $(this).val();
+        
+      if($(this).prop('checked')) {
+        selectedPublishersGuids.push(publisherId);
+      } else {
+        let index = selectedPublishersGuids.indexOf(publisherId);
+        if (index !== -1) {
+          selectedPublishersGuids.splice(index, 1);
         }
-        return stars.ToString();
+      }
+      sendSortingRequest($('#sortSelect').val(), getSortDirection())
+    });
+    
+    // Watching for authors selection for filtering
+    $(document).on('change', '.dropdownAut-content input[type="checkbox"]', function() {
+      let authorId = $(this).val();
+        
+      if($(this).prop('checked')) {
+        // Add the GUID to the list
+        selectedAuthorsGuids.push(authorId);
+      } else {
+        let index = selectedAuthorsGuids.indexOf(authorId);
+        if (index !== -1) {
+          selectedAuthorsGuids.splice(index, 1);
+        }
+      }
+      sendSortingRequest($('#sortSelect').val(), getSortDirection())
+    });
+    
+    // Watching for genres selection for filtering
+    $(document).on('change', '.dropdownGen-content input[type="checkbox"]', function() {
+      let genreId = $(this).val();
+        
+      if($(this).prop('checked')) {
+        selectedGenresGuids.push(genreId);
+      } else {
+        let index = selectedGenresGuids.indexOf(genreId);
+        if (index !== -1) {
+          selectedGenresGuids.splice(index, 1);
+        }
+      }
+      sendSortingRequest($('#sortSelect').val(), getSortDirection())
+    });
+    
+    // Show filtering menu
+    $(document).on('click', '.filterMenuButton', function (e) {
+        e.stopPropagation();
+        const $panel = $('#filterPanel');
+        const isOpen = $panel.css('right') === '0px';
+        showFilterMenuButton = !isOpen;
+        $panel.css('right', isOpen ? '-300px' : '0px');
+    });
+
+    $(document).on('click', '#filterPanel', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', function (e) {
+        const $t = $(e.target);
+        if (!$t.closest('#filterPanel, .filterMenuButton').length) {
+            $('#filterPanel').css('right', '-300px');
+            showFilterMenuButton = false;
+        }
+    });
+
+    $(document).on('click', '#hidePanelBtn', function (e) {
+        $('#filterPanel').css('right', '-300px');
+        showFilterMenuButton = false;
+    });
+    
+    // Reset filtering settings
+    $(document).on('click', '.filterResetbtn', function() {
+        selectedAuthorsGuids = [];
+        selectedGenresGuids = [];
+        selectedPublishersGuids = [];
+        selectedWarehousesGuids = [];
+        sendSortingRequest($('#sortSelect').val(), getSortDirection(), false)
+    });    
+    
+    // Event listener for sorting selection change
+    $(document).on('change', '#sortSelect', function() {
+        let sortBy = $(this).val();
+        let sortDirection = getSortDirection();
+        sendSortingRequest(sortBy, sortDirection);
+    });
+
+    function getSortDirection() {
+        return $('.pyramid').hasClass('rotate') ? 'descending' : 'ascending';
     }
+
+    // Function to send AJAX request for sorting
+    function sendSortingRequest(sortBy, sortDirection) {
+        const searchInput = "@Model.SearchInput";
+        
+        $.ajax({
+            url: '/Home/Index',
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            data: {
+                searchInput: searchInput,
+                sortBy,
+                sortDirection,
+                selectedAuthorsGuidsJson: JSON.stringify(selectedAuthorsGuids),
+                selectedGenresGuidsJson: JSON.stringify(selectedGenresGuids),
+                selectedPublishersGuidsJson: JSON.stringify(selectedPublishersGuids),
+                selectedWarehousesGuidsJson: JSON.stringify(selectedWarehousesGuids)
+            },
+            success: function (html) {
+                const $new = $(html);
+                $('#results-root').replaceWith($new);
+                
+                $('#sortSelect').val(sortBy);
+                if (sortDirection === 'descending') $('#rotateButton .pyramid').addClass('rotate'); else $('#rotateButton .pyramid').removeClass('rotate');
+                
+                if (showFilterMenuButton) $('#filterPanel').css('right', '0px');
+                
+                $('.dropdownAut-content input[type=checkbox]').each(function() {
+                    $(this).prop('checked', selectedAuthorsGuids.includes($(this).val()));
+                });
+                $('.dropdownGen-content input[type=checkbox]').each(function() {
+                    $(this).prop('checked', selectedGenresGuids.includes($(this).val()));
+                });
+                $('.dropdownPub-content input[type=checkbox]').each(function() {
+                    $(this).prop('checked', selectedPublishersGuids.includes($(this).val()));
+                });
+                $('.dropdownWar-content input[type=checkbox]').each(function() {
+                    $(this).prop('checked', selectedWarehousesGuids.includes($(this).val()));
+                });
+
+                syncChipsHighlight();
+            },
+            error: function (xhr, status, error) {
+                console.log("status:", status, "error:", error);
+            }
+        });
+    }
+    
+    // Function to handle button click event
+    $(document).on('click', '#rotateButton', function() {
+        rotatePyramid();
+        // Retrieve sorting criteria and direction
+        let sortBy = $('#sortSelect').val();
+        let sortDirection = getSortDirection();
+        sendSortingRequest(sortBy, sortDirection);
+    });
+
+    // Images adaptive size increasing hovering
+    document.querySelectorAll('.img-wrapper').forEach(thumb => {
+        const img = thumb.querySelector('.img-hover');
+
+        thumb.addEventListener('mouseenter', () => {
+            const boxRatio = thumb.offsetWidth / thumb.offsetHeight;
+            const imgRatio = img.naturalWidth / img.naturalHeight;
+
+            if (Math.abs(imgRatio - boxRatio) < 0.01) {
+                img.style.width = '115%';
+                img.style.height = '115%';
+            } else if (imgRatio > boxRatio) {
+                img.style.width = '115%';
+                img.style.height = '100%';
+            } else if (imgRatio < boxRatio) {
+                img.style.height = '115%';
+                img.style.width = '100%';
+            }
+        });
+
+        thumb.addEventListener('mouseleave', () => {
+            img.style.width = '100%';
+            img.style.height = '100%';
+        });
+    });
+
+    function syncChipsHighlight() {
+        $('.genre-chip').removeClass('active-genre');
+        selectedGenresGuids.forEach(function(id){
+            $('.genre-chip[data-id="' + id + '"]').addClass('active-genre');
+        });
+    }
+
+});
+
+// Function to toggle pyramid rotation
+function rotatePyramid() {
+    let pyramid = document.getElementById("rotateButton").querySelector(".pyramid");
+    pyramid.classList.toggle("rotate");
 }
-
-
-<script src="~/js/book-title-size-handler.js" asp-append-version="true"></script>
-@* <table class="table"> *@
-@*   <thead> *@
-@*   <tr> *@
-@*       <th> *@
-@*           Image *@
-@*       </th> *@
-@*       <th> *@
-@*           @Html.DisplayNameFor(model => model.Books.Publisher) *@
-@*       </th> *@
-@*       <th> *@
-@*           @Html.DisplayNameFor(model => model.Books.Tittle) *@
-@*       </th> *@
-@*       <th> *@
-@*           @Html.DisplayNameFor(model => model.Books.Price) *@
-@*       </th> *@
-@*       <th> *@
-@*           @Html.DisplayNameFor(model => model.Books.Description) *@
-@*       </th> *@
-@*       <th></th> *@
-@*   </tr> *@
-@*   </thead> *@
-@* </table> *@
+</script>

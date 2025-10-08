@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using WebApp.Helpers.Validation.File;
+using WebApp.Infrastructure.Email;
 
 namespace WebApp.Areas.Identity.Pages.Account
 {
@@ -30,13 +32,15 @@ namespace WebApp.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<AppUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IEmailTemplateService _templates;
 
         public RegisterModel(
             UserManager<AppUser> userManager,
             IUserStore<AppUser> userStore,
             SignInManager<AppUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IEmailTemplateService templates)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +48,7 @@ namespace WebApp.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _templates = templates;
         }
 
         /// <summary>
@@ -99,18 +104,29 @@ namespace WebApp.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
             
+            /// <summary>
+            /// First Name
+            /// </summary>
             [Required]
             [Display(Name = "First name")]
             [StringLength(64, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 1)]
             public string FirstName { get; set; }
 
             
+            /// <summary>
+            /// Last Name
+            /// </summary>
             [Required]
             [Display(Name = "Last name")]
             [StringLength(64, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 1)]
             public string LastName { get; set; }
             
-            [Display(Name = "Image")]
+            /// <summary>
+            /// Profile image
+            /// </summary>
+            [Display(Name = "Avatar Photo")]
+            [AllowedExtensions(new[] { ".jpg", ".jpeg", ".png", ".gif" })]
+            [MaxFileSize(2 * 1024 * 1024)]
             public IFormFile AvatarImageData { get; set; }
         }
 
@@ -163,8 +179,10 @@ namespace WebApp.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    var html = await _templates.RenderConfirmEmailAsync(callbackUrl);
+                    await _emailSender.SendEmailAsync(Input.Email, "Email confirmation", html);
+                    // await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

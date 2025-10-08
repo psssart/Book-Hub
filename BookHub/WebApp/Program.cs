@@ -3,11 +3,13 @@ using App.Contracts.BLL;
 using App.Contracts.DAL;
 using App.DAL.EF;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapperProfile = WebApp.Helpers.AutoMapperProfile;
 
 using WebApp.Infrastructure.Data;
 using WebApp.Infrastructure.Extensions;
+using WebApp.Infrastructure.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,11 +69,15 @@ builder.Services.AddAutoMapper(
     typeof(AutoMapperProfile)
 );
 
-// 7. MVC / Controllers / RazorPages
+// 7. MVC / Controllers / RazorPages / MailService
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddHealthChecks();
+
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 
 var app = builder.Build();
 
