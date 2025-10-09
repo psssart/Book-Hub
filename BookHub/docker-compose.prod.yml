@@ -2,35 +2,60 @@
   sql:
     image: postgres:16
     container_name: bookhub-sql
-    ports:
-      # external: internal
-      - 7890:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB: bookhub
     volumes:
-      - sql-volume:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-    restart: on-failure
-    logging:
-      options:
-        max-size: 10m
-        max-file: 3
-  
+      - sql-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    secrets:
+      - postgres_password
+
   app:
-    build: ./
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: bookhub-app
-    ports:
-      - 8080:8080
-    restart: on-failure
-    logging:
-      options:
-        max-size: 10m
-        max-file: 3
     environment:
-      ConnectionStrings__DefaultConnection: "Host=bookhub-sql;Port=5432;Database=bookhub;Username=postgres;Password=postgres"
-      Smtp__Password: 'APP_PSW'
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=sql;Port=5432;Database=bookhub;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ASPNETCORE_URLS: "http://+:8080"
+      Smtp__Password: ${SMTP_PASSWORD}
     depends_on:
-      - sql
+      sql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  migrator:
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    working_dir: /src
+    volumes:
+      - ./:/src:ro
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=sql;Port=5432;Database=bookhub;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      sql:
+        condition: service_healthy
+    entrypoint: ["/bin/sh","-c"]
+    command: >
+      "dotnet tool install --global dotnet-ef &&
+       export PATH=$PATH:/root/.dotnet/tools &&
+       dotnet restore &&
+       dotnet ef database update --project App.DAL.EF/App.DAL.EF.csproj --startup-project WebApp/WebApp.csproj"
+    restart: "no"
 
 volumes:
-  sql-volume:
+  sql-data:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
