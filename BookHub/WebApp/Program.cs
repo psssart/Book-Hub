@@ -3,6 +3,7 @@ using App.Contracts.BLL;
 using App.Contracts.DAL;
 using App.DAL.EF;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapperProfile = WebApp.Helpers.AutoMapperProfile;
@@ -12,6 +13,13 @@ using WebApp.Infrastructure.Extensions;
 using WebApp.Infrastructure.Email;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 
 // 1. Connection String
 var connectionString = builder.Configuration
@@ -31,6 +39,8 @@ builder.Services.AddSession(opts =>
     opts.IdleTimeout   = TimeSpan.FromMinutes(20);
     opts.Cookie.HttpOnly = true;
     opts.Cookie.IsEssential = true;
+    opts.Cookie.SameSite = SameSiteMode.Lax;
+    opts.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 // 4. CORS
@@ -81,6 +91,12 @@ builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    KnownProxies = { System.Net.IPAddress.Parse("127.0.0.1") }
+});
+
 // 8. Pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -97,7 +113,7 @@ app.UseStaticFiles();
 
 app.UseSession();
 
-app.UseHealthChecks("/health");
+app.MapHealthChecks("/health");
 
 app.UseRouting();
 
@@ -106,18 +122,21 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwagger();
-app.UseSwaggerUI(opts =>
+if (app.Environment.IsDevelopment())
 {
-    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-    foreach (var desc in provider.ApiVersionDescriptions)
+    app.UseSwagger();
+    app.UseSwaggerUI(opts =>
     {
-        opts.SwaggerEndpoint(
-            $"/swagger/{desc.GroupName}/swagger.json",
-            desc.GroupName.ToUpperInvariant()
-        );
-    }
-});
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var desc in provider.ApiVersionDescriptions)
+        {
+            opts.SwaggerEndpoint(
+                $"/swagger/{desc.GroupName}/swagger.json",
+                desc.GroupName.ToUpperInvariant()
+            );
+        }
+    });
+}
 
 app.MapControllerRoute(
     name: "area",

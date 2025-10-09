@@ -2,37 +2,57 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# копируем sln и csproj'и для кеша зависимостей
-COPY *.sln ./
-COPY WebApp/*.csproj ./WebApp/
-COPY App.BLL/*.csproj ./App.BLL/
-COPY App.BLL.DTO/*.csproj ./App.BLL.DTO/
-COPY App.Contracts.BLL/*.csproj ./App.Contracts.BLL/
-COPY App.Contracts.DAL/*.csproj ./App.Contracts.DAL/
-COPY App.DAL.DTO/*.csproj ./App.DAL.DTO/
-COPY App.DAL.EF/*.csproj ./App.DAL.EF/
-COPY App.DTO/*.csproj ./App.DTO/
-COPY App.Domain/*.csproj ./App.Domain/
-COPY App.Test/*.csproj ./App.Test/
-COPY Base.BLL/*.csproj ./Base.BLL/
-COPY Base.Contracts.BLL/*.csproj ./Base.Contracts.BLL/
-COPY Base.Contracts.DAL/*.csproj ./Base.Contracts.DAL/
-COPY Base.Contracts.Domain/*.csproj ./Base.Contracts.Domain/
-COPY Base.DAL.EF/*.csproj ./Base.DAL.EF/
-COPY Base.Domain/*.csproj ./Base.Domain/
-COPY Base.Tests/*.csproj ./Base.Tests/
-COPY Helpers/*.csproj ./Helpers/
-RUN dotnet restore
+COPY Directory.Build.props ./
 
-# теперь весь исходник и publish
+COPY WebApp/*.csproj WebApp/
+COPY App.BLL/*.csproj App.BLL/
+COPY App.BLL.DTO/*.csproj App.BLL.DTO/
+COPY App.Contracts.BLL/*.csproj App.Contracts.BLL/
+COPY App.Contracts.DAL/*.csproj App.Contracts.DAL/
+COPY App.DAL.DTO/*.csproj App.DAL.DTO/
+COPY App.DAL.EF/*.csproj App.DAL.EF/
+COPY App.DTO/*.csproj App.DTO/
+COPY App.Domain/*.csproj App.Domain/
+COPY Base.BLL/*.csproj Base.BLL/
+COPY Base.Contracts.BLL/*.csproj Base.Contracts.BLL/
+COPY Base.Contracts.DAL/*.csproj Base.Contracts.DAL/
+COPY Base.Contracts.Domain/*.csproj Base.Contracts.Domain/
+COPY Base.DAL.EF/*.csproj Base.DAL.EF/
+COPY Base.Domain/*.csproj Base.Domain/
+COPY Helpers/*.csproj Helpers/
+
+RUN dotnet restore WebApp/WebApp.csproj \
+    -r linux-x64 \
+    -p:PublishReadyToRun=true
+
 COPY . .
-RUN dotnet publish WebApp/WebApp.csproj -c Release -o /app/publish /p:UseAppHost=false
+
+RUN dotnet publish WebApp/WebApp.csproj -c Release -o /app/publish \
+    -r linux-x64 \
+    /p:UseAppHost=false \
+    /p:PublishReadyToRun=true \
+    --no-restore
 
 # runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/publish .
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV ASPNETCORE_URLS=http://+:8080 \
+    ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_FORWARDEDHEADERS_ENABLED=true \
+    DOTNET_EnableDiagnostics=0
+    
+COPY --from=build /app/publish ./
+
+RUN adduser --disabled-password --gecos "" appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8080/health || exit 1
 
 EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "WebApp.dll"]

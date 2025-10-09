@@ -4,6 +4,10 @@
 **/publish/
 .docker_cache/
 .docker/
+**/.msbuild
+artifacts/efbundle
+App.Test/
+Base.Tests/
 
 # Visual Studio
 .vs/
