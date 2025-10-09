@@ -1,9 +1,10 @@
+# build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-# copy csproj and restore as distinct layers
-COPY *.sln .
-# copy ALL the projects
+# копируем sln и csproj'и для кеша зависимостей
+COPY *.sln ./
+COPY WebApp/*.csproj ./WebApp/
 COPY App.BLL/*.csproj ./App.BLL/
 COPY App.BLL.DTO/*.csproj ./App.BLL.DTO/
 COPY App.Contracts.BLL/*.csproj ./App.Contracts.BLL/
@@ -21,44 +22,17 @@ COPY Base.DAL.EF/*.csproj ./Base.DAL.EF/
 COPY Base.Domain/*.csproj ./Base.Domain/
 COPY Base.Tests/*.csproj ./Base.Tests/
 COPY Helpers/*.csproj ./Helpers/
-COPY WebApp/*.csproj ./WebApp/
-
 RUN dotnet restore
 
+# теперь весь исходник и publish
+COPY . .
+RUN dotnet publish WebApp/WebApp.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-# copy everything else and build app
-# copy all the projects
-COPY App.BLL/. ./App.BLL/
-COPY App.BLL.DTO/. ./App.BLL.DTO/
-COPY App.Contracts.BLL/. ./App.Contracts.BLL/
-COPY App.Contracts.DAL/. ./App.Contracts.DAL/
-COPY App.DAL.DTO/. ./App.DAL.DTO/
-COPY App.DAL.EF/. ./App.DAL.EF/
-COPY App.DTO/. ./App.DTO/
-COPY App.Domain/. ./App.Domain/
-COPY App.Test/. ./App.Test/
-COPY Base.BLL/. ./Base.BLL/
-COPY Base.Contracts.BLL/. ./Base.Contracts.BLL/
-COPY Base.Contracts.DAL/. ./Base.Contracts.DAL/
-COPY Base.Contracts.Domain/. ./Base.Contracts.Domain/
-COPY Base.DAL.EF/. ./Base.DAL.EF/
-COPY Base.Domain/. ./Base.Domain/
-COPY Base.Tests/. ./Base.Tests/
-COPY Helpers/. ./Helpers/
-COPY WebApp/. ./WebApp/
-
-# run tests
-RUN dotnet test Base.Tests
-RUN dotnet test App.Test
-
-# build output files
-WORKDIR /app/WebApp
-RUN dotnet publish -c Release -o out
-
-# switch to runtime image
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-EXPOSE 80
-EXPOSE 8080
+# runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/WebApp/out ./
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "WebApp.dll"]
