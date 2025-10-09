@@ -4,7 +4,7 @@
     container_name: bookhub-sql
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: bookhub
     volumes:
       - sql-data:/var/lib/postgresql/data
@@ -14,8 +14,6 @@
       timeout: 5s
       retries: 5
     restart: unless-stopped
-    secrets:
-      - postgres_password
 
   app:
     build:
@@ -24,9 +22,9 @@
     container_name: bookhub-app
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: "Host=sql;Port=5432;Database=bookhub;Username=postgres;Password=${POSTGRES_PASSWORD}"
-      ASPNETCORE_URLS: "http://+:8080"
-      Smtp__Password: ${SMTP_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_KEY: ${JWT_KEY}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
     depends_on:
       sql:
         condition: service_healthy
@@ -38,24 +36,28 @@
     image: mcr.microsoft.com/dotnet/sdk:8.0
     working_dir: /src
     volumes:
-      - ./:/src:ro
+      - ./:/src
+      - nuget_cache:/root/.nuget/packages
     environment:
-      ConnectionStrings__DefaultConnection: "Host=sql;Port=5432;Database=bookhub;Username=postgres;Password=${POSTGRES_PASSWORD}"
       ASPNETCORE_ENVIRONMENT: Production
+      NUGET_PACKAGES: /root/.nuget/packages
     depends_on:
       sql:
         condition: service_healthy
-    entrypoint: ["/bin/sh","-c"]
-    command: >
-      "dotnet tool install --global dotnet-ef &&
-       export PATH=$PATH:/root/.dotnet/tools &&
-       dotnet restore &&
-       dotnet ef database update --project App.DAL.EF/App.DAL.EF.csproj --startup-project WebApp/WebApp.csproj"
+    command:
+      - /bin/sh
+      - -lc
+      - |
+        set -eu
+        dotnet tool install dotnet-ef --tool-path /usr/local/bin --version 8.*
+        dotnet restore
+        dotnet build App.DAL.EF/App.DAL.EF.csproj -c Release
+        dotnet build WebApp/WebApp.csproj -c Release
+        dotnet-ef database update \
+          --project App.DAL.EF/App.DAL.EF.csproj \
+          --startup-project WebApp/WebApp.csproj
     restart: "no"
 
 volumes:
   sql-data:
-
-secrets:
-  postgres_password:
-    file: ./secrets/postgres_password.txt
+  nuget_cache:
