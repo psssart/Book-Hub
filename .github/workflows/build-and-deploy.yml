@@ -95,7 +95,13 @@ jobs:
           install -m 600 -D /dev/null ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-        # safe ssh setup
+        # ssh materials ready
+
+      - name: Init remote dirs
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "mkdir -p ${{ env.APP_DIR }}/artifacts"
+        # create destination path
 
       - name: Push efbundle to server
         run: |
@@ -103,23 +109,23 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.new
           rsync -e "ssh -p ${{ secrets.SSH_PORT }}" -avz BookHub/artifacts/efbundle.sha256 \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.sha256.new
-        # stage new bundle+hash
+        # stage bundle + checksum
 
       - name: Deploy over SSH
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -euo pipefail
-          cd ${APP_DIR}
+          cd ${{ env.APP_DIR }}
 
           # ensure env exists and set image tag
           if ! grep -q '^APP_IMAGE_TAG=' .env; then echo "APP_IMAGE_TAG=" >> .env; fi
           sed -i "s/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${IMAGE_TAG}/" .env
 
-          # login to GHCR if image is private
-          if [ -n "${GHCR_TOKEN:-}" ]; then
-            echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
+          # docker login if image is private; safe because value substituted on CI side
+          if [ -n "${{ secrets.GHCR_TOKEN }}" ]; then
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           fi
 
           # pull only app image
@@ -127,9 +133,9 @@ jobs:
           docker compose -f docker-compose.prod.yml up -d sql
 
           # compare migration bundle checksum
-          NEW_SHA="$(cat artifacts/efbundle.sha256.new)"
-          OLD_SHA="$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
-          if [ "$NEW_SHA" != "$OLD_SHA" ]; then
+          NEW_SHA="\$(cat artifacts/efbundle.sha256.new)"
+          OLD_SHA="\$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
+          if [ "\$NEW_SHA" != "\$OLD_SHA" ]; then
             mv artifacts/efbundle.new artifacts/efbundle
             mv artifacts/efbundle.sha256.new artifacts/efbundle.sha256
             echo "Running migrations (bundle changed)"
@@ -139,8 +145,7 @@ jobs:
             echo "Skip migrations (no schema change)"
           fi
 
-          # start/upgrade app
           docker compose -f docker-compose.prod.yml up -d app
           docker compose -f docker-compose.prod.yml ps
           EOF
-        # conditional migrations by checksum
+        # single ssh session, variables expanded locally
