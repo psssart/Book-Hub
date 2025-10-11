@@ -7,6 +7,7 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write
@@ -15,7 +16,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/book-hub-app
-      APP_DIR: /home/deploy/apps/BookHub/BookHub    # compose + artifacts here
+      APP_DIR: /home/deploy/apps/BookHub/BookHub  # compose + artifacts here
 
     steps:
       - name: Checkout
@@ -50,7 +51,7 @@ jobs:
             -o ./artifacts/efbundle
           chmod +x ./artifacts/efbundle
           (cd artifacts && sha256sum efbundle | awk '{print $1}' > efbundle.sha256)
-        # produce checksum to detect schema changes
+        # checksum for conditional migrations
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -106,26 +107,28 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.new
           rsync -e "ssh -p ${{ secrets.SSH_PORT }}" -avz BookHub/artifacts/efbundle.sha256 \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.sha256.new
-    
+        # stage bundle + checksum
+
       - name: Deploy over SSH
-        env: { IMAGE_TAG: ${{ github.sha }} }
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -euo pipefail
           cd ${{ env.APP_DIR }}
-          
-          # фикс тега
+
+          # set image tag
           if ! grep -q '^APP_IMAGE_TAG=' .env; then echo "APP_IMAGE_TAG=" >> .env; fi
           sed -i "s/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${IMAGE_TAG}/" .env
-          
-          # ghcr login, если секрет дан
+
+          # optional ghcr login (private images)
           if [ -n "${{ secrets.GHCR_TOKEN }}" ]; then
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           fi
-          
+
           docker compose -f docker-compose.prod.yml pull app
           docker compose -f docker-compose.prod.yml up -d sql
-          
+
           NEW_SHA="\$(cat artifacts/efbundle.sha256.new)"
           OLD_SHA="\$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
           if [ "\$NEW_SHA" != "\$OLD_SHA" ]; then
@@ -137,7 +140,8 @@ jobs:
             rm -f artifacts/efbundle.new artifacts/efbundle.sha256.new
             echo "Skip migrations (no schema change)"
           fi
-          
+
           docker compose -f docker-compose.prod.yml up -d app
           docker compose -f docker-compose.prod.yml ps
           EOF
+        # single ssh session, local var expansion
