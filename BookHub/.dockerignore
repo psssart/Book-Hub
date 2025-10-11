@@ -8,6 +8,13 @@
 artifacts/efbundle
 App.Test/
 Base.Tests/
+artifacts/*
+**/*.user
+**/*.suo
+**/*.db
+*.md
+docker-compose*.yml
+.env*
 
 # Visual Studio
 .vs/
@@ -47,4 +54,5 @@ node_modules/
 # Certificate / Git files
 *.pfx
 .git
+.gitignore
 .github/
