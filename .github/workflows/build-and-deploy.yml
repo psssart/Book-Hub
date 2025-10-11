@@ -15,8 +15,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/book-hub-app
-      DEPLOY_ROOT: /opt/bookhub        # repo root on server
-      APP_DIR: /opt/bookhub/BookHub/BookHub    # compose + artifacts here
+      APP_DIR: /home/deploy/apps/BookHub/BookHub    # compose + artifacts here
 
     steps:
       - name: Checkout
@@ -98,41 +97,35 @@ jobs:
         # ssh materials ready
 
       - name: Init remote dirs
-        run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "mkdir -p ${{ env.APP_DIR }}/artifacts"
+        run: ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ env.APP_DIR }}/artifacts"
         # ensure target path exists
 
       - name: Push efbundle to server
         run: |
           rsync -e "ssh -p ${{ secrets.SSH_PORT }}" -avz BookHub/artifacts/efbundle \
-          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.new
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.new
           rsync -e "ssh -p ${{ secrets.SSH_PORT }}" -avz BookHub/artifacts/efbundle.sha256 \
-          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.sha256.new
-          # stage new bundle + checksum
-
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.sha256.new
+    
       - name: Deploy over SSH
-        env:
-          IMAGE_TAG: ${{ github.sha }}
+        env: { IMAGE_TAG: ${{ github.sha }} }
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -euo pipefail
-          cd ${{ env.APP_DIR }}  # nested BookHub with compose
+          cd ${{ env.APP_DIR }}
           
-          # ensure .env has tag
+          # фикс тега
           if ! grep -q '^APP_IMAGE_TAG=' .env; then echo "APP_IMAGE_TAG=" >> .env; fi
           sed -i "s/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${IMAGE_TAG}/" .env
           
-          # login to GHCR if private
+          # ghcr login, если секрет дан
           if [ -n "${{ secrets.GHCR_TOKEN }}" ]; then
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           fi
           
-          # pull app image only
           docker compose -f docker-compose.prod.yml pull app
           docker compose -f docker-compose.prod.yml up -d sql
           
-          # run migrations only if bundle changed
           NEW_SHA="\$(cat artifacts/efbundle.sha256.new)"
           OLD_SHA="\$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
           if [ "\$NEW_SHA" != "\$OLD_SHA" ]; then
@@ -148,4 +141,3 @@ jobs:
           docker compose -f docker-compose.prod.yml up -d app
           docker compose -f docker-compose.prod.yml ps
           EOF
-        # single ssh session, local var expansion

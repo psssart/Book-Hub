@@ -1,7 +1,6 @@
 ﻿services:
   sql:
     image: postgres:16.4
-    container_name: bookhub-sql
     env_file: [.env]
     ports:
       - "127.0.0.1:5432:5432"
