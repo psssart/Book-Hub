@@ -111,37 +111,46 @@ jobs:
 
       - name: Deploy over SSH
         env:
-          IMAGE_TAG: sha-${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -euo pipefail
+          set -x  # verbose for debugging
           cd ${{ env.APP_DIR }}
-
-          # set image tag
-          if ! grep -q '^APP_IMAGE_TAG=' .env; then echo "APP_IMAGE_TAG=" >> .env; fi
+          
+          # ensure .env and set image tag
+          grep -q '^APP_IMAGE_TAG=' .env || echo "APP_IMAGE_TAG=" >> .env
           sed -i "s/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${IMAGE_TAG}/" .env
-
-          # optional ghcr login (private images)
+          
+          # login to GHCR if token provided (private images)
           if [ -n "${{ secrets.GHCR_TOKEN }}" ]; then
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           fi
-
+          
+          # sanity: show services and current state
+          docker compose -f docker-compose.prod.yml config --services || true
+          docker compose -f docker-compose.prod.yml ps || true
+          
+          # pull image and start DB
           docker compose -f docker-compose.prod.yml pull app
           docker compose -f docker-compose.prod.yml up -d sql
-
-          NEW_SHA="\$(cat artifacts/efbundle.sha256.new)"
+          
+          # run migrations only if bundle changed
+          NEW_SHA="\$(cat artifacts/efbundle.sha256.new 2>/dev/null || true)"
           OLD_SHA="\$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
-          if [ "\$NEW_SHA" != "\$OLD_SHA" ]; then
-            mv artifacts/efbundle.new artifacts/efbundle
-            mv artifacts/efbundle.sha256.new artifacts/efbundle.sha256
-            echo "Running migrations (bundle changed)"
+          if [ -n "\$NEW_SHA" ] && [ "\$NEW_SHA" != "\$OLD_SHA" ]; then
+            mv -f artifacts/efbundle.new artifacts/efbundle
+            mv -f artifacts/efbundle.sha256.new artifacts/efbundle.sha256
             docker compose -f docker-compose.prod.yml run --rm migrator
           else
-            rm -f artifacts/efbundle.new artifacts/efbundle.sha256.new
-            echo "Skip migrations (no schema change)"
+            rm -f artifacts/efbundle.new artifacts/efbundle.sha256.new || true
+            echo "Skip migrations"
           fi
-
+          
+          # ALWAYS start/upgrade app
           docker compose -f docker-compose.prod.yml up -d app
+          
+          # show status and recent logs for app
           docker compose -f docker-compose.prod.yml ps
+          docker compose -f docker-compose.prod.yml logs --no-color --tail=200 app || true
           EOF
-        # single ssh session, local var expansion
