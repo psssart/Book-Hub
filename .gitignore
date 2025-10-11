@@ -18,6 +18,7 @@
 *.userosscache
 *.sln.docstates
 *.userprefs
+.env
 
 ## ASP.NET specific
 project.lock.json

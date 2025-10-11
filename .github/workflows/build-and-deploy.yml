@@ -111,7 +111,7 @@ jobs:
 
       - name: Deploy over SSH
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: sha-${{ github.sha }}
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -euo pipefail
