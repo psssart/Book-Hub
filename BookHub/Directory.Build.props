@@ -9,4 +9,17 @@
         <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/obj/**/*</DefaultItemExcludes>
         <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/bin/**/*</DefaultItemExcludes>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Update="NuGet.Common"    PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.Protocol"  PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.Packaging" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.ProjectModel" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.Configuration" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.DependencyResolver.Core" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.Frameworks" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.LibraryModel" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="NuGet.Versioning" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Update="Microsoft.VisualStudio.Web.CodeGeneration.*" PrivateAssets="all" ExcludeAssets="runtime" />
+    </ItemGroup>
 </Project>

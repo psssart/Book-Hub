@@ -43,9 +43,8 @@ ENV ASPNETCORE_URLS=http://+:8080 \
     DOTNET_EnableDiagnostics=0 \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-USER 64198:64198
-
 COPY --chown=64198:64198 --from=build /app/publish ./
+USER 64198:64198
 
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "WebApp.dll"]

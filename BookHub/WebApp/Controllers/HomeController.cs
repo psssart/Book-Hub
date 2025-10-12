@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
+using System.Text.Json;
 using WebApp.Models;
 
 namespace WebApp.Controllers;
@@ -59,7 +59,7 @@ public class HomeController : Controller
                 // filters
                 if (!string.IsNullOrWhiteSpace(selectedPublishersGuidsJson) && selectedPublishersGuidsJson != "[]")
                 {
-                    var ids = JsonConvert.DeserializeObject<string[]>(selectedPublishersGuidsJson) ??
+                    var ids = JsonSerializer.Deserialize<string[]>(selectedPublishersGuidsJson) ??
                               Array.Empty<string>();
                     var guidIds = ids.Select(Guid.Parse).ToArray();
                     books = books.Where(b => guidIds.Contains(b.PublisherId));
@@ -67,7 +67,7 @@ public class HomeController : Controller
 
                 if (!string.IsNullOrWhiteSpace(selectedWarehousesGuidsJson) && selectedWarehousesGuidsJson != "[]")
                 {
-                    var ids = JsonConvert.DeserializeObject<string[]>(selectedWarehousesGuidsJson) ??
+                    var ids = JsonSerializer.Deserialize<string[]>(selectedWarehousesGuidsJson) ??
                               Array.Empty<string>();
                     var guidIds = ids.Select(Guid.Parse).ToArray();
 
@@ -80,7 +80,7 @@ public class HomeController : Controller
 
                 if (!string.IsNullOrWhiteSpace(selectedAuthorsGuidsJson) && selectedAuthorsGuidsJson != "[]")
                 {
-                    var ids = JsonConvert.DeserializeObject<string[]>(selectedAuthorsGuidsJson) ??
+                    var ids = JsonSerializer.Deserialize<string[]>(selectedAuthorsGuidsJson) ??
                               Array.Empty<string>();
                     var guidIds = ids.Select(Guid.Parse).ToArray();
 
@@ -93,7 +93,7 @@ public class HomeController : Controller
 
                 if (!string.IsNullOrWhiteSpace(selectedGenresGuidsJson) && selectedGenresGuidsJson != "[]")
                 {
-                    var ids = JsonConvert.DeserializeObject<string[]>(selectedGenresGuidsJson) ?? Array.Empty<string>();
+                    var ids = JsonSerializer.Deserialize<string[]>(selectedGenresGuidsJson) ?? Array.Empty<string>();
                     var guidIds = ids.Select(Guid.Parse).ToArray();
 
                     var bookIds = bookGenres
