@@ -113,7 +113,7 @@ jobs:
         # keep SBOM
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@v0
         with:
           image-ref: "${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}"
           format: 'table'
@@ -124,7 +124,7 @@ jobs:
             # fail on HIGH/CRITICAL
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.9.0
+        uses: sigstore/cosign-installer@v3
         # install cosign
 
       - name: Sign image with Cosign (keyless)
