@@ -43,7 +43,7 @@
     tmpfs:
       - /tmp:rw,nosuid,nodev,noexec,mode=1777
     volumes:
-      - app-dp-keys:/app_data_protection:rw
+      - ./app_data_protection:/app_data_protection:rw
     environment:
       ASPNETCORE_DATA_PROTECTION_DIR: /app_data_protection
     security_opt:
