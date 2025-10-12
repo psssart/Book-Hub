@@ -4,6 +4,10 @@ on:
   push:
     branches: [ main ]  # auto deploy on main
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -78,6 +82,7 @@ jobs:
         # tag image with commit sha
 
       - name: Build and push image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: BookHub
@@ -89,6 +94,47 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
         # build app image only
+
+      # --- Security & provenance ---
+
+      - name: Generate SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          image: "${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}"
+          format: spdx-json
+          output-file: sbom.spdx.json
+            # produce SBOM
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+        # keep SBOM
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@v0.33.1
+        with:
+          image-ref: "${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}"
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
+            # fail on HIGH/CRITICAL
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installerv3.9.0
+        # install cosign
+
+      - name: Sign image with Cosign (keyless)
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+        run: |
+          cosign sign --yes ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+        # sign via OIDC
+        
+      # --- Deploy ---
 
       - name: Prepare SSH
         run: |
@@ -113,28 +159,28 @@ jobs:
         env:
           IMAGE_TAG: sha-${{ github.sha }}
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           set -euo pipefail
-          set -x  # verbose for debugging
+          set -x
           cd ${{ env.APP_DIR }}
-          
+
           # ensure .env and set image tag
           grep -q '^APP_IMAGE_TAG=' .env || echo "APP_IMAGE_TAG=" >> .env
           sed -i "s/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${IMAGE_TAG}/" .env
-          
+
           # login to GHCR if token provided (private images)
           if [ -n "${{ secrets.GHCR_TOKEN }}" ]; then
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           fi
-          
-          # sanity: show services and current state
+
+          # show current state
           docker compose -f docker-compose.prod.yml config --services || true
           docker compose -f docker-compose.prod.yml ps || true
-          
+
           # pull image and start DB
           docker compose -f docker-compose.prod.yml pull app
           docker compose -f docker-compose.prod.yml up -d sql
-          
+
           # run migrations only if bundle changed
           NEW_SHA="\$(cat artifacts/efbundle.sha256.new 2>/dev/null || true)"
           OLD_SHA="\$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
@@ -146,11 +192,11 @@ jobs:
             rm -f artifacts/efbundle.new artifacts/efbundle.sha256.new || true
             echo "Skip migrations"
           fi
-          
-          # ALWAYS start/upgrade app
+
+          # start/upgrade app
           docker compose -f docker-compose.prod.yml up -d app
-          
-          # show status and recent logs for app
+
+          # status + recent logs
           docker compose -f docker-compose.prod.yml ps
           docker compose -f docker-compose.prod.yml logs --no-color --tail=200 app || true
           EOF

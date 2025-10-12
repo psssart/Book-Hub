@@ -1,6 +1,7 @@
 # Assembly artifacts
 **/bin/
 **/obj/
+**/.vs/
 **/publish/
 .docker_cache/
 .docker/
@@ -15,6 +16,7 @@ artifacts/*
 *.md
 docker-compose*.yml
 .env*
+*.key
 
 # Visual Studio
 .vs/
