@@ -3,6 +3,7 @@ using App.Contracts.BLL;
 using App.Contracts.DAL;
 using App.DAL.EF;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -89,15 +90,16 @@ builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp")
 builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
 builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 
+// 8. Data protection
+var keysDir = Environment.GetEnvironmentVariable("ASPNETCORE_DATA_PROTECTION_DIR")
+              ?? "/app_data_protection";
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keysDir))
+    .SetApplicationName("BookHub"); // одинаково на всех инстансах
+
 var app = builder.Build();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-    KnownProxies = { System.Net.IPAddress.Parse("127.0.0.1") }
-});
-
-// 8. Pipeline
+// 9. Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -148,7 +150,7 @@ app.MapControllerRoute(
 );
 app.MapRazorPages();
 
-// 9. Seeding
+// 10. Seeding
 await app.SeedAsync();
 
 app.Run();
