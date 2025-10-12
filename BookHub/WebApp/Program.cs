@@ -95,7 +95,7 @@ var keysDir = Environment.GetEnvironmentVariable("ASPNETCORE_DATA_PROTECTION_DIR
               ?? "/app_data_protection";
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(keysDir))
-    .SetApplicationName("BookHub"); // одинаково на всех инстансах
+    .SetApplicationName("BookHub");
 
 var app = builder.Build();
 
