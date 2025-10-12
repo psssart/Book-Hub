@@ -43,7 +43,7 @@ namespace WebApp.Infrastructure.Email
                 throw new InvalidOperationException("SMTP Host is not configured.");
 
             var msg = new MimeMessage();
-            msg.From.Add(MailboxAddress.Parse(_opt.From));
+            msg.From.Add(new MailboxAddress("BookHub", _opt.From));
             msg.To.Add(MailboxAddress.Parse(email));
             msg.Subject = subject;
 
