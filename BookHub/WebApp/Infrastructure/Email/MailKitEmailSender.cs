@@ -66,16 +66,23 @@ namespace WebApp.Infrastructure.Email
                 Timeout = _opt.TimeoutSeconds * 1000
             };
             
+            client.LocalDomain = Environment.MachineName;
+            
             if (_env.EnvironmentName == "Development" && _opt.AllowInvalidCertInDevelopment)
                 client.ServerCertificateValidationCallback = (_, _, _, _) => true;
 
             await client.ConnectAsync(_opt.Host, _opt.Port, secure);
 
-            var canAuth = !string.IsNullOrWhiteSpace(_opt.User) || !_opt.DisableAuthIfUserEmpty;
-            if (canAuth)
-            {
-                if (!string.IsNullOrWhiteSpace(_opt.User))
-                    await client.AuthenticateAsync(_opt.User, _opt.Password);
+            var serverSupportsAuth = client.Capabilities.HasFlag(MailKit.Net.Smtp.SmtpCapabilities.Authentication);
+            var wantAuth = !string.IsNullOrWhiteSpace(_opt.User); 
+            
+            if (wantAuth && serverSupportsAuth) 
+            { 
+                await client.AuthenticateAsync(_opt.User!, _opt.Password); 
+            }
+            else
+            { 
+                client.AuthenticationMechanisms.Clear(); 
             }
 
             await client.SendAsync(msg);

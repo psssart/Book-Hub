@@ -54,8 +54,6 @@
       nofile:
         soft: 4096
         hard: 8192
-    extra_hosts:
-      - "mail.myapp.com:host-gateway"
     networks: [ bookhub-net ]
 
 volumes:
