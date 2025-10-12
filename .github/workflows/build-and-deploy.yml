@@ -166,28 +166,30 @@ jobs:
           set -euo pipefail
           set -x
           cd ${{ env.APP_DIR }}
-
+          
           # ensure .env and set image tag
           grep -q '^APP_IMAGE_TAG=' .env || echo "APP_IMAGE_TAG=" >> .env
           sed -i "s/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${IMAGE_TAG}/" .env
-
+          
           # login to GHCR if token provided (private images)
           if [ -n "${{ secrets.GHCR_TOKEN }}" ]; then
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           fi
-
-          # show current state
+          
+          # sanity
           docker compose -f docker-compose.prod.yml config --services || true
           docker compose -f docker-compose.prod.yml ps || true
-
-          # pull image and start DB
+          
+          # pull image explicitly and fail if cannot
           docker compose -f docker-compose.prod.yml pull app
+          
+          # start DB
           docker compose -f docker-compose.prod.yml up -d sql
-
+          
           # run migrations only if bundle changed
-          NEW_SHA="\$(cat artifacts/efbundle.sha256.new 2>/dev/null || true)"
-          OLD_SHA="\$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
-          if [ -n "\$NEW_SHA" ] && [ "\$NEW_SHA" != "\$OLD_SHA" ]; then
+          NEW_SHA="$(cat artifacts/efbundle.sha256.new 2>/dev/null || true)"
+          OLD_SHA="$(cat artifacts/efbundle.sha256 2>/dev/null || true)"
+          if [ -n "$NEW_SHA" ] && [ "$NEW_SHA" != "$OLD_SHA" ]; then
             mv -f artifacts/efbundle.new artifacts/efbundle
             mv -f artifacts/efbundle.sha256.new artifacts/efbundle.sha256
             docker compose -f docker-compose.prod.yml run --rm migrator
@@ -195,11 +197,11 @@ jobs:
             rm -f artifacts/efbundle.new artifacts/efbundle.sha256.new || true
             echo "Skip migrations"
           fi
-
-          # start/upgrade app
-          docker compose -f docker-compose.prod.yml up -d app
-
-          # status + recent logs
+          
+          # always start/upgrade app, pull if tag changed
+          docker compose -f docker-compose.prod.yml up -d --pull always app
+          
+          # status + recent logs (do not fail pipeline on logs)
           docker compose -f docker-compose.prod.yml ps
           docker compose -f docker-compose.prod.yml logs --no-color --tail=200 app || true
           EOF
