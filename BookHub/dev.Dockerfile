@@ -1,4 +1,5 @@
-﻿# Use the full SDK image to enable hot-reload, build and debugging
+﻿# ---Development build---
+# Use the full SDK image to enable hot-reload, build and debugging
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dev
 
 # Set working directory inside the container
