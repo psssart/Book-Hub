@@ -162,7 +162,7 @@ jobs:
         env:
           IMAGE_TAG: sha-${{ github.sha }}
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -euo pipefail
           set -x
           cd ${{ env.APP_DIR }}
