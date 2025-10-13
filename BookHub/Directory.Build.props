@@ -10,7 +10,23 @@
         <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/bin/**/*</DefaultItemExcludes>
     </PropertyGroup>
 
-    <ItemGroup>
+    <PropertyGroup>
+        <IsProdBuild Condition="'$(IsProdBuild)' == ''">false</IsProdBuild>
+        <IsLocalDev Condition="'$(IsLocalDev)' == '' and '$(ContinuousIntegrationBuild)' != 'true' and '$(IsProdBuild)' != 'true'">true</IsLocalDev>
+        <IsLocalDev Condition="'$(IsLocalDev)' == ''">false</IsLocalDev>
+    </PropertyGroup>
+
+    <!-- Separate bin/obj only for local dev to avoid host–container conflicts -->
+    <PropertyGroup Condition="'$(IsLocalDev)' == 'true' and '$(DOTNET_RUNNING_IN_CONTAINER)' == 'true'">
+        <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/container/</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(MSBuildProjectDirectory)/bin/container/</BaseOutputPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsLocalDev)' == 'true' and '$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'">
+        <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj/local/</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(MSBuildProjectDirectory)/bin/local/</BaseOutputPath>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="'$(IsProdBuild)' == 'true'">
         <PackageReference Update="NuGet.Common"    PrivateAssets="all" ExcludeAssets="runtime" />
         <PackageReference Update="NuGet.Protocol"  PrivateAssets="all" ExcludeAssets="runtime" />
         <PackageReference Update="NuGet.Packaging" PrivateAssets="all" ExcludeAssets="runtime" />
