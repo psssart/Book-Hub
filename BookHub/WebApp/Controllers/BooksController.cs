@@ -131,7 +131,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("PublisherId,Tittle,Price,Description,Id")] Book book, IFormFile imageData)
+        public async Task<IActionResult> Edit(Guid id, [Bind("PublisherId,Tittle,Price,Description,Id,imageData")] Book book, IFormFile imageData)
         {
             if (id != book.Id)
             {
