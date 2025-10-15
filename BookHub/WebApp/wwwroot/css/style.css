@@ -953,7 +953,13 @@ nav.d-flex {
   height: 115px;
 }
 .book-wrapper {
-  transition: transform 0.3s ease;
+  opacity:1;
+  visibility: visible;
+  transition: transform 0.3s ease, visibility .25s ease, opacity .25s ease;
+}
+.book-wrapper.fading-out {
+  opacity: 0;
+  visibility: hidden;
 }
 .book-wrapper:hover {
   transform: translateY(-10px) rotate(-3deg);
@@ -970,3 +976,11 @@ table td {
 table th {
   color: rgb(206, 192, 115);
 }
+
+.hidden { display: none !important; cursor: auto; }
+
+.open-book, .open-book-preview { opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease; cursor: auto; }
+.open-book.visible, .open-book-preview.visible { opacity: 1; visibility: visible; cursor: pointer; }
+
+.ratings-book-image { transition: height .35s ease; height: 0; }
+.ratings-content { opacity: 0; transition: opacity .2s ease; }

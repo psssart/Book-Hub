@@ -41,17 +41,43 @@
     
     <div class="lectern-wrapper position-relative d-flex flex-column" style="width: 620px;">
         <div class="ratings-book-wrapper d-flex justify-content-center">
-            <div class="position-relative" style="width: 360px; height: 260px;">
-                <div class="d-flex px-4 py-5 w-100 h-100 align-items-center justify-content-center">
-                    Write your review here
+            <div class="ratings-book position-relative" style="width: 360px;">
+                <div class="px-4 py-4 ratings-content">
+                    <form id="ratingForm" method="post" style="padding-right:5px;padding-left:7px;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Id" id="ratingId" />
+                        <input type="hidden" name="BookId" id="bookId" />
+
+                        <div class="mt-3 mb-2">
+                            <label for="Value" class="form-label"></label>
+                            <input class="form-control" type="number" step="0.5" min="0" max="5" name="Value" id="Value" />
+                        </div>
+                        <div class="mb-1">
+                            <label for="Comment" class="form-label w-100 text-center">Review</label>
+                            <textarea class="form-control" name="Comment" id="Comment" rows="4" placeholder="Write few words..." style="resize: none;"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <button type="button" id="cancelOpen" class="btn p-0 fs-2 text-danger" style="width: 3.5rem;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                            <button type="submit" class="btn p-0 fs-2 text-success" style="width: 3.5rem;">
+                                <i class="bi bi-check"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 <img src="~/img/png/pargament.png" alt="ratings-book" class="ratings-book-image position-absolute"
-                     style="width: 360px; height: 260px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"/>
+                     style="width: 360px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"/>
             </div>
         </div>
         <div class="lectern-wrapper d-flex justify-content-center">
             <div class="book-on-lectern position-relative" style="width: 300px; height: 450px;">
-                <img src="~/img/png/open_book.png" class="open-book" alt="open-book" style="position: absolute; top: 10px; left: 58px; width: 180px;"/>
+                <div style="position: absolute; top: 10px; left: 58px; width: 180px;">
+                    <img src="~/img/books/faust.jpg" class="open-book-preview" alt="book-preview" 
+                         style="position: absolute; left: 14%; top: 6%; height: 99px; width: 64px; pointer-events: none"/>
+                    <img src="~/img/png/open_book.png" class="open-book" alt="open-book" style="width: 180px;"/>
+                </div>
                 <img src="~/img/png/lectern.png" alt="lectern" class="lectern-image" style="width: 300px; height: 450px;"/>
             </div>
         </div>
@@ -83,8 +109,15 @@
                      style="position: absolute; top: @rowTops[rowIndex]px; left: @(left)px; width: @(width)px;">
                     @foreach (var b in booksInRow)
                     {
+                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        var userRating = Model?.Ratings.FirstOrDefault(r => r.BookId == b.Id);
                         var frame = rng.Next(1, 6);
-                        <div class="d-flex book-wrapper position-relative" style="width: 95px; height: 115px; margin-right: 6px;">
+                        <div class="d-flex book-wrapper position-relative"
+                             data-book-id="@b.Id"
+                             data-rating-id="@(userRating?.Id.ToString() ?? "")"
+                             data-rating-value="@(userRating?.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                             data-rating-comment="@(userRating?.Comment ?? "")"
+                             style="width: 95px; height: 115px; margin-right: 6px; cursor: pointer;">
                             <div class="d-flex flex-row justify-content-center w-100" style="z-index: 99;">
                                 <span class="text-truncate pt-3 pb-2 user-select-none"
                                       title="@Title(b)"
@@ -103,3 +136,128 @@
     }
     
 </div>
+
+<script>
+    (function () {
+        const shelfSelector = '.book-wrapper';
+        const openBookEl = document.querySelector('.open-book');
+        const openBookPreviewEl = document.querySelector('.open-book-preview');
+        const parchment = document.querySelector('.ratings-book-image');
+        const content = document.querySelector('.ratings-content');
+        const form = document.getElementById('ratingForm');
+        const ratingId = document.getElementById('ratingId');
+        const bookId = document.getElementById('bookId');
+        const valueInput = document.getElementById('Value');
+        const commentInput = document.getElementById('Comment');
+        const cancelOpenBtn = document.getElementById('cancelOpen');
+
+        let currentBookEl = null;
+        
+        function openParchment() {
+            parchment.style.height = '0px';
+            requestAnimationFrame(() => {
+                const target = document.querySelector('.ratings-book').getBoundingClientRect().height;
+                parchment.style.height = target + 'px';
+                parchment.addEventListener('transitionend', () => { content.style.opacity = '1'; }, { once: true });
+            });
+        }
+        function closeParchment(cb) {
+            content.style.opacity = '0';
+            parchment.addEventListener('transitionend', () => cb && cb(), { once: true });
+            parchment.style.height = '0px';
+        }
+        
+        function setFormActionFor(rId) {
+            if (!rId) {
+                form.action = '@Url.Action("Create", "Ratings")';
+                form.method = 'post';
+            } else {
+                form.action = '@Url.Action("Edit", "Ratings")/' + encodeURIComponent(rId);
+                form.method = 'post';
+            }
+        }
+        
+        function showOpenBookWithPreview(src) {
+            if (src) openBookPreviewEl.src = src;
+            openBookEl.classList.add('visible');
+            openBookPreviewEl.classList.add('visible');
+            openParchment();
+        }
+        
+        function hideOpenBookAndPreview() {
+            closeParchment(() => {
+                openBookEl.classList.remove('visible');
+                openBookPreviewEl.classList.remove('visible');
+            });
+        }
+
+        function fadeOutBook(el, after) {
+            el.classList.add('fading-out');
+            const done = () => {
+                el.removeEventListener('transitionend', done);
+                el.classList.add('hidden');
+                if (after) after();
+            };
+            el.addEventListener('transitionend', done);
+            setTimeout(done, 350);
+        }
+        
+        document.querySelectorAll(shelfSelector).forEach(el => {
+            el.addEventListener('click', () => {
+                if (currentBookEl && currentBookEl !== el) {
+                    const prev = currentBookEl;
+                    currentBookEl = null;
+                    prev.classList.remove('hidden');
+                    
+                    requestAnimationFrame(() => {
+                        if (prev && prev.classList) prev.classList.remove('fading-out');
+                    });
+                }
+
+                const bId = el.dataset.bookId;
+                const rId = el.dataset.ratingId || '';
+                const rVal = el.dataset.ratingValue || '';
+                const rCom = el.dataset.ratingComment || '';
+
+                ratingId.value = rId;
+                bookId.value = bId;
+                valueInput.value = rVal;
+                commentInput.value = rCom;
+
+                setFormActionFor(rId);
+
+                const coverImg = el.querySelector('img.align-self-center');
+                const fallback = '@Url.Content("~/img/books/faust.jpg")';
+                const coverSrc = coverImg ? coverImg.src : fallback;
+
+                fadeOutBook(el, () => {
+                    currentBookEl = el;
+                    showOpenBookWithPreview(coverSrc);
+                });
+            });
+        });
+
+
+        function closeEverything() {
+            hideOpenBookAndPreview();
+
+            if (currentBookEl) {
+                const el = currentBookEl;
+                currentBookEl = null;
+
+                const delay = 300;
+
+                setTimeout(() => {
+                    el.classList.remove('hidden');
+                    
+                    requestAnimationFrame(() => {
+                        if (el && el.classList) el.classList.remove('fading-out');
+                    });
+                }, delay);
+            }
+        }
+        
+        openBookEl.addEventListener('click', closeEverything);
+        cancelOpenBtn.addEventListener('click', closeEverything);
+    })();
+</script>

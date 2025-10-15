@@ -146,7 +146,7 @@ namespace WebApp.Controllers
                 ? new List<Rating>()
                 : await _context.Ratings
                     .AsNoTracking()
-                    .Where(r => bookIds.Contains(r.BookId))
+                    .Where(r => bookIds.Contains(r.BookId) && r.AppUserId == currentUser.Id)
                     .ToListAsync();
             var bookAuthors = bookIds.Count == 0
                 ? new List<BookAuthor>()
