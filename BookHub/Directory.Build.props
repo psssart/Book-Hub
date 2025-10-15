@@ -6,6 +6,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/obj/**/*</DefaultItemExcludes>
+        <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/bin/**/*</DefaultItemExcludes>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <IsProdBuild Condition="'$(IsProdBuild)' == ''">false</IsProdBuild>
         <IsLocalDev Condition="'$(IsLocalDev)' == '' and '$(ContinuousIntegrationBuild)' != 'true' and '$(IsProdBuild)' != 'true'">true</IsLocalDev>
         <IsLocalDev Condition="'$(IsLocalDev)' == ''">false</IsLocalDev>
