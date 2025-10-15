@@ -57,6 +57,12 @@ BookHub follows a clean, domain-driven design with the following layers:
     ```bash 
     dotnet ef database update --project App.DAL.EF
 
+### Docker Deployment
+Build and run with single command:
+```bash
+docker-compose up -d
+```
+
 ### Running Locally
 From the solution root:
 ```bash
@@ -64,19 +70,6 @@ dotnet build
 dotnet run --project WebApp/WebApp.csproj
 ```
 Navigate to https://localhost:5001 in your browser.
-
-### Docker Deployment
-Build and run with Docker:
-```bash
-docker build -f Dockerfile -t pasubi/bookhub:latest .
-
-docker-compose up -d
-```
-Push multi-arch image and deploy:
-```bash
-docker build --platform linux/amd64 -t pasubi/bookhub:latest -f dev.Dockerfile .
-docker push pasubi/bookhub:latest
-```
 
 ### API Documentation
 API endpoints are documented and available at runtime via Swagger UI:

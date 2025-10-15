@@ -1,13 +1,56 @@
 # Project Setup on Linux Server
 
-1. Clone the project into `./opt/bookhub/`
+## Useful commands
+### 1. Check Logs
+* All containers
+   ```bash
+   docker compose -f docker-compose.prod.yml ps -a
+   ```
+* App
+   ```bash
+   docker compose -f docker-compose.prod.yml logs -f app
+   ```
+* Migrator
+   ```bash
+   docker compose -f docker-compose.prod.yml logs -f migrator
+   ```
+* Resource consumption
+  ```bash
+  docker stats
+  ```
+* Inspect docker network
+  ```bash
+  docker network inspect bookhub-net
+  ```
+
+### 2. Reset
+* Stop and remove containers
+  ```bash
+  docker compose -f docker-compose.prod.yml down
+  ```
+* Stop and delete containers, networks, images, and volumes from a project
+  ```bash
+  docker compose -f docker-compose.prod.yml down --rmi all --volumes
+  ```
+* Remove dangling resources
+  ```bash
+  docker system prune -f
+  ```
+* Delete all unused, including volumes
+  ```bash
+  docker system prune -a --volumes -f
+  ```
+* Clear build cache
+  ```bash
+  docker builder prune -f
+  ```
+## Setup Manually
+### 1. Clone the project into `./opt/bookhub/`
    ```bash
    git clone https://github.com/psssart/Book-Hub
    ```
-
-2. Create secrets (`.env` file) like `.env.example` next to the `docker-compose` file
-
-3. EF-bundle
+### 2. Create secrets (`.env` file) like `.env.example` next to the `docker-compose` file
+### 3. EF-bundle
    * Build
    ```bash
    docker run --rm -t \
@@ -32,8 +75,7 @@
    ```bash
    rm -f artifacts/efbundle
    ```
-
-4. First deployment
+### 4. First deployment
    ```bash
    # from the project root
    docker compose -f docker-compose.prod.yml build # --pull --no-cache ap
@@ -44,28 +86,9 @@
    docker compose -f docker-compose.prod.yml up -d app
    docker compose -f docker-compose.prod.yml ps
    ```
-
-5. Updating without pain
+### 5. Updating without pain
    ```bash
    git pull
    docker compose -f docker-compose.prod.yml build app
    docker compose -f docker-compose.prod.yml up -d app
-   ```
-
-6. Check Logs
-   * Containers
-   >docker compose -f docker-compose.prod.yml ps
-   * App
-   >docker compose -f docker-compose.prod.yml logs -f app
-   * Migrator
-   >docker compose -f docker-compose.prod.yml logs -f migrator
-
-7. Reset
-   * Remove containers
-   ```bash
-   docker compose -f docker-compose.prod.yml down
-   ```
-   * Remove containers AND sql-data volume
-   ```bash
-   docker compose -f docker-compose.prod.yml down -v
    ```

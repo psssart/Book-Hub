@@ -17,7 +17,7 @@
   width: 1450px;
   max-width: 100%;
   border-radius: 0 600px 0 0;
-  z-index: 999;
+  z-index: -1;
 }
 .card-shopping-cart {
   height: 15rem; 
@@ -100,7 +100,7 @@
   pointer-events: none;
   top: 0;
   right: 0;
-  z-index: 0 !important;
+  z-index: -1 !important;
   max-width: 100%;
 }
 .auth-container {
@@ -311,7 +311,7 @@ select {
   max-width: 100%;
   height: 590px;
   border-radius: 0 600px 0 0;
-  z-index: 999;
+  z-index: -1;
 }
 .header {
   max-height: 15%;
@@ -370,7 +370,7 @@ a:hover {
   height: auto;
   background: white;
   border-radius: 0 6px 6px 0;
-  z-index: 999;
+  z-index: -1;
 }
 .logo-image {
   padding: 30px 39px 39px 39px;
@@ -385,7 +385,7 @@ a:hover {
   border: 3px solid white;
   box-shadow: 2px 4px 4px 2px rgba(0, 0, 0, 0.16);
   padding: 0 15px;
-  z-index: 999;
+  z-index: -1;
   position: fixed;
   right: 130px;
   bottom: 211px;
@@ -953,7 +953,13 @@ nav.d-flex {
   height: 115px;
 }
 .book-wrapper {
-  transition: transform 0.3s ease;
+  opacity:1;
+  visibility: visible;
+  transition: transform 0.3s ease, visibility .25s ease, opacity .25s ease;
+}
+.book-wrapper.fading-out {
+  opacity: 0;
+  visibility: hidden;
 }
 .book-wrapper:hover {
   transform: translateY(-10px) rotate(-3deg);
@@ -963,3 +969,77 @@ nav.d-flex {
   width: 180px;
   height: auto;
 }
+
+table td {
+  color: var(--text-primary);
+}
+table th {
+  color: rgb(206, 192, 115);
+}
+
+.hidden { display: none !important; cursor: auto; }
+
+.open-book, .open-book-preview { opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease; cursor: auto; }
+.open-book.visible, .open-book-preview.visible { opacity: 1; visibility: visible; cursor: pointer; }
+
+.ratings-book-image { transition: height .35s ease; height: 0; }
+.ratings-content { opacity: 0; transition: opacity .2s ease; }
+
+.rating {
+  --hover: 0;
+}
+.old-serif {
+ color: rgb(123, 75, 42);
+ font-family: "IM Fell English", "EB Garamond", "Cinzel", "Baskerville", "Garamond", "Times New Roman", serif;
+ letter-spacing: .2px;
+}
+
+/* Star rating */
+.rating {
+  --value: 0;
+  --star-size: 2rem;
+  --gap: .25rem;
+  display: inline-block;
+  position: relative;
+  width: calc(5 * var(--star-size) + 4 * var(--gap));
+  height: var(--star-size);
+  cursor: pointer;
+  user-select: none;
+}
+.rating::before {
+  content: "☆☆☆☆☆";
+  font-size: var(--star-size);
+  line-height: 1;
+  letter-spacing: var(--gap);
+  color: #c9c9c9;
+  display: block;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.rating::after {
+  content: "★★★★★";
+  font-size: var(--star-size);
+  line-height: 1;
+  letter-spacing: var(--gap);
+  color: #d08a00;
+  position: absolute;
+  inset: 0;
+  width: calc((var(--value) / 5) * 100%);
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  pointer-events: none;
+}
+.rating[data-hover]::after {
+  width: calc((var(--hover) / 5) * 100%);
+}
+
+.rating:focus {
+  outline: 2px solid #8b5e00;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.ratings-content, .ratings-book-wrapper, .ratings-book .form-label, .ratings-book textarea, .ratings-book button {
+  font-family: "IM Fell English", "EB Garamond", "Cinzel", "Baskerville", "Garamond", serif;
+}
+

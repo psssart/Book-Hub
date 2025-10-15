@@ -93,6 +93,7 @@ namespace WebApp.Controllers
     }
 
         // GET: Authors/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -103,10 +104,20 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Age,Biography,Id")] Author author)
+        public async Task<IActionResult> Create([Bind("Name,Age,Biography,Id,imageData")] Author author, IFormFile imageData)
         {
             if (ModelState.IsValid)
             {
+                
+                if (imageData != null && imageData.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await imageData.CopyToAsync(memoryStream);
+                        author.imageData = memoryStream.ToArray();
+                    }
+                }
+                
                 author.Id = Guid.NewGuid();
                 _context.Add(author);
                 await _context.SaveChangesAsync();
@@ -136,7 +147,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Age,Biography,Id")] Author author)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Age,Biography,Id,imageData")] Author author, IFormFile imageData)
         {
             if (id != author.Id)
             {
@@ -145,6 +156,16 @@ namespace WebApp.Controllers
 
             if (ModelState.IsValid)
             {
+                
+                if (imageData != null && imageData.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await imageData.CopyToAsync(memoryStream);
+                        author.imageData = memoryStream.ToArray();
+                    }
+                }
+                
                 try
                 {
                     _context.Update(author);

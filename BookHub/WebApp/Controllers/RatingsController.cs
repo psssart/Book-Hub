@@ -9,17 +9,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Entities;
+using App.Domain.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebApp.Controllers
 {
     public class RatingsController : Controller
     {
         private readonly IAppBLL _bll;
+        private readonly UserManager<AppUser> _userManager;
         /*private readonly IAppUnitOfWork _uow;*/
 
-        public RatingsController(IAppBLL bll)
+        public RatingsController(IAppBLL bll, UserManager<AppUser> userManager)
         {
             _bll = bll;
+            _userManager = userManager;
             /*_uow = new AppUOW(context);*/
         }
 
@@ -59,16 +63,24 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AppUserId,BookId,Value,Comment,Id")] App.BLL.DTO.Rating rating)
+        public async Task<IActionResult> Create([Bind("BookId,Value,Comment")] App.BLL.DTO.Rating rating)
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+            
+            rating.AppUserId = user.Id;
+            rating.Id = Guid.NewGuid();
+            
+            ModelState.Remove(nameof(rating.Id));
+            ModelState.Remove(nameof(rating.AppUserId));
+
             if (ModelState.IsValid)
             {
-                rating.Id = Guid.NewGuid();
                 _bll.Ratings.Add(rating);
                 await _bll.SaveChangesAsync();
                 return RedirectToAction("Index", "PurchasedBooks");
             }
-            ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", rating.AppUserId);
+            
             return RedirectToAction("Index", "PurchasedBooks");
         }
 
@@ -95,12 +107,15 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("AppUserId,BookId,Value,Comment,Id")] App.BLL.DTO.Rating rating)
+        public async Task<IActionResult> Edit(Guid id, [Bind("BookId,Value,Comment")] App.BLL.DTO.Rating rating)
         {
-            if (id != rating.Id)
-            {
-                return NotFound();
-            }
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            rating.Id = id;
+            rating.AppUserId = user.Id;
+            
+            ModelState.Remove(nameof(rating.AppUserId));
 
             if (ModelState.IsValid)
             {
@@ -111,18 +126,12 @@ namespace WebApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (! await _bll.Ratings.ExistsAsync(rating.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!await _bll.Ratings.ExistsAsync(rating.Id)) return NotFound();
+                    throw;
                 }
                 return RedirectToAction("Index", "PurchasedBooks");
             }
-            
+
             return RedirectToAction("Index", "PurchasedBooks");
         }
 

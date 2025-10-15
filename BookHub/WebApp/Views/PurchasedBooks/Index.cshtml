@@ -5,66 +5,354 @@
 
 @{
     ViewData["Title"] = "My bookshelf";
+    
+    var books = Model?.Books ?? new List<Book>();
+    
+    const int perRow = 5;
+    const int rowsPerShelf = 4;
+    const int perShelf = perRow * rowsPerShelf;
+    
+    var rowTops = new[] { 26, 155, 295, 426 };
+    var left = 49;
+    var width = 490;
+    
+    var shelves = books
+        .Select((b, i) => new { b, i })
+        .GroupBy(x => x.i / perShelf)
+        .Select(g => g.Select(x => x.b).ToList())
+        .ToList();
+    
+    var rng = new Random();
+    
+    string CoverSrc(Book b)
+    {
+        if (b.imageData is { Length: > 0 })
+        {
+            var base64 = Convert.ToBase64String(b.imageData);
+            return $"data:image/jpeg;base64,{base64}";
+        }
+        return Url.Content("~/img/books/faust.jpg");
+    }
+    
+    string Title(Book b) => string.IsNullOrWhiteSpace(b.Tittle) ? "Untitled" : b.Tittle;
 }
 
 <div class="d-flex w-100 justify-content-center align-items-center flex-wrap mb-4">
-    <div class="lectern-wrapper position-relative d-flex align-self-end">
-        <div class="ratings-book-wrapper" style="position: absolute; top: -280px; left: -10px; width: 340px;">
-            <img src="~/img/png/pargament.png" alt="ratings-book" class="ratings-book-image" style="width: 340px; height: 260px;"/>
-        </div>
-        <img src="~/img/png/lectern.png" alt="lectern" class="lectern-image" style="width: 300px; height: auto;"/>
+    
+    <div class="lectern-wrapper position-relative d-flex flex-column" style="width: 620px;">
+        <div class="ratings-book-wrapper d-flex justify-content-center">
+            <div class="ratings-book position-relative" style="width: 360px;">
+                <div class="px-4 py-4 ratings-content">
+                    <form id="ratingForm" asp-controller="Ratings" method="post" style="padding-right:5px;padding-left:7px;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Id" id="ratingId" />
+                        <input type="hidden" name="BookId" id="bookId" />
 
-        <div class="open-book-wrapper" style="position: absolute; top: 11px; left: 59px; width: 180px;">
-            <img src="~/img/png/open_book.png" class="open-book" alt="open-book"/>
-        </div>
-    </div>
-    <div class="bookshelf-wrapper position-relative">
-        <img src="~/img/png/bookshelf.png" alt="bookshelf" class="bookshelf-image" style="width: 800px; height: auto;"/>
+                        <div class="mt-3 mb-2 d-flex flex-column align-items-center">
+                            <label for="Value" class="form-label w-100 text-center old-serif">Rating</label>
+                            
+                            <input class="form-control d-none" type="number" step="0.5" min="0" max="5" name="Value" id="Value" />
 
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 156px; left: 167px; width: 490px;">
-            <div class="d-flex book-wrapper" style="width: 95px;height: 115px;">
-                <div class="d-flex flex-row justify-content-center w-100 px-1" style="z-index: 99;">
-                    <span class="text-truncate pt-3 user-select-none" 
-                          style="writing-mode: vertical-rl; transform: rotate(183deg); z-index: 9999; color: var(--bg-primary);">
-                        Faust The Decide
-                    </span>
-                    <img src="~/img/books/faust.jpg" class="align-self-center pt-2" alt="bookgf" 
-                         style="width: 72%;height: 96%; transform: rotate(3deg);"/>
+                            <div id="ratingStars"
+                                 class="rating"
+                                 role="slider"
+                                 aria-label="Rating"
+                                 aria-valuemin="0"
+                                 aria-valuemax="5"
+                                 aria-valuenow="0"
+                                 tabindex="0"
+                                 data-for="Value">
+                            </div>
+                            <div class="text-center small opacity-75 mt-1 d-none" id="ratingText" aria-live="polite"></div>
+                        </div>
+                        <div class="mb-1 old-serif">
+                            <label for="Comment" class="form-label w-100 text-center">Review</label>
+                            <textarea class="form-control" name="Comment" id="Comment" rows="4" placeholder="Write few words..." 
+                                style="resize: none; background-color: rgb(123, 75, 42); color: rgb(225, 198, 160)"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <button type="button" id="cancelOpen" class="btn p-0 fs-2 text-danger" style="width: 3.5rem;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                            <button type="submit" class="btn p-0 fs-2 text-success" style="width: 3.5rem;">
+                                <i class="bi bi-check"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <img src="~/img/png/book_1.png" class="position-absolute book" alt="book1"/>
+                <img src="~/img/png/pargament.png" alt="ratings-book" class="ratings-book-image position-absolute"
+                     style="width: 360px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"/>
             </div>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
         </div>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 283px; left: 167px; width: 490px;">
-            <img src="~/img/png/book_1.png" class="book" alt="book1"/>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
-        </div>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 421px; left: 167px; width: 490px;">
-            <img src="~/img/png/book_1.png" class="book" alt="book1"/>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
-        </div>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 550px; left: 167px; width: 490px;">
-            <img src="~/img/png/book_1.png" class="book" alt="book1"/>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
+        <div class="lectern-wrapper d-flex justify-content-center">
+            <div class="book-on-lectern position-relative" style="width: 300px; height: 450px;">
+                <div style="position: absolute; top: 10px; left: 58px; width: 180px;">
+                    <img src="~/img/books/faust.jpg" class="open-book-preview" alt="book-preview" 
+                         style="position: absolute; left: 14%; top: 6%; height: 99px; width: 64px; pointer-events: none"/>
+                    <img src="~/img/png/open_book.png" class="open-book" alt="open-book" style="width: 180px;"/>
+                </div>
+                <img src="~/img/png/lectern.png" alt="lectern" class="lectern-image" style="width: 300px; height: 450px;"/>
+            </div>
         </div>
     </div>
+    
+    @foreach (var shelf in shelves)
+    {
+        <div class="bookshelf-wrapper position-relative m-2">
+            <img src="~/img/png/bookshelf.png" alt="bookshelf" class="bookshelf-image" style="width: 570px; height: auto;"/>
+
+            @{
+                var rows = shelf
+                    .Chunk(perRow)
+                    .Take(rowsPerShelf)
+                    .ToArray();
+
+                for (int rowIndex = 0; rowIndex < rows.Length; rowIndex++)
+                {
+                    var booksInRow = rows[rowIndex];
+                    var top = rowTops[rowIndex]; 
+                }
+            }
+
+            @for (int rowIndex = 0; rowIndex < rows.Length; rowIndex++)
+            {
+                var booksInRow = rows[rowIndex];
+
+                <div class="d-flex justify-content-start books-row-@rowIndex"
+                     style="position: absolute; top: @rowTops[rowIndex]px; left: @(left)px; width: @(width)px;">
+                    @foreach (var b in booksInRow)
+                    {
+                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        var userRating = Model?.Ratings.FirstOrDefault(r => r.BookId == b.Id);
+                        var frame = rng.Next(1, 6);
+                        <div class="d-flex book-wrapper position-relative"
+                             data-book-id="@b.Id"
+                             data-rating-id="@(userRating?.Id.ToString() ?? "")"
+                             data-rating-value="@(userRating?.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                             data-rating-comment="@(userRating?.Comment ?? "")"
+                             style="width: 95px; height: 115px; margin-right: 6px; cursor: pointer;">
+                            <div class="d-flex flex-row justify-content-center w-100" style="z-index: 99;">
+                                <span class="text-truncate pt-3 pb-2 user-select-none"
+                                      title="@Title(b)"
+                                      style="writing-mode: vertical-rl; transform: rotate(183deg); z-index: 9999; color: var(--bg-primary);">
+                                    @Title(b)
+                                </span>
+                                <img src="@CoverSrc(b)" class="align-self-center pt-2" alt="@Title(b)"
+                                     style="width: 71%; height: 96%; transform: rotate(3deg);" />
+                            </div>
+                            <img src="~/img/png/book_@(frame).png" class="position-absolute book" alt="book-frame-@frame"/>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    
 </div>
+
+<script>
+    (function () {
+        const shelfSelector = '.book-wrapper';
+        const openBookEl = document.querySelector('.open-book');
+        const openBookPreviewEl = document.querySelector('.open-book-preview');
+        const parchment = document.querySelector('.ratings-book-image');
+        const content = document.querySelector('.ratings-content');
+        const form = document.getElementById('ratingForm');
+        const ratingId = document.getElementById('ratingId');
+        const bookId = document.getElementById('bookId');
+        const valueInput = document.getElementById('Value');
+        const commentInput = document.getElementById('Comment');
+        const cancelOpenBtn = document.getElementById('cancelOpen');
+
+        let currentBookEl = null;
+        
+        function openParchment() {
+            parchment.style.height = '0px';
+            requestAnimationFrame(() => {
+                const target = document.querySelector('.ratings-book').getBoundingClientRect().height;
+                parchment.style.height = target + 'px';
+                parchment.addEventListener('transitionend', () => { content.style.opacity = '1'; }, { once: true });
+            });
+        }
+        function closeParchment(cb) {
+            content.style.opacity = '0';
+            parchment.addEventListener('transitionend', () => cb && cb(), { once: true });
+            parchment.style.height = '0px';
+        }
+        
+        function setFormActionFor(rId) {
+            if (!rId) {
+                form.action = '@Url.Action("Create", "Ratings")';
+                form.method = 'post';
+            } else {
+                form.action = '@Url.Action("Edit", "Ratings")/' + encodeURIComponent(rId);
+                form.method = 'post';
+            }
+        }
+        
+        function showOpenBookWithPreview(src) {
+            if (src) openBookPreviewEl.src = src;
+            openBookEl.classList.add('visible');
+            openBookPreviewEl.classList.add('visible');
+            openParchment();
+        }
+        
+        function hideOpenBookAndPreview() {
+            closeParchment(() => {
+                openBookEl.classList.remove('visible');
+                openBookPreviewEl.classList.remove('visible');
+            });
+        }
+
+        function fadeOutBook(el, after) {
+            el.classList.add('fading-out');
+            const done = () => {
+                el.removeEventListener('transitionend', done);
+                el.classList.add('hidden');
+                if (after) after();
+            };
+            el.addEventListener('transitionend', done);
+            setTimeout(done, 350);
+        }
+        
+        document.querySelectorAll(shelfSelector).forEach(el => {
+            el.addEventListener('click', () => {
+                if (currentBookEl && currentBookEl !== el) {
+                    const prev = currentBookEl;
+                    currentBookEl = null;
+                    prev.classList.remove('hidden');
+                    
+                    requestAnimationFrame(() => {
+                        if (prev && prev.classList) prev.classList.remove('fading-out');
+                    });
+                }
+
+                const bId = el.dataset.bookId;
+                const rId = el.dataset.ratingId || '';
+                const rVal = el.dataset.ratingValue || '';
+                const rCom = el.dataset.ratingComment || '';
+
+                ratingId.value = rId;
+                bookId.value = bId;
+                valueInput.value = rVal;
+                commentInput.value = rCom;
+
+                setFormActionFor(rId);
+
+                const coverImg = el.querySelector('img.align-self-center');
+                const fallback = '@Url.Content("~/img/books/faust.jpg")';
+                const coverSrc = coverImg ? coverImg.src : fallback;
+
+                fadeOutBook(el, () => {
+                    currentBookEl = el;
+                    showOpenBookWithPreview(coverSrc);
+                });
+            });
+        });
+
+
+        function closeEverything() {
+            hideOpenBookAndPreview();
+
+            if (currentBookEl) {
+                const el = currentBookEl;
+                currentBookEl = null;
+
+                const delay = 300;
+
+                setTimeout(() => {
+                    el.classList.remove('hidden');
+                    
+                    requestAnimationFrame(() => {
+                        if (el && el.classList) el.classList.remove('fading-out');
+                    });
+                }, delay);
+            }
+        }
+        
+        openBookEl.addEventListener('click', closeEverything);
+        cancelOpenBtn.addEventListener('click', closeEverything);
+
+        const ratingEl  = document.getElementById('ratingStars');
+        const ratingTxt = document.getElementById('ratingText');
+
+        function clampHalf(v) {
+            const n = Math.round(v * 2) / 2;
+            return Math.min(5, Math.max(0, n));
+        }
+        function setVisual(val) {
+            ratingEl.style.setProperty('--value', String(val || 0));
+            ratingEl.setAttribute('aria-valuenow', String(val || 0));
+            ratingTxt.textContent = val ? `${val.toFixed(1)} / 5` : '';
+        }
+        function commit(val) {
+            const v = clampHalf(val);
+            valueInput.value = v || '';
+            setVisual(v);
+        }
+        function valueFromPointer(evt) {
+            const rect = ratingEl.getBoundingClientRect();
+            const x = Math.min(rect.right, Math.max(rect.left, (evt.touches?.[0]?.clientX ?? evt.clientX)));
+            const pct = (x - rect.left) / rect.width;
+            return clampHalf(pct * 5);
+        }
+        
+        ratingEl.addEventListener('pointerdown', e => {
+            ratingEl.setPointerCapture(e.pointerId);
+            commit(valueFromPointer(e));
+        });
+        ratingEl.addEventListener('pointermove', e => {
+            if (e.buttons !== 1) return;
+            const hv = valueFromPointer(e);
+            ratingEl.dataset.hover = '1';
+            ratingEl.style.setProperty('--hover', String(hv));
+        });
+        ['pointerup','pointerleave','pointercancel'].forEach(t =>
+            ratingEl.addEventListener(t, () => {
+                delete ratingEl.dataset.hover;
+                ratingEl.style.removeProperty('--hover');
+            })
+        );
+        
+        ratingEl.addEventListener('mousemove', e => {
+            if (e.buttons === 1) return;
+            const hv = valueFromPointer(e);
+            ratingEl.dataset.hover = '1';
+            ratingEl.style.setProperty('--hover', String(hv));
+        });
+        ratingEl.addEventListener('mouseleave', () => {
+            delete ratingEl.dataset.hover;
+            ratingEl.style.removeProperty('--hover');
+        });
+        
+        ratingEl.addEventListener('keydown', e => {
+            const cur = parseFloat(valueInput.value || '0') || 0;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                commit(cur + 0.5);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                commit(cur - 0.5);
+            } else if (e.key === 'Home') {
+                e.preventDefault(); commit(0);
+            } else if (e.key === 'End') {
+                e.preventDefault(); commit(5);
+            }
+        });
+        
+        function initFromInput() {
+            const v = parseFloat(valueInput.value || '0') || 0;
+            setVisual(v);
+        }
+        initFromInput();
+        
+        const _setFormActionFor = setFormActionFor;
+        setFormActionFor = function(rId) {
+            _setFormActionFor(rId);
+            initFromInput();
+        };
+        
+        valueInput.addEventListener('input', initFromInput);
+    })();
+</script>
