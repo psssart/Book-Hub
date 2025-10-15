@@ -57,7 +57,7 @@ jobs:
             --configuration Release \
             --force \
             -o ./artifacts/efbundle \
-            -- $DOTNET_MSBUILD_ARGS
+            -- --msbuildprojectextensionspath App.DAL.EF/obj/ $DOTNET_MSBUILD_ARGS
           chmod +x ./artifacts/efbundle
           (cd artifacts && sha256sum efbundle | awk '{print $1}' > efbundle.sha256)
         # checksum for conditional migrations
