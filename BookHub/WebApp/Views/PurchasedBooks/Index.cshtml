@@ -5,66 +5,101 @@
 
 @{
     ViewData["Title"] = "My bookshelf";
+    
+    var books = Model?.Books ?? new List<Book>();
+    
+    const int perRow = 5;
+    const int rowsPerShelf = 4;
+    const int perShelf = perRow * rowsPerShelf;
+    
+    var rowTops = new[] { 26, 155, 295, 426 };
+    var left = 49;
+    var width = 490;
+    
+    var shelves = books
+        .Select((b, i) => new { b, i })
+        .GroupBy(x => x.i / perShelf)
+        .Select(g => g.Select(x => x.b).ToList())
+        .ToList();
+    
+    var rng = new Random();
+    
+    string CoverSrc(Book b)
+    {
+        if (b.imageData is { Length: > 0 })
+        {
+            var base64 = Convert.ToBase64String(b.imageData);
+            return $"data:image/jpeg;base64,{base64}";
+        }
+        return Url.Content("~/img/books/faust.jpg");
+    }
+    
+    string Title(Book b) => string.IsNullOrWhiteSpace(b.Tittle) ? "Untitled" : b.Tittle;
 }
 
 <div class="d-flex w-100 justify-content-center align-items-center flex-wrap mb-4">
-    <div class="lectern-wrapper position-relative d-flex align-self-end">
-        <div class="ratings-book-wrapper" style="position: absolute; top: -280px; left: -10px; width: 340px;">
-            <img src="~/img/png/pargament.png" alt="ratings-book" class="ratings-book-image" style="width: 340px; height: 260px;"/>
-        </div>
-        <img src="~/img/png/lectern.png" alt="lectern" class="lectern-image" style="width: 300px; height: auto;"/>
-
-        <div class="open-book-wrapper" style="position: absolute; top: 11px; left: 59px; width: 180px;">
-            <img src="~/img/png/open_book.png" class="open-book" alt="open-book"/>
-        </div>
-    </div>
-    <div class="bookshelf-wrapper position-relative">
-        <img src="~/img/png/bookshelf.png" alt="bookshelf" class="bookshelf-image" style="width: 800px; height: auto;"/>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 156px; left: 167px; width: 490px;">
-            <div class="d-flex book-wrapper" style="width: 95px;height: 115px;">
-                <div class="d-flex flex-row justify-content-center w-100 px-1" style="z-index: 99;">
-                    <span class="text-truncate pt-3 user-select-none" 
-                          style="writing-mode: vertical-rl; transform: rotate(183deg); z-index: 9999; color: var(--bg-primary);">
-                        Faust The Decide
-                    </span>
-                    <img src="~/img/books/faust.jpg" class="align-self-center pt-2" alt="bookgf" 
-                         style="width: 72%;height: 96%; transform: rotate(3deg);"/>
+    
+    <div class="lectern-wrapper position-relative d-flex flex-column" style="width: 620px;">
+        <div class="ratings-book-wrapper d-flex justify-content-center">
+            <div class="position-relative" style="width: 360px; height: 260px;">
+                <div class="d-flex px-4 py-5 w-100 h-100 align-items-center justify-content-center">
+                    Write your review here
                 </div>
-                <img src="~/img/png/book_1.png" class="position-absolute book" alt="book1"/>
+                <img src="~/img/png/pargament.png" alt="ratings-book" class="ratings-book-image position-absolute"
+                     style="width: 360px; height: 260px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"/>
             </div>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
         </div>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 283px; left: 167px; width: 490px;">
-            <img src="~/img/png/book_1.png" class="book" alt="book1"/>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
-        </div>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 421px; left: 167px; width: 490px;">
-            <img src="~/img/png/book_1.png" class="book" alt="book1"/>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
-        </div>
-
-        <div class="d-flex justify-content-start books-row-1"
-             style="position: absolute; top: 550px; left: 167px; width: 490px;">
-            <img src="~/img/png/book_1.png" class="book" alt="book1"/>
-            <img src="~/img/png/book_2.png" class="book" alt="book2"/>
-            <img src="~/img/png/book_3.png" class="book" alt="book3"/>
-            <img src="~/img/png/book_4.png" class="book" alt="book4"/>
-            <img src="~/img/png/book_5.png" class="book" alt="book5"/>
+        <div class="lectern-wrapper d-flex justify-content-center">
+            <div class="book-on-lectern position-relative" style="width: 300px; height: 450px;">
+                <img src="~/img/png/open_book.png" class="open-book" alt="open-book" style="position: absolute; top: 10px; left: 58px; width: 180px;"/>
+                <img src="~/img/png/lectern.png" alt="lectern" class="lectern-image" style="width: 300px; height: 450px;"/>
+            </div>
         </div>
     </div>
+    
+    @foreach (var shelf in shelves)
+    {
+        <div class="bookshelf-wrapper position-relative m-2">
+            <img src="~/img/png/bookshelf.png" alt="bookshelf" class="bookshelf-image" style="width: 570px; height: auto;"/>
+
+            @{
+                var rows = shelf
+                    .Chunk(perRow)
+                    .Take(rowsPerShelf)
+                    .ToArray();
+
+                for (int rowIndex = 0; rowIndex < rows.Length; rowIndex++)
+                {
+                    var booksInRow = rows[rowIndex];
+                    var top = rowTops[rowIndex]; 
+                }
+            }
+
+            @for (int rowIndex = 0; rowIndex < rows.Length; rowIndex++)
+            {
+                var booksInRow = rows[rowIndex];
+
+                <div class="d-flex justify-content-start books-row-@rowIndex"
+                     style="position: absolute; top: @rowTops[rowIndex]px; left: @(left)px; width: @(width)px;">
+                    @foreach (var b in booksInRow)
+                    {
+                        var frame = rng.Next(1, 6);
+                        <div class="d-flex book-wrapper position-relative" style="width: 95px; height: 115px; margin-right: 6px;">
+                            <div class="d-flex flex-row justify-content-center w-100" style="z-index: 99;">
+                                <span class="text-truncate pt-3 pb-2 user-select-none"
+                                      title="@Title(b)"
+                                      style="writing-mode: vertical-rl; transform: rotate(183deg); z-index: 9999; color: var(--bg-primary);">
+                                    @Title(b)
+                                </span>
+                                <img src="@CoverSrc(b)" class="align-self-center pt-2" alt="@Title(b)"
+                                     style="width: 71%; height: 96%; transform: rotate(3deg);" />
+                            </div>
+                            <img src="~/img/png/book_@(frame).png" class="position-absolute book" alt="book-frame-@frame"/>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    
 </div>
