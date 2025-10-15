@@ -984,3 +984,62 @@ table th {
 
 .ratings-book-image { transition: height .35s ease; height: 0; }
 .ratings-content { opacity: 0; transition: opacity .2s ease; }
+
+.rating {
+  --hover: 0;
+}
+.old-serif {
+ color: rgb(123, 75, 42);
+ font-family: "IM Fell English", "EB Garamond", "Cinzel", "Baskerville", "Garamond", "Times New Roman", serif;
+ letter-spacing: .2px;
+}
+
+/* Star rating */
+.rating {
+  --value: 0;
+  --star-size: 2rem;
+  --gap: .25rem;
+  display: inline-block;
+  position: relative;
+  width: calc(5 * var(--star-size) + 4 * var(--gap));
+  height: var(--star-size);
+  cursor: pointer;
+  user-select: none;
+}
+.rating::before {
+  content: "☆☆☆☆☆";
+  font-size: var(--star-size);
+  line-height: 1;
+  letter-spacing: var(--gap);
+  color: #c9c9c9;
+  display: block;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.rating::after {
+  content: "★★★★★";
+  font-size: var(--star-size);
+  line-height: 1;
+  letter-spacing: var(--gap);
+  color: #d08a00;
+  position: absolute;
+  inset: 0;
+  width: calc((var(--value) / 5) * 100%);
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  pointer-events: none;
+}
+.rating[data-hover]::after {
+  width: calc((var(--hover) / 5) * 100%);
+}
+
+.rating:focus {
+  outline: 2px solid #8b5e00;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.ratings-content, .ratings-book-wrapper, .ratings-book .form-label, .ratings-book textarea, .ratings-book button {
+  font-family: "IM Fell English", "EB Garamond", "Cinzel", "Baskerville", "Garamond", serif;
+}
+

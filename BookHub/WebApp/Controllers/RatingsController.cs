@@ -112,8 +112,6 @@ namespace WebApp.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
-            if (id != rating.Id) return NotFound();
-
             rating.Id = id;
             rating.AppUserId = user.Id;
             
