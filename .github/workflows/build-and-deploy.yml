@@ -50,19 +50,14 @@ jobs:
         run: |
           export PATH="$PATH:/home/runner/.dotnet/tools"
           dotnet tool install --global dotnet-ef --version 8.*
-          # make sure both projects are restored
-          dotnet restore App.DAL.EF/App.DAL.EF.csproj
-          dotnet restore WebApp/WebApp.csproj
-
           mkdir -p artifacts
           dotnet ef migrations bundle \
             --project App.DAL.EF/App.DAL.EF.csproj \
             --startup-project WebApp/WebApp.csproj \
             --configuration Release \
-            --msbuildprojectextensionspath App.DAL.EF/obj \
             --force \
-            -o ./artifacts/efbundle
-
+            -o ./artifacts/efbundle \
+            -- $DOTNET_MSBUILD_ARGS
           chmod +x ./artifacts/efbundle
           (cd artifacts && sha256sum efbundle | awk '{print $1}' > efbundle.sha256)
         # checksum for conditional migrations
