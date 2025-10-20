@@ -25,12 +25,9 @@ COPY Base.DAL.EF/*.csproj Base.DAL.EF/
 COPY Base.Domain/*.csproj Base.Domain/
 COPY Helpers/*.csproj Helpers/
 
-ARG MSBUILD_PROPS="/p:IsProdBuild=true /p:IsLocalDev=false /p:ContinuousIntegrationBuild=true"
-
 RUN dotnet restore WebApp/WebApp.csproj \
     -r linux-x64 \
-    -p:PublishReadyToRun=true \
-    $MSBUILD_PROPS
+    -p:PublishReadyToRun=true
 
 COPY . .
 
@@ -38,8 +35,7 @@ RUN dotnet publish WebApp/WebApp.csproj -c Release -o /app/publish \
     -r linux-x64 \
     /p:UseAppHost=false \
     /p:PublishReadyToRun=true \
-    --no-restore \
-    $MSBUILD_PROPS
+    --no-restore
 
 # runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-chiseled AS runtime
