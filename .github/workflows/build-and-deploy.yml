@@ -21,10 +21,6 @@ jobs:
       REGISTRY: ghcr.io
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/book-hub-app
       APP_DIR: /home/deploy/apps/BookHub/BookHub  # compose + artifacts here
-      DOTNET_MSBUILD_ARGS: >-
-        /p:IsProdBuild=true
-        /p:IsLocalDev=false
-        /p:ContinuousIntegrationBuild=true
 
     steps:
       - name: Checkout
@@ -37,12 +33,12 @@ jobs:
 
       - name: Restore
         working-directory: BookHub
-        run: dotnet restore WebApp/WebApp.csproj -r linux-x64 -p:PublishReadyToRun=true $DOTNET_MSBUILD_ARGS
+        run: dotnet restore WebApp/WebApp.csproj -r linux-x64 -p:PublishReadyToRun=true
         # restore once
 
       - name: Build
         working-directory: BookHub
-        run: dotnet build WebApp/WebApp.csproj -c Release --no-restore -v m $DOTNET_MSBUILD_ARGS
+        run: dotnet build WebApp/WebApp.csproj -c Release --no-restore -v m
         # compile app
 
       - name: Build EF bundle
@@ -56,8 +52,7 @@ jobs:
             --startup-project WebApp/WebApp.csproj \
             --configuration Release \
             --force \
-            -o ./artifacts/efbundle \
-            $DOTNET_MSBUILD_ARGS
+            -o ./artifacts/efbundle
           chmod +x ./artifacts/efbundle
           (cd artifacts && sha256sum efbundle | awk '{print $1}' > efbundle.sha256)
         # checksum for conditional migrations
@@ -98,8 +93,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: |
-            MSBUILD_PROPS=${{ env.DOTNET_MSBUILD_ARGS }}
         # build app image only
 
       # --- Security & provenance ---
