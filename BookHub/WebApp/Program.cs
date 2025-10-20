@@ -29,7 +29,18 @@ var connectionString = builder.Configuration
 
 // 2. EF Core + UnitOfWork + BLL/DAL
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseNpgsql(connectionString));
+{
+    opt.UseNpgsql(connectionString);
+    if (builder.Environment.IsDevelopment())
+    {
+        opt.EnableDetailedErrors();
+        opt.EnableSensitiveDataLogging();
+
+        opt.LogTo(Console.WriteLine,
+            new[] { DbLoggerCategory.Database.Command.Name },
+            LogLevel.Information);
+    }
+});
 builder.Services.AddScoped<IAppUnitOfWork, AppUOW>();
 builder.Services.AddScoped<IAppBLL, AppBLL>();
 
