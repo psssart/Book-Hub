@@ -22,9 +22,9 @@ jobs:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/book-hub-app
       APP_DIR: /home/deploy/apps/BookHub/BookHub  # compose + artifacts here
       DOTNET_MSBUILD_ARGS: >-
-        -p:IsProdBuild=true
-        -p:IsLocalDev=false
-        -p:ContinuousIntegrationBuild=true
+        /p:IsProdBuild=true
+        /p:IsLocalDev=false
+        /p:ContinuousIntegrationBuild=true
 
     steps:
       - name: Checkout
