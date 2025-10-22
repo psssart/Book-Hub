@@ -47,7 +47,7 @@
         </div>
 
         @* Filter panel *@
-        <div id="filterPanel" class="container filterPanel" style="top: 89px;">
+        <div id="filterPanel" class="container filterPanel">
             <div class="row">
                 <h5 class="col-12 text-center mt-2">
                     Filtering Settings
@@ -145,68 +145,68 @@ var selectedGenresGuids = [];
 var selectedPublishersGuids = [];
 var selectedWarehousesGuids = [];
 $(document).ready(function() {
-    
+
     $(document).on('click', '.dropdown-filter > .dropbtn', function(e) {
         e.stopPropagation();
         const $dropdown = $(this).closest('.dropdown-filter');
         $('.dropdown-filter').not($dropdown).removeClass('open');
         $dropdown.toggleClass('open');
     });
-    
+
     $(document).on('click', '.dropdown-filter-content', function(e) {
         e.stopPropagation();
     });
-    
+
     $(document).on('click', function() {
         $('.dropdown-filter').removeClass('open');
     });
-    
+
     // Watching for publishers selection for filtering
     $(document).on('change', '.dropdownPub-content input[type="checkbox"]', function(){
-      let publisherId = $(this).val();
-        
-      if($(this).prop('checked')) {
-        selectedPublishersGuids.push(publisherId);
-      } else {
-        let index = selectedPublishersGuids.indexOf(publisherId);
-        if (index !== -1) {
-          selectedPublishersGuids.splice(index, 1);
+        let publisherId = $(this).val();
+
+        if($(this).prop('checked')) {
+            selectedPublishersGuids.push(publisherId);
+        } else {
+            let index = selectedPublishersGuids.indexOf(publisherId);
+            if (index !== -1) {
+                selectedPublishersGuids.splice(index, 1);
+            }
         }
-      }
-      sendSortingRequest($('#sortSelect').val(), getSortDirection())
+        sendSortingRequest($('#sortSelect').val(), getSortDirection())
     });
-    
+
     // Watching for authors selection for filtering
     $(document).on('change', '.dropdownAut-content input[type="checkbox"]', function() {
-      let authorId = $(this).val();
-        
-      if($(this).prop('checked')) {
-        // Add the GUID to the list
-        selectedAuthorsGuids.push(authorId);
-      } else {
-        let index = selectedAuthorsGuids.indexOf(authorId);
-        if (index !== -1) {
-          selectedAuthorsGuids.splice(index, 1);
+        let authorId = $(this).val();
+
+        if($(this).prop('checked')) {
+            // Add the GUID to the list
+            selectedAuthorsGuids.push(authorId);
+        } else {
+            let index = selectedAuthorsGuids.indexOf(authorId);
+            if (index !== -1) {
+                selectedAuthorsGuids.splice(index, 1);
+            }
         }
-      }
-      sendSortingRequest($('#sortSelect').val(), getSortDirection())
+        sendSortingRequest($('#sortSelect').val(), getSortDirection())
     });
-    
+
     // Watching for genres selection for filtering
     $(document).on('change', '.dropdownGen-content input[type="checkbox"]', function() {
-      let genreId = $(this).val();
-        
-      if($(this).prop('checked')) {
-        selectedGenresGuids.push(genreId);
-      } else {
-        let index = selectedGenresGuids.indexOf(genreId);
-        if (index !== -1) {
-          selectedGenresGuids.splice(index, 1);
+        let genreId = $(this).val();
+
+        if($(this).prop('checked')) {
+            selectedGenresGuids.push(genreId);
+        } else {
+            let index = selectedGenresGuids.indexOf(genreId);
+            if (index !== -1) {
+                selectedGenresGuids.splice(index, 1);
+            }
         }
-      }
-      sendSortingRequest($('#sortSelect').val(), getSortDirection())
+        sendSortingRequest($('#sortSelect').val(), getSortDirection())
     });
-    
+
     // Show filtering menu
     $(document).on('click', '.filterMenuButton', function (e) {
         e.stopPropagation();
@@ -232,7 +232,7 @@ $(document).ready(function() {
         $('#filterPanel').css('right', '-300px');
         showFilterMenuButton = false;
     });
-    
+
     // Reset filtering settings
     $(document).on('click', '.filterResetbtn', function() {
         selectedAuthorsGuids = [];
@@ -240,8 +240,8 @@ $(document).ready(function() {
         selectedPublishersGuids = [];
         selectedWarehousesGuids = [];
         sendSortingRequest($('#sortSelect').val(), getSortDirection(), false)
-    });    
-    
+    });
+
     // Event listener for sorting selection change
     $(document).on('change', '#sortSelect', function() {
         let sortBy = $(this).val();
@@ -256,7 +256,7 @@ $(document).ready(function() {
     // Function to send AJAX request for sorting
     function sendSortingRequest(sortBy, sortDirection) {
         const searchInput = "@Model.SearchInput";
-        
+
         $.ajax({
             url: '/Home/Index',
             method: 'GET',
@@ -273,12 +273,12 @@ $(document).ready(function() {
             success: function (html) {
                 const $new = $(html);
                 $('#results-root').replaceWith($new);
-                
+
                 $('#sortSelect').val(sortBy);
                 if (sortDirection === 'descending') $('#rotateButton .pyramid').addClass('rotate'); else $('#rotateButton .pyramid').removeClass('rotate');
-                
+
                 if (showFilterMenuButton) $('#filterPanel').css('right', '0px');
-                
+
                 $('.dropdownAut-content input[type=checkbox]').each(function() {
                     $(this).prop('checked', selectedAuthorsGuids.includes($(this).val()));
                 });
@@ -299,7 +299,7 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     // Function to handle button click event
     $(document).on('click', '#rotateButton', function() {
         rotatePyramid();
@@ -333,6 +333,18 @@ $(document).ready(function() {
             img.style.width = '100%';
             img.style.height = '100%';
         });
+    });
+
+    // Books genre click handle - filter & show
+    $(document).on('click', '.genre-chip', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        const $cb = $('.dropdownGen-content input[type="checkbox"][value="' + id + '"]');
+        if (!$cb.length) return;
+        const checked = !$cb.prop('checked');
+        $cb.prop('checked', checked).trigger('change');
+
+        $('.genre-chip[data-id="' + id + '"]').toggleClass('active-genre', checked);
     });
 
     function syncChipsHighlight() {
