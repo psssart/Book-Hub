@@ -4,11 +4,9 @@ using App.Domain.Address_Tables;
 using App.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using WebApp.Models;
+using System.Text.RegularExpressions;
 
 namespace WebApp.Controllers;
 
@@ -44,60 +42,111 @@ public class HomeController : Controller
             bool? userAuthenticated = User.Identity?.IsAuthenticated;
             bool emptySearchInput = string.IsNullOrWhiteSpace(searchInput);
             
-            var tokens = Tokenize(searchInput);
-            var containsPatterns   = tokens.Select(t => "%" + t + "%").ToArray();
-            var prefixPatterns     = tokens.Select(t => t + "%").ToArray();
-            var wordStartPatterns  = tokens.Select(t => "% " + t + "%").ToArray();
-            var exactPhrasePattern = string.IsNullOrWhiteSpace(searchInput) ? null : searchInput;
-            
-            
-            var relaxed3TokenPatterns = tokens
-                .Where(t => t.Length >= 3)
-                .Select(t => "%" + t.Substring(0, 3) + "%")
-                .Distinct()
-                .ToArray();
-
-            var relaxed3WholeInputPattern = (!string.IsNullOrWhiteSpace(searchInput) && searchInput.Length >= 3)
-                ? "%" + searchInput.Substring(0, 3) + "%"
-                : null;
             if (!emptySearchInput || userAuthenticated == true)
             {
-                // 1) strict: any token contained in title
-                if (containsPatterns.Length > 0)
+                if (!emptySearchInput)
                 {
-                    books = books.Where(b => containsPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)));
-                }
-                else if (!string.IsNullOrWhiteSpace(searchInput))
-                {
-                    var broad = "%" + searchInput + "%";
-                    books = books.Where(b => EF.Functions.ILike(b.Tittle, broad));
+                    var q = searchInput!.Trim();
+                    
+                    var tokens = Regex
+                        .Split(q, @"[^\p{L}\p{N}]+", RegexOptions.CultureInvariant)
+                        .Where(t => !string.IsNullOrWhiteSpace(t))
+                        .Select(t => t.Trim())
+                        .Distinct()
+                        .ToArray();
+
+                    var loose = tokens.Length > 0 ? tokens[0] : q;
+                    
+                    var prefix3 = loose.Length >= 3 ? loose.Substring(0, 3) : loose;
+                    
+                    books = books
+                        .Where(b =>
+                            // 1) the full text matched
+                            b.SearchVector.Matches(
+                                EF.Functions.WebSearchToTsQuery(
+                                    "simple",
+                                    EF.Functions.Unaccent(q)
+                                )
+                            )
+                            ||
+
+                            // 2) string matches by keyword
+                            EF.Functions.ILike(b.Tittle, $"%{loose}%") ||
+                            EF.Functions.ILike(b.Description, $"%{loose}%") ||
+
+                            // 3) match by shortened prefix (3 characters)
+                            EF.Functions.ILike(b.Tittle, $"%{prefix3}%") ||
+                            EF.Functions.ILike(b.Description, $"%{prefix3}%") ||
+
+                            // 4) match on the entire user source string
+                            EF.Functions.ILike(b.Tittle, $"%{q}%") ||
+                            EF.Functions.ILike(b.Description, $"%{q}%") ||
+
+                            // 5) similarity by trigrams with a threshold
+                            EF.Functions.TrigramsSimilarity(b.Tittle, q) > 0.1
+                        )
+                        .OrderByDescending(b =>
+                            b.SearchVector.Matches(
+                                EF.Functions.WebSearchToTsQuery(
+                                    "simple",
+                                    EF.Functions.Unaccent(q)
+                                )
+                            )
+                        )
+                        .ThenByDescending(b =>
+                            b.SearchVector.Rank(
+                                EF.Functions.WebSearchToTsQuery(
+                                    "simple",
+                                    EF.Functions.Unaccent(q)
+                                )
+                            )
+                        )
+                        .ThenByDescending(b =>
+                            EF.Functions.TrigramsSimilarity(b.Tittle, q)
+                        );
+                    
+                    authors = authors
+                        .Where(a =>
+                            a.SearchVector.Matches(
+                                EF.Functions.WebSearchToTsQuery(
+                                    "simple",
+                                    EF.Functions.Unaccent(q)
+                                )
+                            )
+                            ||
+                            
+                            EF.Functions.ILike(a.Name, $"%{loose}%") ||
+                            EF.Functions.ILike(a.Biography, $"%{loose}%") ||
+                            
+                            EF.Functions.ILike(a.Name, $"%{prefix3}%") ||
+                            EF.Functions.ILike(a.Biography, $"%{prefix3}%") ||
+                            
+                            EF.Functions.ILike(a.Name, $"%{q}%") ||
+                            EF.Functions.ILike(a.Biography, $"%{q}%") ||
+                            
+                            EF.Functions.TrigramsSimilarity(a.Name, q) > 0.1
+                        )
+                        .OrderByDescending(a =>
+                            a.SearchVector.Matches(
+                                EF.Functions.WebSearchToTsQuery(
+                                    "simple",
+                                    EF.Functions.Unaccent(q)
+                                )
+                            )
+                        )
+                        .ThenByDescending(a =>
+                            a.SearchVector.Rank(
+                                EF.Functions.WebSearchToTsQuery(
+                                    "simple",
+                                    EF.Functions.Unaccent(q)
+                                )
+                            )
+                        )
+                        .ThenByDescending(a =>
+                            EF.Functions.TrigramsSimilarity(a.Name, q)
+                        );
                 }
 
-                // 2) fallback if nothing found: prefix/word-start
-                if (!books.Any() && tokens.Length > 0)
-                {
-                    books = _context.Books.Include(b => b.Publisher)
-                        .Where(b =>
-                            prefixPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)) ||
-                            wordStartPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)));
-                }
-                
-                // 3) fallback if still empty: relaxed 3-char roots
-                if (!books.Any())
-                {
-                    if (relaxed3TokenPatterns.Length > 0)
-                    {
-                        books = _context.Books.Include(b => b.Publisher)
-                            .Where(b => relaxed3TokenPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)));
-                    }
-                    else if (relaxed3WholeInputPattern != null)
-                    {
-                        var rp = relaxed3WholeInputPattern;
-                        books = _context.Books.Include(b => b.Publisher)
-                            .Where(b => EF.Functions.ILike(b.Tittle, rp));
-                    }
-                }
-                
                 // narrow relations to found books
                 var bookIdsQ = books.Select(b => b.Id);
 
@@ -152,40 +201,6 @@ public class HomeController : Controller
 
                     books = books.Where(b => bookIds.Contains(b.Id));
                 }
-
-                // Authors by name with tokens
-                if (containsPatterns.Length > 0)
-                {
-                    authors = authors.Where(a => containsPatterns.Any(p => EF.Functions.ILike(a.Name, p)));
-                }
-                else if (!string.IsNullOrWhiteSpace(searchInput))
-                {
-                    var broad = "%" + searchInput + "%";
-                    authors = authors.Where(a => EF.Functions.ILike(a.Name, broad));
-                }
-
-                if (!authors.Any() && tokens.Length > 0)
-                {
-                    authors = _context.Authors
-                        .Where(a =>
-                            prefixPatterns.Any(p => EF.Functions.ILike(a.Name, p)) ||
-                            wordStartPatterns.Any(p => EF.Functions.ILike(a.Name, p)));
-                }
-
-                if (!authors.Any())
-                {
-                    if (relaxed3TokenPatterns.Length > 0)
-                    {
-                        authors = _context.Authors
-                            .Where(a => relaxed3TokenPatterns.Any(p => EF.Functions.ILike(a.Name, p)));
-                    }
-                    else if (relaxed3WholeInputPattern != null)
-                    {
-                        var rp = relaxed3WholeInputPattern;
-                        authors = _context.Authors
-                            .Where(a => EF.Functions.ILike(a.Name, rp));
-                    }
-                }
             }
 
             // sort
@@ -225,46 +240,15 @@ public class HomeController : Controller
 
                 default:
                 {
-                    if (!emptySearchInput)
-                    {
-                        // Boolean tiers; EF translates bool OrderBy to CASE WHEN in SQL.
-                        booksList = books
-                            // 1) exact phrase match
-                            .OrderByDescending(b => exactPhrasePattern != null && EF.Functions.ILike(b.Tittle, exactPhrasePattern))
-                            // 2) starts-with any token
-                            .ThenByDescending(b => prefixPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)))
-                            // 3) word-start boost (naive)
-                            .ThenByDescending(b => wordStartPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)))
-                            // 4) contains any token
-                            .ThenByDescending(b => containsPatterns.Any(p => EF.Functions.ILike(b.Tittle, p)))
-                            // tie-breaker
-                            .ThenBy(b => b.Tittle)
-                            .ToList();
-                    }
-                    else
-                    {
-                        booksList = books.ToList();
-                    }
+                    booksList = books.ToList();
                     break;
                 }
-            }
-
-            // Authors: order by relevance if searching
-            IQueryable<Author> authorsOrdered = authors;
-            if (!emptySearchInput)
-            {
-                authorsOrdered = authors
-                    .OrderByDescending(a => exactPhrasePattern != null && EF.Functions.ILike(a.Name, exactPhrasePattern))
-                    .ThenByDescending(a => prefixPatterns.Any(p => EF.Functions.ILike(a.Name, p)))
-                    .ThenByDescending(a => wordStartPatterns.Any(p => EF.Functions.ILike(a.Name, p)))
-                    .ThenByDescending(a => containsPatterns.Any(p => EF.Functions.ILike(a.Name, p)))
-                    .ThenBy(a => a.Name);
             }
             
             var vm = new HomeViewModel
             {
                 Books = booksList,
-                Authors = authorsOrdered.ToList(),
+                Authors = authors.ToList(),
                 Ratings = ratings.ToList(),
                 BookAuthors = bookAuthors.ToList(),
                 BookGenres = bookGenres.ToList(),
@@ -302,17 +286,5 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-    
-    // Splits user input into normalized tokens
-    private static string[] Tokenize(string? input)
-    {
-        if (string.IsNullOrWhiteSpace(input)) return Array.Empty<string>();
-        return Regex
-            .Split(input.Trim(), @"[^\p{L}\p{N}]+", RegexOptions.CultureInvariant)
-            .Where(t => !string.IsNullOrWhiteSpace(t))
-            .Select(t => t.ToLowerInvariant())
-            .Distinct()
-            .ToArray();
     }
 }

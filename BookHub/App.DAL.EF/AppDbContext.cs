@@ -1,5 +1,4 @@
-﻿using App.Domain;
-using App.Domain.Address_Tables;
+﻿using App.Domain.Address_Tables;
 using App.Domain.Entities;
 using App.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -49,4 +48,42 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, IdentityUs
 
         return base.SaveChangesAsync(cancellationToken);
     }
+    
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Entity<Book>(b =>
+        {
+            b.Property(x => x.SearchVector)
+                .HasColumnName("search_vector")
+                .HasColumnType("tsvector");
+
+            b.HasIndex(x => x.SearchVector)
+                .HasMethod("GIN")
+                .HasDatabaseName("idx_books_search_vector");
+
+            b.HasIndex(x => x.Tittle)
+                .HasMethod("GIN")
+                .HasDatabaseName("idx_books_title_trgm")
+                .HasOperators("gin_trgm_ops");
+        });
+
+        builder.Entity<Author>(a =>
+        {
+            a.Property(x => x.SearchVector)
+                .HasColumnName("search_vector")
+                .HasColumnType("tsvector");
+
+            a.HasIndex(x => x.SearchVector)
+                .HasMethod("GIN")
+                .HasDatabaseName("idx_authors_search_vector");
+
+            a.HasIndex(x => x.Name)
+                .HasMethod("GIN")
+                .HasDatabaseName("idx_authors_name_trgm")
+                .HasOperators("gin_trgm_ops");
+        });
+    }
+    
 }
