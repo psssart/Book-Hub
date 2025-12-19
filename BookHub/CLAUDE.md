@@ -186,6 +186,116 @@ The solution uses a **two-tier inheritance pattern** where generic base classes 
 - Template-based emails stored in `WebApp/Infrastructure/Email/EmailTemplates/`
 - Services: `IEmailSender` (MailKitEmailSender) and `IEmailTemplateService`
 
+### SignalR Real-Time Communication
+
+**Overview:**
+- ASP.NET Core 8.0 built-in SignalR for WebSocket-based real-time updates
+- JavaScript client library 8.0.0 loaded via CDN
+- Enables instant message and topic updates without page refresh
+- Progressive enhancement approach - forms work without JavaScript
+
+**Hub Architecture:**
+- **Single unified hub**: `WebApp/Hubs/DiscussionHub.cs`
+- Hub endpoint: `/hubs/discussion`
+- Requires authentication via `[Authorize]` attribute
+- Supports both Cookie (MVC) and JWT Bearer (API) authentication
+
+**Group Management Strategy:**
+- **Discussion-level groups**: `discussion_{discussionId}` - broadcasts new topics to all viewers of a discussion
+- **Topic-level groups**: `topic_{topicId}` - broadcasts new messages to all viewers of a topic
+- Groups prevent unnecessary broadcasts to unrelated clients
+- Auto-rejoin groups on reconnection (handled by client-side manager)
+
+**Broadcasting from Controllers:**
+
+When creating new messages or topics, controllers broadcast to SignalR groups:
+
+```csharp
+// In MessagesController - inject IHubContext<DiscussionHub>
+private readonly IHubContext<DiscussionHub> _hubContext;
+
+// After saving message
+var notification = new NewMessageNotification { /* ... */ };
+await _hubContext.Clients
+    .Group($"topic_{topicId}")
+    .SendAsync("ReceiveMessage", notification);
+```
+
+```csharp
+// In TopicsController - inject IHubContext<DiscussionHub>
+private readonly IHubContext<DiscussionHub> _hubContext;
+
+// After saving topic
+var notification = new NewTopicNotification { /* ... */ };
+await _hubContext.Clients
+    .Group($"discussion_{discussionId}")
+    .SendAsync("ReceiveTopic", notification);
+```
+
+**Notification Models:**
+- `WebApp/Models/SignalR/NewMessageNotification.cs` - Message broadcast DTO
+- `WebApp/Models/SignalR/NewTopicNotification.cs` - Topic broadcast DTO
+- Keep DTOs minimal (only essential data for UI updates)
+
+**Client-Side Integration:**
+
+Connection manager: `WebApp/wwwroot/js/discussion-hub.js`
+- Global instance: `window.discussionHub`
+- Automatic reconnection with exponential backoff (0, 2, 10, 30 seconds)
+- Methods: `initialize()`, `joinDiscussion(id)`, `joinTopic(id)`, `onReceiveMessage(callback)`, `onReceiveTopic(callback)`
+
+Usage in views:
+```javascript
+// Topics/Details.cshtml - Join topic and listen for messages
+await window.discussionHub.initialize();
+await window.discussionHub.joinTopic(topicId);
+window.discussionHub.onReceiveMessage(function(notification) {
+    // Update UI with new message
+});
+
+// Discussions/Details.cshtml - Join discussion and listen for topics
+await window.discussionHub.initialize();
+await window.discussionHub.joinDiscussion(discussionId);
+window.discussionHub.onReceiveTopic(function(notification) {
+    // Update UI with new topic
+});
+```
+
+**Configuration in Program.cs:**
+```csharp
+// Register SignalR services (line ~88)
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
+
+// CORS configuration requires AllowCredentials for SignalR (line ~67)
+.AllowCredentials(); // Required for SignalR
+
+// Map hub endpoint (line ~162)
+app.MapHub<WebApp.Hubs.DiscussionHub>("/hubs/discussion");
+```
+
+**Key Implementation Files:**
+- `WebApp/Hubs/DiscussionHub.cs` - SignalR hub with group management
+- `WebApp/Models/SignalR/` - Notification DTOs
+- `WebApp/wwwroot/js/discussion-hub.js` - Client connection manager
+- `WebApp/Controllers/MessagesController.cs` - Broadcasts messages
+- `WebApp/Controllers/TopicsController.cs` - Broadcasts topics
+- `WebApp/Views/Topics/Details.cshtml` - Real-time message UI
+- `WebApp/Views/Discussions/Details.cshtml` - Real-time topic UI
+- `WebApp/Views/Shared/_Layout.cshtml` - SignalR script includes
+
+**Important Notes:**
+- All SignalR broadcasts happen AFTER successful database saves (hybrid approach)
+- Broadcasting is done through controllers, NOT directly from views
+- Maintains BLL pattern - no breaking changes to business logic
+- Connection logging enabled via `ILogger<DiscussionHub>`
+- Network failures auto-reconnect; groups are automatically rejoined
+- Works in production with proper CORS configuration (`AllowCredentials`)
+
 ## Important Conventions
 
 ### Naming Patterns

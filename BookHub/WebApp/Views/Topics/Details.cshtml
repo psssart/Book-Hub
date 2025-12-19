@@ -20,17 +20,21 @@
         </dd>
     </dl>
     
-    @if (ViewData["Messages"] != null && ((List<App.BLL.DTO.Message>)ViewData["Messages"]!).Any())
-    {
-        <div>
+    <div id="messages-container">
+        @if (ViewData["Messages"] != null && ((List<App.BLL.DTO.Message>)ViewData["Messages"]!).Any())
+        {
             @foreach (var message in (ViewData["Messages"] as List<App.BLL.DTO.Message>)!)
             {
-                <div>
+                <div class="message-item" data-message-id="@message.Id">
                     <span>@message.AppUser!.UserName -- @message.Content</span>
                 </div>
             }
-        </div>
-    }
+        }
+        else
+        {
+            <p>No messages yet.</p>
+        }
+    </div>
     
     <!-- Create Message Form -->
     <div>
@@ -47,3 +51,67 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (async function() {
+            const topicId = '@Model.Id';
+
+            try {
+                // Initialize SignalR connection
+                await window.discussionHub.initialize();
+
+                // Join this topic's room
+                await window.discussionHub.joinTopic(topicId);
+
+                // Listen for new messages
+                window.discussionHub.onReceiveMessage(function(notification) {
+                    // Only add if it's for this topic
+                    if (notification.topicId === topicId) {
+                        addMessageToUI(notification);
+                    }
+                });
+
+                console.log('SignalR connected for topic:', topicId);
+
+            } catch (error) {
+                console.error('Failed to connect to SignalR:', error);
+            }
+
+            function addMessageToUI(notification) {
+                const messagesContainer = document.getElementById('messages-container');
+
+                // Remove "No messages yet" if present
+                const noMessagesText = messagesContainer.querySelector('p');
+                if (noMessagesText && noMessagesText.textContent === 'No messages yet.') {
+                    noMessagesText.remove();
+                }
+
+                // Create new message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-item';
+                messageDiv.setAttribute('data-message-id', notification.messageId);
+
+                const messageContent = document.createElement('span');
+                messageContent.textContent = `${notification.userName} -- ${notification.content}`;
+
+                messageDiv.appendChild(messageContent);
+                messagesContainer.appendChild(messageDiv);
+
+                // Optional: Scroll to new message
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+                // Optional: Highlight new message briefly
+                messageDiv.style.backgroundColor = '#ffffcc';
+                setTimeout(() => {
+                    messageDiv.style.backgroundColor = '';
+                }, 2000);
+            }
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', async function() {
+                await window.discussionHub.leaveTopic(topicId);
+            });
+        })();
+    </script>
+}

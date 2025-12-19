@@ -63,7 +63,8 @@ builder.Services.AddCors(opts =>
         {
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // Required for SignalR
         }
     })
 );
@@ -83,6 +84,14 @@ builder.Services.AddAutoMapper(
 // 7. MVC / Controllers / RazorPages / MailService
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+// 7.5. SignalR
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
 
 builder.Services.AddHealthChecks();
 
@@ -148,6 +157,10 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
+
+// Map SignalR hubs
+app.MapHub<WebApp.Hubs.DiscussionHub>("/hubs/discussion");
+
 app.MapRazorPages();
 
 // 10. Seeding

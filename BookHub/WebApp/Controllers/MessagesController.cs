@@ -6,21 +6,24 @@ using App.Contracts.BLL;
 using App.Contracts.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Entities;
+using WebApp.Hubs;
+using WebApp.Models.SignalR;
 
 namespace WebApp.Controllers
 {
     public class MessagesController : Controller
     {
         private readonly IAppBLL _bll;
-        /*private readonly IAppUnitOfWork _uow;*/
+        private readonly IHubContext<DiscussionHub> _hubContext;
 
-        public MessagesController(IAppBLL bll)
+        public MessagesController(IAppBLL bll, IHubContext<DiscussionHub> hubContext)
         {
             _bll = bll;
-            /*_uow = new AppUOW(context);*/
+            _hubContext = hubContext;
         }
 
         // GET: Messages
@@ -68,6 +71,27 @@ namespace WebApp.Controllers
                 message.CreationTime = DateTime.UtcNow;
                 _bll.Messages.Add(message);
                 await _bll.SaveChangesAsync();
+
+                // Fetch the complete message with user info for broadcasting
+                var savedMessage = await _bll.Messages.FirstOrDefaultIncludeAllAsync(message.Id);
+
+                if (savedMessage != null)
+                {
+                    // Broadcast to all clients in this topic's room
+                    var notification = new NewMessageNotification
+                    {
+                        MessageId = savedMessage.Id,
+                        TopicId = savedMessage.TopicId,
+                        Content = savedMessage.Content,
+                        UserName = savedMessage.AppUser?.UserName ?? "Unknown",
+                        CreationTime = savedMessage.CreationTime
+                    };
+
+                    await _hubContext.Clients
+                        .Group($"topic_{message.TopicId}")
+                        .SendAsync("ReceiveMessage", notification);
+                }
+
                 return RedirectToAction("Details", "Topics", new { id = message.TopicId });
             }
             ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", message.AppUserId);

@@ -72,43 +72,44 @@
             Topics
         </dt>
         <dd class="col-sm-10">
-            @if (ViewData["Topics"] != null && ((List<Topic>)ViewData["Topics"]!).Any())
-            {
-                @foreach (var topic in (ViewData["Topics"] as List<Topic>)!)
+            <div id="topics-container">
+                @if (ViewData["Topics"] != null && ((List<Topic>)ViewData["Topics"]!).Any())
                 {
-                    <div>
-                        <a asp-area="" asp-controller="Topics" asp-action="Details" asp-route-id="@topic.Id">
-                            <strong>@Html.DisplayFor(model => topic.Tittle) -- @Html.DisplayFor(model => topic.AppUser!.UserName)</strong>
-                            <div>@Html.DisplayFor(model => topic.Content) -- @Html.DisplayFor(model => topic.CreationTime)</div>
-                        </a>
-                        <!-- Add more properties of the Topic entity as needed -->
-                    </div>
-
-                    <!-- Display messages for each topic -->
-                    @if (ViewData["Messages"] != null && ((List<App.Domain.Entities.Message>)ViewData["Messages"]!).Any())
+                    @foreach (var topic in (ViewData["Topics"] as List<Topic>)!)
                     {
-                        <div>
-                            <button class="toggleMessagesBtn">↓</button>
-                            <div class="messagesContainer" style="display: none;">
-                                @foreach (var message in (ViewData["Messages"] as List<App.Domain.Entities.Message>)!)
-                                {
-                                    if (message.TopicId == topic.Id)
-                                    {
-                                        <div>
-                                            <span>@Html.DisplayFor(model => message.AppUser!.UserName) -- @Html.DisplayFor(model => message.Content)</span>
-                                        </div>
-                                    }
-                                }
-                            </div>
+                        <div class="topic-item" data-topic-id="@topic.Id">
+                            <a asp-area="" asp-controller="Topics" asp-action="Details" asp-route-id="@topic.Id">
+                                <strong>@Html.DisplayFor(model => topic.Tittle) -- @Html.DisplayFor(model => topic.AppUser!.UserName)</strong>
+                                <div>@Html.DisplayFor(model => topic.Content) -- @Html.DisplayFor(model => topic.CreationTime)</div>
+                            </a>
+                            <!-- Add more properties of the Topic entity as needed -->
 
+                            <!-- Display messages for each topic -->
+                            @if (ViewData["Messages"] != null && ((List<App.Domain.Entities.Message>)ViewData["Messages"]!).Any())
+                            {
+                                <div>
+                                    <button class="toggleMessagesBtn">↓</button>
+                                    <div class="messagesContainer" style="display: none;">
+                                        @foreach (var message in (ViewData["Messages"] as List<App.Domain.Entities.Message>)!)
+                                        {
+                                            if (message.TopicId == topic.Id)
+                                            {
+                                                <div>
+                                                    <span>@Html.DisplayFor(model => message.AppUser!.UserName) -- @Html.DisplayFor(model => message.Content)</span>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
                 }
-            }
-            else
-            {
-                <p>No topics found for this discussion.</p>
-            }
+                else
+                {
+                    <p>No topics found for this discussion.</p>
+                }
+            </div>
 
 
             <!-- Button to show/hide create topic form -->
@@ -139,22 +140,89 @@
     </dl>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var createTopicForm = document.getElementById('createTopicForm');
-        var btnCreateTopic = document.getElementById('btnCreateTopic');
-        
-        var toggleButtons = document.querySelectorAll('.toggleMessagesBtn');
+@section Scripts {
+    <script>
+        (async function() {
+            const discussionId = '@Model.Id';
 
-        btnCreateTopic.addEventListener('click', function () {
-            createTopicForm.style.display = (createTopicForm.style.display === 'none') ? 'block' : 'none';
-        });
-        
-        toggleButtons.forEach(function (button) {
-             button.addEventListener('click', function () {
-                var messagesContainer = button.nextElementSibling;
-                messagesContainer.style.display = (messagesContainer.style.display === 'none') ? 'block' : 'none';
-             });
-        });
-    });
-</script>
+            // Existing toggle functionality
+            document.addEventListener('DOMContentLoaded', function () {
+                var createTopicForm = document.getElementById('createTopicForm');
+                var btnCreateTopic = document.getElementById('btnCreateTopic');
+                var toggleButtons = document.querySelectorAll('.toggleMessagesBtn');
+
+                btnCreateTopic.addEventListener('click', function () {
+                    createTopicForm.style.display = (createTopicForm.style.display === 'none') ? 'block' : 'none';
+                });
+
+                toggleButtons.forEach(function (button) {
+                     button.addEventListener('click', function () {
+                        var messagesContainer = button.nextElementSibling;
+                        messagesContainer.style.display = (messagesContainer.style.display === 'none') ? 'block' : 'none';
+                     });
+                });
+            });
+
+            // SignalR real-time functionality
+            try {
+                await window.discussionHub.initialize();
+                await window.discussionHub.joinDiscussion(discussionId);
+
+                // Listen for new topics
+                window.discussionHub.onReceiveTopic(function(notification) {
+                    if (notification.discussionId === discussionId) {
+                        addTopicToUI(notification);
+                    }
+                });
+
+                console.log('SignalR connected for discussion:', discussionId);
+
+            } catch (error) {
+                console.error('Failed to connect to SignalR:', error);
+            }
+
+            function addTopicToUI(notification) {
+                const topicsContainer = document.getElementById('topics-container');
+
+                // Remove "No topics found" if present
+                const noTopicsText = topicsContainer.querySelector('p');
+                if (noTopicsText) {
+                    noTopicsText.remove();
+                }
+
+                // Create new topic element
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'topic-item';
+                topicDiv.setAttribute('data-topic-id', notification.topicId);
+
+                const topicLink = document.createElement('a');
+                topicLink.href = `/Topics/Details/${notification.topicId}`;
+
+                const topicTitle = document.createElement('strong');
+                topicTitle.textContent = `${notification.tittle} -- ${notification.userName}`;
+
+                const topicContent = document.createElement('div');
+                const creationTime = new Date(notification.creationTime).toLocaleString();
+                topicContent.textContent = `${notification.content} -- ${creationTime}`;
+
+                topicLink.appendChild(topicTitle);
+                topicLink.appendChild(topicContent);
+                topicDiv.appendChild(topicLink);
+
+                // Add to container (at the top for newest first)
+                topicsContainer.insertBefore(topicDiv, topicsContainer.firstChild);
+
+                // Optional: Highlight briefly
+                topicDiv.style.backgroundColor = '#ffffcc';
+                setTimeout(() => {
+                    topicDiv.style.backgroundColor = '';
+                }, 2000);
+            }
+
+            // Cleanup
+            window.addEventListener('beforeunload', async function() {
+                await window.discussionHub.leaveDiscussion(discussionId);
+            });
+        })();
+    </script>
+}

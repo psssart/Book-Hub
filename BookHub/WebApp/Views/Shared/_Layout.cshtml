@@ -339,6 +339,11 @@ else
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/theme.js" asp-append-version="true" defer></script>
+
+<!-- SignalR JavaScript Library -->
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@@8.0.0/dist/browser/signalr.min.js"></script>
+<script src="~/js/discussion-hub.js" asp-append-version="true"></script>
+
 @await RenderSectionAsync("Scripts", required: false)
 @await Html.PartialAsync("_ToastPartial")
 </body>
