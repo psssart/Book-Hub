@@ -1,143 +1,247 @@
-@using App.Domain.Address_Tables
 @using App.Domain.Entities
 @using System.Security.Claims
 @using Microsoft.IdentityModel.Tokens
 @model App.Domain.Entities.Discussion
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Tittle;
+    var topics = (ViewData["Topics"] as List<Topic>) ?? new List<Topic>();
+    var messages = (ViewData["Messages"] as List<App.Domain.Entities.Message>) ?? new List<App.Domain.Entities.Message>();
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = User.Identity!.IsAuthenticated && currentUserId == Model.AppUserId.ToString();
 }
 
-<h1>@Html.DisplayFor(model => model.Tittle)</h1>
+<head>
+    <link rel="stylesheet" href="~/css/discussions.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/discussion-details.css" asp-append-version="true">
+</head>
 
-<div>
-    <h4>Discussion</h4>
-    <hr />
-    <dl class="row">
-        @if (!Model.imageData.IsNullOrEmpty())
-        {
-            <dt>Picture</dt>
-            <dd>
-                <img src="data:image;base64,@Convert.ToBase64String(Model.imageData)" width="180px" height="270px" alt="Picture not found!"/>
-            </dd>
-        }
-        @if (User.Identity!.IsAuthenticated && User.Identity!.Name!.Equals(Model.AppUser!.UserName))
-        {
-            <span><a asp-area="" asp-controller="Discussions" asp-action="Edit" asp-route-id="@Model.Id">Edit</a></span>
-        }
-        @if (Model.Book != null)
-        {
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Book)
-            </dt>
-            <dd class="col-sm-10">
-                <a asp-area="" asp-controller="Books" asp-action="Details" asp-route-id="@Model.Book.Id">@Model.Book.Tittle</a>
-            </dd>
-        }
-        @if (Model.Genre != null)
-        {
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Genre)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Genre!.Name)
-            </dd>
-        }
-        @if (Model.Author != null)
-        {
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Author)
-            </dt>
-            <dd class="col-sm-10">
-                <a asp-area="" asp-controller="Authors" asp-action="Details" asp-route-id="@Model.Author.Id">@Model.Author.Name</a>
-            </dd>
-        }
-        <dt class="col-sm-2">Creator</dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.AppUser!.UserName)
-        </dd>
-        <dt class="col-sm-2">Created</dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CreationTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
+<div class="container-xxl py-4">
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Discussions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Tittle</li>
+        </ol>
+    </nav>
 
-        <!-- Display associated topics -->
-        <dt class="col-sm-2">
-            Topics
-        </dt>
-        <dd class="col-sm-10">
-            <div id="topics-container">
-                @if (ViewData["Topics"] != null && ((List<Topic>)ViewData["Topics"]!).Any())
-                {
-                    @foreach (var topic in (ViewData["Topics"] as List<Topic>)!)
-                    {
-                        <div class="topic-item" data-topic-id="@topic.Id">
-                            <a asp-area="" asp-controller="Topics" asp-action="Details" asp-route-id="@topic.Id">
-                                <strong>@Html.DisplayFor(model => topic.Tittle) -- @Html.DisplayFor(model => topic.AppUser!.UserName)</strong>
-                                <div>@Html.DisplayFor(model => topic.Content) -- @Html.DisplayFor(model => topic.CreationTime)</div>
+    <!-- Main Discussion Post (Reddit-style) -->
+    <div class="discussion-post-container shadow-sm mb-4">
+        <div class="discussion-post-main">
+            <!-- Left: Discussion stats/info -->
+            <div class="discussion-post-sidebar">
+                <div class="vote-section">
+                    <i class="bi bi-chat-dots-fill text-primary"></i>
+                    <span class="vote-count">@topics.Count</span>
+                    <span class="vote-label">topics</span>
+                </div>
+                <div class="vote-section mt-3">
+                    <i class="bi bi-reply-fill text-secondary"></i>
+                    <span class="vote-count">@messages.Count</span>
+                    <span class="vote-label">replies</span>
+                </div>
+            </div>
+
+            <!-- Center: Discussion content -->
+            <div class="discussion-post-content">
+                <!-- Header with title and metadata -->
+                <div class="discussion-post-header">
+                    <h2 class="discussion-post-title">@Model.Tittle</h2>
+                    <div class="discussion-post-meta">
+                        <span class="meta-item">
+                            <i class="bi bi-person-circle"></i>
+                            Posted by <strong>@Model.AppUser!.UserName</strong>
+                        </span>
+                        <span class="meta-item">
+                            <i class="bi bi-clock"></i>
+                            @Model.CreationTime.ToString("MMM dd, yyyy 'at' HH:mm")
+                        </span>
+                        @if (isOwner)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="meta-item edit-link">
+                                <i class="bi bi-pencil-square"></i> Edit
                             </a>
-                            <!-- Add more properties of the Topic entity as needed -->
+                        }
+                    </div>
+                </div>
 
-                            <!-- Display messages for each topic -->
-                            @if (ViewData["Messages"] != null && ((List<App.Domain.Entities.Message>)ViewData["Messages"]!).Any())
-                            {
-                                <div>
-                                    <button class="toggleMessagesBtn">↓</button>
-                                    <div class="messagesContainer" style="display: none;">
-                                        @foreach (var message in (ViewData["Messages"] as List<App.Domain.Entities.Message>)!)
-                                        {
-                                            if (message.TopicId == topic.Id)
-                                            {
-                                                <div>
-                                                    <span>@Html.DisplayFor(model => message.AppUser!.UserName) -- @Html.DisplayFor(model => message.Content)</span>
-                                                </div>
-                                            }
-                                        }
-                                    </div>
-                                </div>
-                            }
+                <!-- Discussion body -->
+                <div class="discussion-post-body">
+                    @if (!Model.imageData.IsNullOrEmpty())
+                    {
+                        <div class="discussion-post-image mb-3">
+                            <img src="data:image;base64,@Convert.ToBase64String(Model.imageData)" alt="@Model.Tittle">
                         </div>
                     }
-                }
-                else
+                    <p class="discussion-post-description">@Model.Description</p>
+                </div>
+
+                <!-- Tags/Related content -->
+                <div class="discussion-post-tags mt-3">
+                    @if (Model.Book != null)
+                    {
+                        <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.Book.Id"
+                           class="badge bg-primary">
+                            <i class="bi bi-book"></i> @Model.Book.Tittle
+                        </a>
+                    }
+                    @if (Model.Genre != null)
+                    {
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-tag"></i> @Model.Genre.Name
+                        </span>
+                    }
+                    @if (Model.Author != null)
+                    {
+                        <a asp-controller="Authors" asp-action="Details" asp-route-id="@Model.Author.Id"
+                           class="badge bg-info">
+                            <i class="bi bi-pen"></i> @Model.Author.Name
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Topic Section -->
+    <div class="create-topic-section mb-4">
+        <button id="btnCreateTopic" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Topic
+        </button>
+
+        <div id="createTopicForm" class="create-topic-form shadow-sm" style="display:none;">
+            <h5 class="mb-3">
+                <i class="bi bi-chat-square-text"></i> Start a New Topic
+            </h5>
+            <form asp-controller="Topics" asp-action="Create" method="post">
+                <input type="hidden" name="AppUserId" value="@currentUserId"/>
+                <input type="hidden" name="DiscussionId" value="@Model.Id"/>
+
+                <div class="mb-3">
+                    <label class="form-label">Topic Title</label>
+                    <input class="form-control" name="Tittle" required placeholder="What's this topic about?"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Content</label>
+                    <textarea class="form-control" name="Content" rows="4" required
+                              placeholder="Share your thoughts..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-send"></i> Post Topic
+                    </button>
+                    <button type="button" id="btnCancelTopic" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Topics List (Reddit comment style) -->
+    <div class="topics-section">
+        <h4 class="topics-header mb-3">
+            <i class="bi bi-chat-left-text"></i> Topics (@topics.Count)
+        </h4>
+
+        <div id="topics-container">
+            @if (topics.Any())
+            {
+                @foreach (var topic in topics.OrderByDescending(t => t.CreationTime))
                 {
-                    <p>No topics found for this discussion.</p>
+                    var topicMessages = messages.Where(m => m.TopicId == topic.Id).OrderBy(m => m.CreationTime).ToList();
+                    var isTopicOwner = User.Identity!.IsAuthenticated && currentUserId == topic.AppUserId.ToString();
+
+                    <div class="topic-card shadow-sm mb-3" data-topic-id="@topic.Id">
+                        <!-- Topic header -->
+                        <div class="topic-header">
+                            <div class="topic-title-row">
+                                <a asp-controller="Topics" asp-action="Details" asp-route-id="@topic.Id"
+                                   class="topic-title-link">
+                                    <h5 class="topic-title">@topic.Tittle</h5>
+                                </a>
+                                @if (isTopicOwner)
+                                {
+                                    <a asp-controller="Topics" asp-action="Edit" asp-route-id="@topic.Id"
+                                       class="topic-edit-link">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                }
+                            </div>
+                            <div class="topic-meta">
+                                <span class="meta-item">
+                                    <i class="bi bi-person"></i> @topic.AppUser!.UserName
+                                </span>
+                                <span class="meta-item">
+                                    <i class="bi bi-clock"></i> @topic.CreationTime.ToString("MMM dd, yyyy 'at' HH:mm")
+                                </span>
+                                <span class="meta-item">
+                                    <i class="bi bi-reply"></i> @topicMessages.Count replies
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Topic content -->
+                        <div class="topic-content">
+                            <p>@topic.Content</p>
+                        </div>
+
+                        <!-- Messages toggle button -->
+                        @if (topicMessages.Any())
+                        {
+                            <button class="toggle-messages-btn btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-chevron-down toggle-icon"></i>
+                                <span class="toggle-text">Show @topicMessages.Count replies</span>
+                            </button>
+
+                            <!-- Messages container (collapsible) -->
+                            <div class="messages-container" style="display: none;">
+                                @foreach (var message in topicMessages)
+                                {
+                                    var isMessageOwner = User.Identity!.IsAuthenticated && currentUserId == message.AppUserId.ToString();
+
+                                    <div class="message-card">
+                                        <div class="message-header">
+                                            <span class="message-author">
+                                                <i class="bi bi-person-fill"></i> @message.AppUser!.UserName
+                                            </span>
+                                            <span class="message-time">
+                                                @message.CreationTime.ToString("MMM dd, HH:mm")
+                                            </span>
+                                            @if (isMessageOwner)
+                                            {
+                                                <a asp-controller="Messages" asp-action="Edit" asp-route-id="@message.Id"
+                                                   class="message-edit-link">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                        <div class="message-content">
+                                            @message.Content
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="no-messages text-muted small">
+                                <i class="bi bi-chat"></i> No replies yet. Be the first to reply!
+                            </p>
+                        }
+                    </div>
                 }
-            </div>
-
-
-            <!-- Button to show/hide create topic form -->
-            <button id="btnCreateTopic">Create Topic</button>
-
-            <!-- Create Topic Form (initially hidden) -->
-            <div id="createTopicForm" style="display:none;">
-                <h4>Create Topic</h4>
-                <form asp-controller="Topics" asp-action="Create" method="post">
-                    @* Select current user *@
-                    <input type="hidden" name="AppUserId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
-                    @* Select current discussion *@
-                    <input type="hidden" name="DiscussionId" value="@Model.Id"/>
-                    <div class="form-group">
-                        <label class="control-label">Tittle</label>
-                        <input class="form-control" name="Tittle"/>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Content</label>
-                        <input class="form-control" name="Content"/>
-                    </div>
-                    <button type="submit">Create</button>
-                </form>
-            </div>
-
-        </dd>
-
-    </dl>
+            }
+            else
+            {
+                <div class="no-topics-message text-center py-5">
+                    <i class="bi bi-chat-left-dots" style="font-size: 3rem; color: #6c757d;"></i>
+                    <p class="text-muted mt-3">No topics found for this discussion.</p>
+                    <p class="text-muted">Be the first to start a conversation!</p>
+                </div>
+            }
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -145,21 +249,44 @@
         (async function() {
             const discussionId = '@Model.Id';
 
-            // Existing toggle functionality
+            // Create topic form toggle
             document.addEventListener('DOMContentLoaded', function () {
-                var createTopicForm = document.getElementById('createTopicForm');
-                var btnCreateTopic = document.getElementById('btnCreateTopic');
-                var toggleButtons = document.querySelectorAll('.toggleMessagesBtn');
+                const createTopicForm = document.getElementById('createTopicForm');
+                const btnCreateTopic = document.getElementById('btnCreateTopic');
+                const btnCancelTopic = document.getElementById('btnCancelTopic');
 
                 btnCreateTopic.addEventListener('click', function () {
-                    createTopicForm.style.display = (createTopicForm.style.display === 'none') ? 'block' : 'none';
+                    createTopicForm.style.display = 'block';
+                    btnCreateTopic.style.display = 'none';
+                    createTopicForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 });
 
+                btnCancelTopic.addEventListener('click', function () {
+                    createTopicForm.style.display = 'none';
+                    btnCreateTopic.style.display = 'block';
+                });
+
+                // Toggle messages for each topic
+                const toggleButtons = document.querySelectorAll('.toggle-messages-btn');
                 toggleButtons.forEach(function (button) {
-                     button.addEventListener('click', function () {
-                        var messagesContainer = button.nextElementSibling;
-                        messagesContainer.style.display = (messagesContainer.style.display === 'none') ? 'block' : 'none';
-                     });
+                    button.addEventListener('click', function () {
+                        const messagesContainer = button.nextElementSibling;
+                        const icon = button.querySelector('.toggle-icon');
+                        const text = button.querySelector('.toggle-text');
+                        const repliesCount = messagesContainer.querySelectorAll('.message-card').length;
+
+                        if (messagesContainer.style.display === 'none') {
+                            messagesContainer.style.display = 'block';
+                            icon.classList.remove('bi-chevron-down');
+                            icon.classList.add('bi-chevron-up');
+                            text.textContent = 'Hide replies';
+                        } else {
+                            messagesContainer.style.display = 'none';
+                            icon.classList.remove('bi-chevron-up');
+                            icon.classList.add('bi-chevron-down');
+                            text.textContent = `Show ${repliesCount} replies`;
+                        }
+                    });
                 });
             });
 
@@ -185,38 +312,64 @@
                 const topicsContainer = document.getElementById('topics-container');
 
                 // Remove "No topics found" if present
-                const noTopicsText = topicsContainer.querySelector('p');
-                if (noTopicsText) {
-                    noTopicsText.remove();
+                const noTopicsMessage = topicsContainer.querySelector('.no-topics-message');
+                if (noTopicsMessage) {
+                    noTopicsMessage.remove();
                 }
 
                 // Create new topic element
                 const topicDiv = document.createElement('div');
-                topicDiv.className = 'topic-item';
+                topicDiv.className = 'topic-card shadow-sm mb-3';
                 topicDiv.setAttribute('data-topic-id', notification.topicId);
 
-                const topicLink = document.createElement('a');
-                topicLink.href = `/Topics/Details/${notification.topicId}`;
+                const creationTime = new Date(notification.creationTime).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
-                const topicTitle = document.createElement('strong');
-                topicTitle.textContent = `${notification.tittle} -- ${notification.userName}`;
-
-                const topicContent = document.createElement('div');
-                const creationTime = new Date(notification.creationTime).toLocaleString();
-                topicContent.textContent = `${notification.content} -- ${creationTime}`;
-
-                topicLink.appendChild(topicTitle);
-                topicLink.appendChild(topicContent);
-                topicDiv.appendChild(topicLink);
+                topicDiv.innerHTML = `
+                    <div class="topic-header">
+                        <div class="topic-title-row">
+                            <a href="/Topics/Details/${notification.topicId}" class="topic-title-link">
+                                <h5 class="topic-title">${notification.tittle}</h5>
+                            </a>
+                        </div>
+                        <div class="topic-meta">
+                            <span class="meta-item">
+                                <i class="bi bi-person"></i> ${notification.userName}
+                            </span>
+                            <span class="meta-item">
+                                <i class="bi bi-clock"></i> ${creationTime}
+                            </span>
+                            <span class="meta-item">
+                                <i class="bi bi-reply"></i> 0 replies
+                            </span>
+                        </div>
+                    </div>
+                    <div class="topic-content">
+                        <p>${notification.content}</p>
+                    </div>
+                    <p class="no-messages text-muted small">
+                        <i class="bi bi-chat"></i> No replies yet. Be the first to reply!
+                    </p>
+                `;
 
                 // Add to container (at the top for newest first)
                 topicsContainer.insertBefore(topicDiv, topicsContainer.firstChild);
 
-                // Optional: Highlight briefly
-                topicDiv.style.backgroundColor = '#ffffcc';
+                // Highlight briefly
+                topicDiv.style.backgroundColor = '#ffffee';
                 setTimeout(() => {
                     topicDiv.style.backgroundColor = '';
-                }, 2000);
+                }, 3000);
+
+                // Update header count
+                const topicsHeader = document.querySelector('.topics-header');
+                const currentCount = topicsContainer.querySelectorAll('.topic-card').length;
+                topicsHeader.innerHTML = `<i class="bi bi-chat-left-text"></i> Topics (${currentCount})`;
             }
 
             // Cleanup

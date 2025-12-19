@@ -1,84 +1,128 @@
-@using Microsoft.IdentityModel.Tokens
-@model IEnumerable<App.Domain.Entities.Discussion>
-
+@model WebApp.Models.DiscussionIndexViewModel
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Discussions";
 }
 
-<h1>Discussions</h1>
+<head>
+    <link rel="stylesheet" href="~/css/discussions.css" asp-append-version="true">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-    <tr>
-        <th>Picture</th>
-        <th></th>
-        <th>
-            @Html.DisplayNameFor(model => model.Tittle)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AppUser)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Book)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Genre)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Author)
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-    <tr>
-        <td>
-        @if (!item.imageData.IsNullOrEmpty())
-        {
-            <img src="data:image;base64,@Convert.ToBase64String(item.imageData)" width="180px" height="270px" alt="Picture not found!"/>
-        }
-        </td>
-        <td><a asp-action="Details" asp-route-id="@item.Id">Open</a></td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Tittle)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AppUser!.UserName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @if (item.Book != null)
-            {
-                @Html.DisplayFor(modelItem => item.Book.Tittle)
-            }
-            else
-            {<span>---</span>}
-        </td>
-        <td>
-            @if (item.Genre != null)
-            {
-                @Html.DisplayFor(modelItem => item.Genre.Name)
-            }
-            else
-            {<span>---</span>}
-        </td>
-        <td>
-            @if (item.Author != null)
-            {
-                @Html.DisplayFor(modelItem => item.Author.Name)
-            }
-            else
-            {<span>---</span>}
-        </td>
-    </tr>
-}
-    </tbody>
-</table>
+<body style="overflow-x: hidden;">
+
+<div class="container-xxl mx-2 ps-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <!-- Left header block -->
+        <div class="d-flex flex-wrap align-items-center gap-3">
+            <h3 class="m-0">Discussions</h3>
+
+            <!-- Search input -->
+            <input type="text" id="searchInput" class="form-control form-control-sm"
+                   placeholder="Search discussions..."
+                   value="@Model.SearchInput"
+                   style="width: 300px; background-color: var(--bg-input);">
+
+            <!-- Sort controls -->
+            <div class="d-flex align-items-center gap-2 pt-2">
+                <label for="sortSelect" class="sort_label m-0">Sort by:</label>
+                <select id="sortSelect" class="form-select form-select-sm w-auto me-0"
+                        style="background-color: var(--bg-input);">
+                    <option value="none"></option>
+                    <option value="participants">Participants</option>
+                    <option value="date">Date Created</option>
+                    <option value="activity">Recent Activity</option>
+                </select>
+                <button id="rotateButton" type="button" class="btn btn-outline-secondary btn-sm"
+                        title="Toggle sort direction">
+                    <span class="pyramid"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right header block -->
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-semibold">Found: @Model.Discussions.Count</span>
+            <a asp-action="Create" class="btn btn-primary btn-sm">Create Discussion</a>
+            <button class="filterMenuButton btn btn-primary btn-sm">Filter</button>
+        </div>
+    </div>
+
+    <!-- Filter panel (slide-out) -->
+    <div id="filterPanel" class="container filterPanel" style="top: 89px;">
+        <div class="row">
+            <h5 class="col-12 text-center mt-2">Filtering Settings</h5>
+        </div>
+
+        <div class="row mt-3">
+            <h6 class="col-12 text-center">Filter by Related Content</h6>
+        </div>
+
+        <div class="row mt-2 text-center">
+            <!-- Books filter -->
+            <span class="col-12 mb-3">
+                <div class="dropdown dropdown-filter">
+                    <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Books</button>
+                    <div class="dropdown-content dropdown-filter-content dropdown-right dropdownBook-content px-3 gap-2">
+                        @foreach (var book in Model.AvailableBooks)
+                        {
+                            <label class="d-flex justify-content-start gap-2">
+                                <input type="checkbox" value="@book.Id"/> @book.Tittle
+                            </label>
+                        }
+                    </div>
+                </div>
+            </span>
+
+            <!-- Authors filter -->
+            <span class="col-6">
+                <div class="dropdown dropdown-filter">
+                    <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Authors</button>
+                    <div class="dropdown-content dropdown-filter-content dropdown-right dropdownAut-content px-3 gap-2">
+                        @foreach (var author in Model.AvailableAuthors)
+                        {
+                            <label class="d-flex justify-content-start gap-2">
+                                <input type="checkbox" value="@author.Id"/> @author.Name
+                            </label>
+                        }
+                    </div>
+                </div>
+            </span>
+
+            <!-- Genres filter -->
+            <span class="col-6">
+                <div class="dropdown dropdown-filter">
+                    <button type="button" class="dropbtn btn btn-outline-secondary btn-sm">Genres</button>
+                    <div class="dropdown-content dropdown-filter-content dropdown-left dropdownGen-content px-3 gap-2">
+                        @foreach (var genre in Model.AvailableGenres)
+                        {
+                            <label class="d-flex justify-content-end gap-2">
+                                @genre.Name <input type="checkbox" value="@genre.Id"/>
+                            </label>
+                        }
+                    </div>
+                </div>
+            </span>
+        </div>
+
+        <div class="row mt-3 text-center">
+            <span class="col-12">
+                <button class="filterResetbtn btn btn-link btn-sm">Reset All Filters</button>
+            </span>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12 flex-column align-items-center align-content-center">
+                <button type="button" id="hidePanelBtn" class="fs-1 transparent-round-btn p-0 pb-1">
+                    &gt;
+                </button>
+            </div>
+        </div>
+    </div> <!-- /filterPanel -->
+</div>
+
+@await Html.PartialAsync("_DiscussionResults", Model)
+
+</body>
+
+<!-- JavaScript at bottom -->
+<script src="~/js/discussions-index.js" asp-append-version="true"></script>

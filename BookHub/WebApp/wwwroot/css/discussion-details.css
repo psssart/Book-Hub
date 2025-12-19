@@ -1,0 +1,426 @@
+/* Discussion Details Page - Reddit-like Style */
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item a {
+    color: #6474C9;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+/* Main Discussion Post Container */
+.discussion-post-container {
+    background-color: var(--bg-secondary, #ffffff);
+    border: 1px solid var(--bg-tertiary, #e0e0e0);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.discussion-post-main {
+    display: flex;
+    gap: 0;
+}
+
+/* Left sidebar with stats (Reddit-style voting area) */
+.discussion-post-sidebar {
+    background-color: var(--bg-input, #f8f9fa);
+    padding: 16px 12px;
+    min-width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid var(--bg-tertiary, #e0e0e0);
+}
+
+.vote-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.vote-section i {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.vote-count {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary, #212529);
+}
+
+.vote-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #6c757d);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Discussion post content */
+.discussion-post-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.discussion-post-header {
+    margin-bottom: 16px;
+}
+
+.discussion-post-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary, #212529);
+}
+
+.discussion-post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #6c757d);
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.meta-item i {
+    font-size: 1rem;
+}
+
+.edit-link {
+    color: #6474C9;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.edit-link:hover {
+    color: #7d8bd7;
+    text-decoration: underline;
+}
+
+.discussion-post-body {
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+.discussion-post-image {
+    max-width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.discussion-post-image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.discussion-post-description {
+    font-size: 1rem;
+    color: var(--text-primary, #212529);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.discussion-post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.discussion-post-tags .badge {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+.discussion-post-tags .badge i {
+    margin-right: 4px;
+}
+
+/* Create Topic Section */
+.create-topic-section {
+    margin-top: 24px;
+}
+
+.create-topic-form {
+    background-color: var(--bg-secondary, #ffffff);
+    border: 1px solid var(--bg-tertiary, #e0e0e0);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 12px;
+}
+
+.create-topic-form h5 {
+    color: var(--text-primary, #212529);
+    font-weight: 600;
+}
+
+.create-topic-form .form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.create-topic-form .form-control {
+    border: 2px solid #e0e0e0;
+    transition: border-color 0.2s ease;
+}
+
+.create-topic-form .form-control:focus {
+    border-color: #6474C9;
+    box-shadow: 0 0 0 3px rgba(100, 116, 201, 0.1);
+}
+
+/* Topics Section */
+.topics-section {
+    margin-top: 32px;
+}
+
+.topics-header {
+    color: var(--text-primary, #212529);
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Topic Card (Reddit comment style) */
+.topic-card {
+    background-color: var(--bg-secondary, #ffffff);
+    border: 1px solid var(--bg-tertiary, #e0e0e0);
+    border-radius: 8px;
+    padding: 16px;
+    transition: box-shadow 0.2s ease;
+}
+
+.topic-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.topic-header {
+    margin-bottom: 12px;
+}
+
+.topic-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.topic-title-link {
+    text-decoration: none;
+    flex: 1;
+}
+
+.topic-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary, #212529);
+    margin: 0;
+    transition: color 0.2s ease;
+}
+
+.topic-title-link:hover .topic-title {
+    color: #6474C9;
+}
+
+.topic-edit-link {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.topic-edit-link:hover {
+    background-color: var(--bg-input, #f8f9fa);
+    color: #6474C9;
+}
+
+.topic-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #6c757d);
+}
+
+.topic-content {
+    margin: 12px 0;
+    line-height: 1.6;
+}
+
+.topic-content p {
+    margin: 0;
+    color: var(--text-primary, #212529);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Toggle messages button */
+.toggle-messages-btn {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.toggle-icon {
+    transition: transform 0.2s ease;
+}
+
+.no-messages {
+    margin-top: 12px;
+    margin-bottom: 0;
+    padding: 8px 12px;
+    background-color: var(--bg-input, #f8f9fa);
+    border-radius: 4px;
+}
+
+/* Messages Container (Reddit-style nested replies) */
+.messages-container {
+    margin-top: 16px;
+    padding-left: 16px;
+    border-left: 3px solid var(--bg-tertiary, #e0e0e0);
+}
+
+.message-card {
+    background-color: var(--bg-input, #f8f9fa);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.message-card:hover {
+    background-color: #e9ecef;
+}
+
+.message-card:last-child {
+    margin-bottom: 0;
+}
+
+.message-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.message-author {
+    font-weight: 600;
+    color: var(--text-primary, #212529);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.message-time {
+    color: var(--text-secondary, #6c757d);
+}
+
+.message-edit-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-left: auto;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.message-edit-link:hover {
+    background-color: #dee2e6;
+    color: #6474C9;
+}
+
+.message-content {
+    color: var(--text-primary, #212529);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* No topics message */
+.no-topics-message {
+    background-color: var(--bg-secondary, #ffffff);
+    border: 1px dashed var(--bg-tertiary, #e0e0e0);
+    border-radius: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .discussion-post-main {
+        flex-direction: column;
+    }
+
+    .discussion-post-sidebar {
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--bg-tertiary, #e0e0e0);
+    }
+
+    .discussion-post-title {
+        font-size: 1.5rem;
+    }
+
+    .discussion-post-meta {
+        gap: 12px;
+        font-size: 0.8rem;
+    }
+
+    .messages-container {
+        padding-left: 12px;
+        border-left-width: 2px;
+    }
+
+    .topic-title {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .discussion-post-content {
+        padding: 16px;
+    }
+
+    .discussion-post-title {
+        font-size: 1.3rem;
+    }
+
+    .topic-card {
+        padding: 12px;
+    }
+
+    .create-topic-form {
+        padding: 16px;
+    }
+}
+
+/* Animation for new topics */
+@keyframes highlightFade {
+    0% { background-color: #ffffee; }
+    100% { background-color: transparent; }
+}
+
+.topic-card.new-topic {
+    animation: highlightFade 3s ease-in-out;
+}
