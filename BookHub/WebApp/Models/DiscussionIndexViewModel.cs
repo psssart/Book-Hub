@@ -26,6 +26,7 @@ public class DiscussionCardData
     public byte[]? ImageData { get; set; }
 
     // Creator info
+    public byte[]? CreatorImageData { get; set; } = default!;
     public string CreatorUsername { get; set; } = default!;
     public Guid CreatorId { get; set; }
 

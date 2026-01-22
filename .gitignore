@@ -80,4 +80,5 @@ _ReSharper*/
 *.sln.ide
 
 ## Certificates
+https/
 *.pfx

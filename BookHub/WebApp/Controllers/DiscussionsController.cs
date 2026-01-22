@@ -149,6 +149,7 @@ namespace WebApp.Controllers
                     Description = d.Description,
                     CreationTime = d.CreationTime,
                     ImageData = d.imageData,
+                    CreatorImageData = d.AppUser?.AvatarImageData,
                     CreatorUsername = d.AppUser?.UserName ?? "Unknown",
                     CreatorId = d.AppUserId,
                     BookTittle = d.Book?.Tittle,
