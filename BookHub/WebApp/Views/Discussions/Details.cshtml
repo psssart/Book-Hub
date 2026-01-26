@@ -44,36 +44,37 @@
 
             <!-- Center: Discussion content -->
             <div class="discussion-post-content">
-                <!-- Header with title and metadata -->
-                <div class="discussion-post-header">
-                    <h2 class="discussion-post-title">@Model.Tittle</h2>
-                    <div class="discussion-post-meta">
-                        <span class="meta-item">
-                            <i class="bi bi-person-circle"></i>
-                            Posted by <strong>@Model.AppUser!.UserName</strong>
-                        </span>
-                        <span class="meta-item">
-                            <i class="bi bi-clock"></i>
-                            @Model.CreationTime.ToString("MMM dd, yyyy 'at' HH:mm")
-                        </span>
-                        @if (isOwner)
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="meta-item edit-link">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-                        }
-                    </div>
-                </div>
-
                 <!-- Discussion body -->
-                <div class="discussion-post-body">
+                <div class="discussion-post-body d-flex flex-row">
                     @if (!Model.imageData.IsNullOrEmpty())
                     {
-                        <div class="discussion-post-image mb-3">
+                        <div class="discussion-post-image mb-3 d-flex justify-content-center align-content-center">
                             <img src="data:image;base64,@Convert.ToBase64String(Model.imageData)" alt="@Model.Tittle">
                         </div>
                     }
-                    <p class="discussion-post-description">@Model.Description</p>
+                    <div>
+                        <!-- Header with title and metadata -->
+                        <div class="discussion-post-header">
+                            <h2 class="discussion-post-title">@Model.Tittle</h2>
+                            <div class="discussion-post-meta">
+                                <span class="meta-item">
+                                    <i class="bi bi-person-circle"></i>
+                                    Posted by <strong>@Model.AppUser!.UserName</strong>
+                                </span>
+                                <span class="meta-item">
+                                    <i class="bi bi-clock"></i>
+                                    @Model.CreationTime.ToString("MMM dd, yyyy 'at' HH:mm")
+                                </span>
+                                @if (isOwner)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@Model.Id" class="meta-item edit-link">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                        <p class="discussion-post-description">@Model.Description</p>
+                    </div>
                 </div>
 
                 <!-- Tags/Related content -->

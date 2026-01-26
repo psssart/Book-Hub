@@ -9,27 +9,8 @@
                 <div class="discussion-card shadow-sm mb-3">
                     <div class="card-main-content">
                         <!-- Left: Voting/Stats section (Reddit-style) -->
-                        <div class="discussion-stats">
-                            <div class="stat-item">
-                                <i class="bi bi-people-fill"></i>
-                                <span class="stat-number">@discussion.ParticipantsCount</span>
-                                <span class="stat-label">participants</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="bi bi-chat-dots-fill"></i>
-                                <span class="stat-number">@discussion.TopicsCount</span>
-                                <span class="stat-label">topics</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="bi bi-reply-fill"></i>
-                                <span class="stat-number">@discussion.MessagesCount</span>
-                                <span class="stat-label">messages</span>
-                            </div>
-                        </div>
-
-                        <!-- Center: Discussion content -->
-                        <div class="discussion-content flex-grow-1">
-                            <div class="d-flex align-items-start gap-3">
+                        <div class="d-flex gap-2 flex-column">
+                            <div class="discussion-main-info d-flex gap-1">
                                 <!-- Thumbnail -->
                                 @if (discussion.ImageData != null)
                                 {
@@ -39,24 +20,47 @@
                                              alt="@discussion.Tittle">
                                     </a>
                                 }
-
-                                <!-- Text content -->
-                                <div class="flex-grow-1">
+                                <div class="d-flex flex-column">
                                     <!-- Title -->
-                                    <h5 class="discussion-title mb-2">
-                                        <a asp-action="Details" asp-route-id="@discussion.Id"
-                                           class="text-decoration-none">
+                                    <h5 class="discussion-title text-truncate mb-2 pb-1">
+                                        <a asp-action="Details" asp-route-id="@discussion.Id">
                                             @discussion.Tittle
                                         </a>
                                     </h5>
-
                                     <!-- Description -->
-                                    <p class="discussion-description text-muted mb-2">
+                                    <p class="discussion-description text-muted text-wrap mb-0">
                                         @discussion.Description
                                     </p>
+                                </div>
+                            </div>
+                            <div class="discussion-stats">
+                                <div class="stat-item">
+                                    <i class="bi bi-people-fill"></i>
+                                    <span class="stat-number">@discussion.ParticipantsCount</span>
+                                    <span class="stat-label">participants</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="bi bi-chat-dots-fill"></i>
+                                    <span class="stat-number">@discussion.TopicsCount</span>
+                                    <span class="stat-label">topics</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="bi bi-reply-fill"></i>
+                                    <span class="stat-number">@discussion.MessagesCount</span>
+                                    <span class="stat-label">messages</span>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Center: Discussion content -->
+                        <div class="discussion-content flex-grow-1">
+                            <div class="d-flex align-items-start gap-3">
+
+                                <!-- Text content -->
+                                <div class="flex-grow-1">
+                                    
                                     <!-- Metadata row -->
-                                    <div class="discussion-meta d-flex flex-wrap gap-3 small text-muted">
+                                    <div class="discussion-meta d-flex flex-wrap gap-2 small text-muted">
                                         <span>
                                             @if (discussion.CreatorImageData != null)
                                             {
