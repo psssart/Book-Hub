@@ -37,6 +37,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 2rem;
     border-right: 1px solid var(--bg-tertiary, #e0e0e0);
 }
 
@@ -204,6 +206,7 @@
     border-radius: 8px;
     padding: 16px;
     transition: box-shadow 0.2s ease;
+    height: 100%;
 }
 
 .topic-card:hover {
@@ -378,6 +381,11 @@
         padding: 12px;
         border-right: none;
         border-bottom: 1px solid var(--bg-tertiary, #e0e0e0);
+    }
+
+    .vote-section {
+        flex-direction: row;
+        gap: 0.5rem;
     }
 
     .discussion-post-title {

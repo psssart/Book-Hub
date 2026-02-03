@@ -103,8 +103,10 @@
 
                 // Optional: Highlight new message briefly
                 messageDiv.style.backgroundColor = '#ffffcc';
+                messageDiv.style.color = 'var(--text-secondary)';
                 setTimeout(() => {
                     messageDiv.style.backgroundColor = '';
+                    messageDiv.style.color = 'var(--text-primary)';
                 }, 2000);
             }
 
