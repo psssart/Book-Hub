@@ -324,7 +324,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
     font-size: 0.85rem;
 }
 
@@ -358,12 +357,12 @@
 .message-content {
     color: var(--text-primary, #212529);
     line-height: 1.5;
-    white-space: pre-wrap;
     word-wrap: break-word;
 }
 
 /* No topics message */
 .no-topics-message {
+    width: 100%;
     background-color: var(--bg-secondary, #ffffff);
     border: 1px dashed var(--bg-tertiary, #e0e0e0);
     border-radius: 8px;

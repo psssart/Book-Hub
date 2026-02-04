@@ -323,7 +323,12 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var discussion = await _context.Discussions.FindAsync(id);
+            var discussion = await _context.Discussions
+                .Include(d => d.AppUser)
+                .Include(d => d.Book)
+                .Include(d => d.Genre)
+                .Include(d => d.Author)
+                .FirstOrDefaultAsync(d => d.Id == id);
             if (discussion == null)
             {
                 return NotFound();
@@ -375,7 +380,7 @@ namespace WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = discussion.Id });
             }
             ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", discussion.AppUserId);
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", discussion.AuthorId);

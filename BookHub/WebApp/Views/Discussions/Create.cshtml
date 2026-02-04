@@ -2,66 +2,214 @@
 @model App.Domain.Entities.Discussion
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Discussion";
 }
 
-<h1>Create</h1>
+<head>
+    <link rel="stylesheet" href="~/css/discussions.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/discussion-create.css" asp-append-version="true">
+</head>
 
-<h4>Discussion</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="BookId" class="control-label">Book</label>
-                <select asp-for="BookId" class="form-control" asp-items="ViewBag.BookId">
-                    <option value="">Select Book</option>
-                </select>
+<div class="container-xxl py-4">
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Discussions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create New</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="bi bi-plus-circle"></i> Create New Discussion
+        </h1>
+        <p class="page-subtitle text-muted">
+            Start a conversation about a book, author, or genre
+        </p>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="create-form-container shadow-sm">
+        <form asp-action="Create" enctype="multipart/form-data" id="discussionForm">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <!-- Hidden user field -->
+            <input asp-for="AppUserId" type="hidden" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
+
+            <div class="row">
+                <!-- Left Column: Form Fields -->
+                <div class="col-lg-7">
+                    <!-- Title Section -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-type"></i> Discussion Details
+                        </h5>
+
+                        <div class="mb-3">
+                            <label asp-for="Tittle" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input asp-for="Tittle" class="form-control" placeholder="Give your discussion a descriptive title"/>
+                            <span asp-validation-for="Tittle" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                      placeholder="Describe what you'd like to discuss..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Related Content Section -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-link-45deg"></i> Related Content
+                        </h5>
+                        <p class="section-description text-muted">
+                            Link your discussion to a book, genre, or author (optional)
+                        </p>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="BookId" class="form-label">
+                                    <i class="bi bi-book text-primary"></i> Book
+                                </label>
+                                <select asp-for="BookId" style="height: 2rem;" class="form-select" asp-items="ViewBag.BookId">
+                                    <option value="">-- Select a book (optional) --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="GenreId" class="form-label">
+                                    <i class="bi bi-tag text-secondary"></i> Genre
+                                </label>
+                                <select asp-for="GenreId" style="height: 2rem;" class="form-select" asp-items="ViewBag.GenreId">
+                                    <option value="">-- Select a genre (optional) --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AuthorId" class="form-label">
+                                    <i class="bi bi-pen text-info"></i> Author
+                                </label>
+                                <select asp-for="AuthorId" style="height: 2rem;" class="form-select" asp-items="ViewBag.AuthorId">
+                                    <option value="">-- Select an author (optional) --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Image Upload -->
+                <div class="col-lg-5">
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-image"></i> Cover Image
+                        </h5>
+                        <p class="section-description text-muted">
+                            Add a cover image to make your discussion stand out (optional)
+                        </p>
+
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                                <img id="imagePreview" src="" alt="Preview" class="image-preview"/>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-image-btn" id="removeImageBtn">
+                                    <i class="bi bi-x-lg"></i> Remove
+                                </button>
+                            </div>
+                            <div class="image-upload-placeholder" id="imagePlaceholder">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                                <p>Click to upload or drag and drop</p>
+                                <span class="text-muted small">PNG, JPG, GIF up to 5MB</span>
+                            </div>
+                            <input asp-for="imageData" type="file" class="image-input" id="imageInput" accept="image/*"/>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label asp-for="GenreId" class="control-label">Genre</label>
-                <select asp-for="GenreId" class="form-control" asp-items="ViewBag.GenreId">
-                    <option value="">Select Genre</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label asp-for="AuthorId" class="control-label">Author</label>
-                <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.AuthorId">
-                    <option value="">Select Author</option>
-                </select>
-            </div>
-            
-            @* Select current user *@
-            <input asp-for="AppUserId" class="form-control" type="hidden" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
-            
-            <div class="form-group">
-                <label asp-for="Tittle" class="control-label"></label>
-                <input asp-for="Tittle" class="form-control" />
-                <span asp-validation-for="Tittle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="imageData" class="control-label">Image</label>
-                <input asp-for="imageData" class="form-control" type="file" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-lg"></i> Create Discussion
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('imageInput');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const imagePlaceholder = document.getElementById('imagePlaceholder');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            const imageUploadArea = document.getElementById('imageUploadArea');
+
+            // Handle file selection
+            imageInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+
+                    // Validate file size (5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        imagePreview.src = event.target.result;
+                        imagePreviewContainer.style.display = 'block';
+                        imagePlaceholder.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle remove image
+            removeImageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                imageInput.value = '';
+                imagePreviewContainer.style.display = 'none';
+                imagePlaceholder.style.display = 'flex';
+            });
+
+            // Make the upload area clickable
+            imageUploadArea.addEventListener('click', function(e) {
+                if (e.target !== removeImageBtn && !removeImageBtn.contains(e.target)) {
+                    imageInput.click();
+                }
+            });
+
+            // Drag and drop handling
+            imageUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.add('dragover');
+            });
+
+            imageUploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.remove('dragover');
+            });
+
+            imageUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.remove('dragover');
+
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    imageInput.files = e.dataTransfer.files;
+                    imageInput.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
 }

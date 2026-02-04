@@ -107,7 +107,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var message = await _bll.Messages.FirstOrDefaultAsync(id.Value);
+            var message = await _bll.Messages.FirstOrDefaultIncludeAllAsync(id.Value);
             if (message == null)
             {
                 return NotFound();
@@ -147,12 +147,16 @@ namespace WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                // Get the topic to find the discussion ID for redirect
+                var topic = await _bll.Topics.FirstOrDefaultAsync(message.TopicId);
+                return RedirectToAction("Details", "Discussions", new { id = topic?.DiscussionId });
             }
 
             ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", message.AppUserId);
             ViewData["TopicId"] = new SelectList(_bll.Topics.GetAll(), "Id", "Content", message.TopicId);
-            return View(message);
+            // Re-fetch with includes for view context
+            var messageWithIncludes = await _bll.Messages.FirstOrDefaultIncludeAllAsync(message.Id);
+            return View(messageWithIncludes ?? message);
         }
 
         // GET: Messages/Delete/5

@@ -3,52 +3,146 @@
 @model App.BLL.DTO.Topic
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Tittle;
+    var messages = (ViewData["Messages"] as List<App.BLL.DTO.Message>) ?? new List<App.BLL.DTO.Message>();
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = User.Identity!.IsAuthenticated && currentUserId == Model.AppUserId.ToString();
 }
 
-<h1>@Html.DisplayFor(model => model.Tittle)</h1>
+<head>
+    <link rel="stylesheet" href="~/css/discussion-details.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/topic-details.css" asp-append-version="true">
+</head>
 
-<div>
-    <h4>Discussion: <a asp-area="" asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.Discussion!.Id">@Model.Discussion!.Tittle</a></h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayFor(model => model.AppUser!.UserName)
-        </dt>
-        <dd class="col-sm-10">
-            ---  @Html.DisplayFor(model => model.Content)  ---  @Html.DisplayFor(model => model.CreationTime)
-        </dd>
-    </dl>
-    
-    <div id="messages-container">
-        @if (ViewData["Messages"] != null && ((List<App.BLL.DTO.Message>)ViewData["Messages"]!).Any())
-        {
-            @foreach (var message in (ViewData["Messages"] as List<App.BLL.DTO.Message>)!)
+<div class="container-xxl py-4">
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Discussions" asp-action="Index">Discussions</a></li>
+            <li class="breadcrumb-item">
+                <a asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.Discussion!.Id">
+                    @Model.Discussion!.Tittle
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Tittle</li>
+        </ol>
+    </nav>
+
+    <!-- Main Topic Post -->
+    <div class="topic-post-container shadow-sm mb-4">
+        <div class="topic-post-main">
+            <!-- Left: Topic stats -->
+            <div class="topic-post-sidebar">
+                <div class="vote-section">
+                    <i class="bi bi-chat-dots-fill text-primary"></i>
+                    <span class="vote-count">@messages.Count</span>
+                    <span class="vote-label">messages</span>
+                </div>
+            </div>
+
+            <!-- Center: Topic content -->
+            <div class="topic-post-content">
+                <!-- Header with title and metadata -->
+                <div class="topic-post-header">
+                    <h2 class="topic-post-title">@Model.Tittle</h2>
+                    <div class="topic-post-meta">
+                        <span class="meta-item">
+                            <i class="bi bi-person-circle"></i>
+                            Posted by <strong>@Model.AppUser!.UserName</strong>
+                        </span>
+                        <span class="meta-item">
+                            <i class="bi bi-clock"></i>
+                            @Model.CreationTime.ToString("MMM dd, yyyy 'at' HH:mm")
+                        </span>
+                        @if (isOwner)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="meta-item edit-link">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- Topic body -->
+                <div class="topic-post-body">
+                    <p class="topic-post-description">@Model.Content</p>
+                </div>
+
+                <!-- Discussion link badge -->
+                <div class="topic-post-tags mt-3">
+                    <a asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.Discussion!.Id"
+                       class="badge bg-primary">
+                        <i class="bi bi-chat-square-text"></i> @Model.Discussion!.Tittle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="messages-section">
+        <h4 class="messages-header mb-3">
+            <i class="bi bi-chat-left-text"></i> Messages (<span id="messages-count">@messages.Count</span>)
+        </h4>
+
+        <div id="messages-container" class="messages-list">
+            @if (messages.Any())
             {
-                <div class="message-item" data-message-id="@message.Id">
-                    <span>@message.AppUser!.UserName -- @message.Content</span>
+                @foreach (var message in messages.OrderBy(m => m.CreationTime))
+                {
+                    var isMessageOwner = User.Identity!.IsAuthenticated && currentUserId == message.AppUserId.ToString();
+
+                    <div class="message-card" data-message-id="@message.Id">
+                        <div class="message-header">
+                            <span class="message-author">
+                                <i class="bi bi-person-fill"></i> @message.AppUser!.UserName
+                            </span>
+                            <span class="message-time">
+                                @message.CreationTime.ToString("MMM dd, HH:mm")
+                            </span>
+                            @if (isMessageOwner)
+                            {
+                                <a asp-controller="Messages" asp-action="Edit" asp-route-id="@message.Id"
+                                   class="message-edit-link">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            }
+                        </div>
+                        <div class="message-content">
+                            @message.Content
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-messages-placeholder text-center py-4">
+                    <i class="bi bi-chat" style="font-size: 2.5rem; color: #6c757d;"></i>
+                    <p class="text-muted mt-2 mb-0">No messages yet. Be the first to reply!</p>
                 </div>
             }
-        }
-        else
-        {
-            <p>No messages yet.</p>
-        }
+        </div>
     </div>
-    
+
     <!-- Create Message Form -->
-    <div>
-        <h4>Chat</h4>
-        <form asp-controller="Messages" asp-action="Create" method="post">
-            @* Select current user *@
-            <input type="hidden" name="AppUserId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
-            @* Select current Topic *@
-            <input type="hidden" name="TopicId" value="@Model.Id"/>
-            <div class="form-group">
-                <input class="form-control" name="Content"/>
-            </div>
-            <button type="submit">Send</button>
-        </form>
+    <div class="create-message-section mt-4">
+        <div class="create-message-form shadow-sm">
+            <h5 class="mb-3">
+                <i class="bi bi-reply"></i> Reply to this topic
+            </h5>
+            <form asp-controller="Messages" asp-action="Create" method="post" id="messageForm">
+                <input type="hidden" name="AppUserId" value="@currentUserId"/>
+                <input type="hidden" name="TopicId" value="@Model.Id"/>
+
+                <div class="input-group">
+                    <input type="text" class="form-control" name="Content" id="messageInput"
+                           placeholder="Write your message..." required autocomplete="off"/>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Send
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -81,33 +175,56 @@
             function addMessageToUI(notification) {
                 const messagesContainer = document.getElementById('messages-container');
 
-                // Remove "No messages yet" if present
-                const noMessagesText = messagesContainer.querySelector('p');
-                if (noMessagesText && noMessagesText.textContent === 'No messages yet.') {
-                    noMessagesText.remove();
+                // Remove "No messages yet" placeholder if present
+                const noMessagesPlaceholder = messagesContainer.querySelector('.no-messages-placeholder');
+                if (noMessagesPlaceholder) {
+                    noMessagesPlaceholder.remove();
                 }
+
+                // Format creation time
+                const creationTime = new Date(notification.creationTime).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
                 // Create new message element
                 const messageDiv = document.createElement('div');
-                messageDiv.className = 'message-item';
+                messageDiv.className = 'message-card new-message';
                 messageDiv.setAttribute('data-message-id', notification.messageId);
 
-                const messageContent = document.createElement('span');
-                messageContent.textContent = `${notification.userName} -- ${notification.content}`;
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">
+                            <i class="bi bi-person-fill"></i> ${notification.userName}
+                        </span>
+                        <span class="message-time">${creationTime}</span>
+                    </div>
+                    <div class="message-content">${escapeHtml(notification.content)}</div>
+                `;
 
-                messageDiv.appendChild(messageContent);
                 messagesContainer.appendChild(messageDiv);
 
-                // Optional: Scroll to new message
+                // Update messages count
+                const countSpan = document.getElementById('messages-count');
+                const newCount = messagesContainer.querySelectorAll('.message-card').length;
+                countSpan.textContent = newCount;
+
+                // Scroll to new message
                 messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-                // Optional: Highlight new message briefly
-                messageDiv.style.backgroundColor = '#ffffcc';
-                messageDiv.style.color = 'var(--text-secondary)';
+                // Remove highlight class after animation
                 setTimeout(() => {
-                    messageDiv.style.backgroundColor = '';
-                    messageDiv.style.color = 'var(--text-primary)';
-                }, 2000);
+                    messageDiv.classList.remove('new-message');
+                }, 3000);
+            }
+
+            // Helper function to escape HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
 
             // Cleanup on page unload

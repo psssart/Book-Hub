@@ -109,13 +109,12 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var topic = await _bll.Topics.FirstOrDefaultAsync(id.Value);
+            var topic = await _bll.Topics.FirstOrDefaultIncludeAllAsync(id.Value);
             if (topic == null)
             {
                 return NotFound();
             }
             ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", topic.AppUserId);
-            // ViewData["DiscussionId"] = new SelectList(_context.Discussions, "Id", "Tittle", topic.DiscussionId);
             return View(topic);
         }
 
@@ -149,10 +148,12 @@ namespace WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Discussions", new { id = topic.DiscussionId });
             }
             ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", topic.AppUserId);
-            return View(topic);
+            // Re-fetch with includes for view context
+            var topicWithIncludes = await _bll.Topics.FirstOrDefaultIncludeAllAsync(topic.Id);
+            return View(topicWithIncludes ?? topic);
         }
 
         // GET: Topics/Delete/5
