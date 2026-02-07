@@ -188,10 +188,11 @@
 /* Filter panel (from existing pattern) */
 .filterPanel {
     position: fixed;
+    top: var(--header-height, 73px);
     right: -300px;
     width: 300px;
     height: 100%;
-    background-color: var(--bg-secondary, #ffffff);
+    background-color: var(--bg-translucent);
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     transition: right 0.3s ease;
     z-index: 1000;
@@ -211,7 +212,7 @@
 .dropdown-filter-content {
     display: none;
     position: absolute;
-    background-color: var(--bg-secondary, #ffffff);
+    background-color: var(--bg-secondary);
     min-width: 200px;
     max-height: 300px;
     overflow-y: auto;
@@ -238,10 +239,6 @@
     padding: 6px 12px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-}
-
-.dropdown-filter-content label:hover {
-    background-color: var(--bg-input, #f5f5f5);
 }
 
 .dropdown-filter-content input[type="checkbox"] {

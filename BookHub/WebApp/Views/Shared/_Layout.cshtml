@@ -339,6 +339,18 @@ else
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/theme.js" asp-append-version="true" defer></script>
+<script>
+    (function() {
+        function syncHeaderHeight() {
+            var header = document.querySelector('header');
+            if (header) {
+                document.documentElement.style.setProperty('--header-height', header.offsetHeight - 1 + 'px');
+            }
+        }
+        syncHeaderHeight();
+        window.addEventListener('resize', syncHeaderHeight);
+    })();
+</script>
 
 <!-- SignalR JavaScript Library -->
 <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@@8.0.0/dist/browser/signalr.min.js"></script>

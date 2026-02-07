@@ -761,11 +761,11 @@ nav.d-flex {
 .filterPanel {
   z-index: 999;
   position: fixed;
-  top: 73px; /* Adjusted top position */
+  top: var(--header-height, 73px);
   right: -300px; /* Initially hide the panel */
   width: 300px;
   height: 100%;
-  background-color: var(--bg-mid-translucent); /* Translucent background */
+  background-color: var(--bg-translucent); /* Translucent background */
   border-left: 1px solid var(--bg-tertiary); /* Add a border for better visibility */
   transition: right 0.3s ease; /* Add smooth transition effect */
 }
