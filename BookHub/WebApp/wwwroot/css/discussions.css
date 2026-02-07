@@ -14,6 +14,7 @@
 }
 
 .card-main-content {
+    height: 100%;
     display: flex;
     gap: 20px;
 }
@@ -125,6 +126,11 @@
     margin-right: 4px;
 }
 
+.discussions-header {
+    margin-left: 3rem;
+    margin-right: 3rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .card-main-content {
@@ -139,6 +145,11 @@
     .discussion-thumbnail {
         width: 100px;
         height: 75px;
+    }
+}
+@media (min-width: 992px) {
+    .discussions-header {
+        margin-right: 13rem;
     }
 }
 

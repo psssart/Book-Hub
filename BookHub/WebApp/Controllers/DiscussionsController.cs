@@ -288,16 +288,15 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookId,GenreId,AuthorId,AppUserId,Tittle,Description,Id")] Discussion discussion, IFormFile imageData)
+        public async Task<IActionResult> Create([Bind("BookId,GenreId,AuthorId,AppUserId,Tittle,Description,Id")] Discussion discussion, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
-                
-                if (imageData != null && imageData.Length > 0)
+                if (imageFile != null && imageFile.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
                     {
-                        await imageData.CopyToAsync(memoryStream);
+                        await imageFile.CopyToAsync(memoryStream);
                         discussion.imageData = memoryStream.ToArray();
                     }
                 }
@@ -345,7 +344,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("BookId,GenreId,AuthorId,AppUserId,Tittle,Description,Id")] Discussion discussion, IFormFile imageData)
+        public async Task<IActionResult> Edit(Guid id, [Bind("BookId,GenreId,AuthorId,AppUserId,Tittle,Description,Id")] Discussion discussion, IFormFile? imageFile)
         {
             if (id != discussion.Id)
             {
@@ -355,15 +354,15 @@ namespace WebApp.Controllers
             if (ModelState.IsValid)
             {
                 
-                if (imageData != null && imageData.Length > 0)
+                if (imageFile != null && imageFile.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
                     {
-                        await imageData.CopyToAsync(memoryStream);
+                        await imageFile.CopyToAsync(memoryStream);
                         discussion.imageData = memoryStream.ToArray();
                     }
                 }
-                
+
                 try
                 {
                     _context.Update(discussion);
