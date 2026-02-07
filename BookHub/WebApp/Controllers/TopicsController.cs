@@ -6,21 +6,24 @@ using App.Contracts.BLL;
 using App.Contracts.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Entities;
+using WebApp.Hubs;
+using WebApp.Models.SignalR;
 
 namespace WebApp.Controllers
 {
     public class TopicsController : Controller
     {
         private readonly IAppBLL _bll;
-        /*private readonly IAppUnitOfWork _uow;*/
+        private readonly IHubContext<DiscussionHub> _hubContext;
 
-        public TopicsController(IAppBLL bll)
+        public TopicsController(IAppBLL bll, IHubContext<DiscussionHub> hubContext)
         {
             _bll = bll;
-            /*_uow = new AppUOW(context);*/
+            _hubContext = hubContext;
         }
 
         // GET: Topics
@@ -71,6 +74,28 @@ namespace WebApp.Controllers
                 topic.CreationTime = DateTime.UtcNow;
                 _bll.Topics.Add(topic);
                 await _bll.SaveChangesAsync();
+
+                // Fetch the complete topic with user info for broadcasting
+                var savedTopic = await _bll.Topics.FirstOrDefaultIncludeAllAsync(topic.Id);
+
+                if (savedTopic != null)
+                {
+                    // Broadcast to all clients viewing this discussion
+                    var notification = new NewTopicNotification
+                    {
+                        TopicId = savedTopic.Id,
+                        DiscussionId = savedTopic.DiscussionId,
+                        Tittle = savedTopic.Tittle,
+                        Content = savedTopic.Content,
+                        UserName = savedTopic.AppUser?.UserName ?? "Unknown",
+                        CreationTime = savedTopic.CreationTime
+                    };
+
+                    await _hubContext.Clients
+                        .Group($"discussion_{topic.DiscussionId}")
+                        .SendAsync("ReceiveTopic", notification);
+                }
+
                 return RedirectToAction("Details", "Discussions", new { id = topic.DiscussionId });
             }
             return RedirectToAction("Details", "Discussions", new { id = topic.DiscussionId });
@@ -84,13 +109,12 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var topic = await _bll.Topics.FirstOrDefaultAsync(id.Value);
+            var topic = await _bll.Topics.FirstOrDefaultIncludeAllAsync(id.Value);
             if (topic == null)
             {
                 return NotFound();
             }
             ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", topic.AppUserId);
-            // ViewData["DiscussionId"] = new SelectList(_context.Discussions, "Id", "Tittle", topic.DiscussionId);
             return View(topic);
         }
 
@@ -124,10 +148,12 @@ namespace WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Discussions", new { id = topic.DiscussionId });
             }
             ViewData["AppUserId"] = new SelectList(_bll.Users.GetAll(), "Id", "Id", topic.AppUserId);
-            return View(topic);
+            // Re-fetch with includes for view context
+            var topicWithIncludes = await _bll.Topics.FirstOrDefaultIncludeAllAsync(topic.Id);
+            return View(topicWithIncludes ?? topic);
         }
 
         // GET: Topics/Delete/5

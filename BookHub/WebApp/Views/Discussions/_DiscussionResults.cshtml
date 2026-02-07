@@ -1,0 +1,129 @@
+@model WebApp.Models.DiscussionIndexViewModel
+
+<div id="results-root" class="py-3 mx-5">
+    @if (Model.Discussions.Any())
+    {
+        <div class="discussion-results d-flex justify-content-center flex-wrap gap-3">
+            @foreach (var discussion in Model.Discussions)
+            {
+                <div class="discussion-card shadow-sm mb-3">
+                    <div class="card-main-content">
+                        <!-- Left: Voting/Stats section (Reddit-style) -->
+                        <div class="d-flex gap-2 flex-column justify-content-between">
+                            <div class="discussion-main-info d-flex gap-1">
+                                <!-- Thumbnail -->
+                                @if (discussion.ImageData != null)
+                                {
+                                    <a asp-action="Details" asp-route-id="@discussion.Id"
+                                       class="discussion-thumbnail">
+                                        <img src="data:image;base64,@Convert.ToBase64String(discussion.ImageData)"
+                                             alt="@discussion.Tittle">
+                                    </a>
+                                }
+                                <div class="d-flex flex-column">
+                                    <!-- Title -->
+                                    <h5 class="discussion-title text-truncate mb-2 pb-1">
+                                        <a asp-action="Details" asp-route-id="@discussion.Id">
+                                            @discussion.Tittle
+                                        </a>
+                                    </h5>
+                                    <!-- Description -->
+                                    <p class="discussion-description text-muted text-wrap mb-0">
+                                        @discussion.Description
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="discussion-stats">
+                                <div class="stat-item">
+                                    <i class="bi bi-people-fill"></i>
+                                    <span class="stat-number">@discussion.ParticipantsCount</span>
+                                    <span class="stat-label">participants</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="bi bi-chat-dots-fill"></i>
+                                    <span class="stat-number">@discussion.TopicsCount</span>
+                                    <span class="stat-label">topics</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="bi bi-reply-fill"></i>
+                                    <span class="stat-number">@discussion.MessagesCount</span>
+                                    <span class="stat-label">messages</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Center: Discussion content -->
+                        <div class="discussion-content flex-grow-1">
+                            <div class="d-flex align-items-start gap-3">
+
+                                <!-- Text content -->
+                                <div class="flex-grow-1">
+                                    
+                                    <!-- Metadata row -->
+                                    <div class="discussion-meta d-flex flex-wrap gap-2 small text-muted">
+                                        <span>
+                                            @if (discussion.CreatorImageData != null)
+                                            {
+                                                <img src="data:image;base64,@Convert.ToBase64String(discussion.CreatorImageData)"
+                                                     class="author-image" alt="User Avatar">
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-person-circle"></i>
+                                            }
+                                            Posted by <strong>@discussion.CreatorUsername</strong>
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bi bi-clock"></i>
+                                            @discussion.CreationTime.ToString("MMM dd, yyyy")
+                                        </span>
+                                        @if (discussion.LastActivityTime.HasValue)
+                                        {
+                                            <span>
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                                Last activity @discussion.LastActivityTime.Value.ToString("MMM dd, yyyy")
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <!-- Tags row (book, genre, author) -->
+                                    <div class="discussion-tags d-flex flex-wrap gap-2 mt-2">
+                                        @if (discussion.BookTittle != null)
+                                        {
+                                            <a asp-controller="Books" asp-action="Details"
+                                               asp-route-id="@discussion.BookId"
+                                               class="badge bg-primary text-decoration-none">
+                                                <i class="bi bi-book"></i> @discussion.BookTittle
+                                            </a>
+                                        }
+                                        @if (discussion.GenreName != null)
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-tag"></i> @discussion.GenreName
+                                            </span>
+                                        }
+                                        @if (discussion.AuthorName != null)
+                                        {
+                                            <a asp-controller="Authors" asp-action="Details"
+                                               asp-route-id="@discussion.AuthorId"
+                                               class="badge bg-info text-decoration-none">
+                                                <i class="bi bi-pen"></i> @discussion.AuthorName
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <p class="text-muted">No discussions found matching your criteria.</p>
+            <a asp-action="Create" class="btn btn-primary">Create First Discussion</a>
+        </div>
+    }
+</div>

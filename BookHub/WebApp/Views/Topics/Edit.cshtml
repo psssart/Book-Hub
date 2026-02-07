@@ -1,47 +1,124 @@
+@using System.Security.Claims
 @model App.BLL.DTO.Topic
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Topic";
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = User.Identity!.IsAuthenticated && currentUserId == Model.AppUserId.ToString();
 }
 
-<h1>Edit</h1>
+<head>
+    <link rel="stylesheet" href="~/css/discussion-details.css" asp-append-version="true">
+</head>
 
-<h4>Topic</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="AppUserId" class="control-label"></label>
-                <select asp-for="AppUserId" class="form-control" asp-items="ViewBag.AppUserId"></select>
-                <span asp-validation-for="AppUserId" class="text-danger"></span>
+<div class="container-xxl py-4">
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Discussions" asp-action="Index">Discussions</a></li>
+            @if (Model.Discussion != null)
+            {
+                <li class="breadcrumb-item">
+                    <a asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.DiscussionId">
+                        @Model.Discussion.Tittle
+                    </a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">Edit Topic</li>
+        </ol>
+    </nav>
+
+    <!-- Edit Form Container -->
+    <div class="discussion-post-container shadow-sm" style="max-width: 800px;">
+        <div class="discussion-post-content">
+            <!-- Header -->
+            <div class="discussion-post-header mb-4">
+                <h2 class="discussion-post-title">
+                    <i class="bi bi-pencil-square"></i> Edit Topic
+                </h2>
+                @if (Model.Discussion != null)
+                {
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-chat-dots"></i> In discussion: <strong>@Model.Discussion.Tittle</strong>
+                    </p>
+                }
             </div>
-            <div class="form-group">
-                <label asp-for="DiscussionId" class="control-label"></label>
-                <select asp-for="DiscussionId" class="form-control" asp-items="ViewBag.DiscussionId"></select>
-                <span asp-validation-for="DiscussionId" class="text-danger"></span>
+
+            <!-- Original post info -->
+            <div class="topic-meta mb-4 pb-3 border-bottom">
+                <span class="meta-item">
+                    <i class="bi bi-person"></i>
+                    Posted by <strong>@(Model.AppUser?.UserName ?? "Unknown")</strong>
+                </span>
+                <span class="meta-item">
+                    <i class="bi bi-clock"></i>
+                    @Model.CreationTime.ToString("MMM dd, yyyy 'at' HH:mm")
+                </span>
             </div>
-            <div class="form-group">
-                <label asp-for="Tittle" class="control-label"></label>
-                <input asp-for="Tittle" class="form-control" />
-                <span asp-validation-for="Tittle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <!-- Hidden fields -->
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="AppUserId" />
+                <input type="hidden" asp-for="DiscussionId" />
+                <input type="hidden" asp-for="CreationTime" />
+
+                <!-- Title -->
+                <div class="mb-4">
+                    <label asp-for="Tittle" class="form-label fw-semibold">
+                        <i class="bi bi-card-heading"></i> Topic Title <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="Tittle" class="form-control form-control-lg"
+                           placeholder="What's this topic about?" required />
+                    <span asp-validation-for="Tittle" class="text-danger small"></span>
+                </div>
+
+                <!-- Content -->
+                <div class="mb-4">
+                    <label asp-for="Content" class="form-label fw-semibold">
+                        <i class="bi bi-text-paragraph"></i> Content <span class="text-danger">*</span>
+                    </label>
+                    <textarea asp-for="Content" class="form-control" rows="8"
+                              placeholder="Share your thoughts, ideas, or questions..." required></textarea>
+                    <span asp-validation-for="Content" class="text-danger small"></span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-between pt-3 border-top">
+                    <a asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.DiscussionId"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Discussion
+                    </a>
+                    <div class="d-flex gap-2">
+                        <a asp-controller="Discussions" asp-action="Details" asp-route-id="@Model.DiscussionId"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <!-- Info card -->
+    <div class="card mt-4" style="max-width: 800px;">
+        <div class="card-body">
+            <h6 class="card-title text-muted">
+                <i class="bi bi-info-circle"></i> Editing Tips
+            </h6>
+            <ul class="small text-muted mb-0">
+                <li>Keep your topic title clear and specific</li>
+                <li>Provide enough detail in the content for meaningful discussion</li>
+                <li>Be respectful and constructive in your communication</li>
+                <li>An edited indicator may be shown to other users</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

@@ -7,8 +7,6 @@
 .docker/
 **/.msbuild
 artifacts/efbundle
-App.Test/
-Base.Tests/
 artifacts/*
 **/*.user
 **/*.suo
