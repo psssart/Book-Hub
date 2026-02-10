@@ -78,6 +78,8 @@
 }
 
 .discussion-post-title {
+    display: inline-block;
+    max-width: 400px;
     font-size: 1.75rem;
     font-weight: 700;
     margin-bottom: 8px;
@@ -93,6 +95,9 @@
 }
 
 .meta-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -119,9 +124,9 @@
 }
 
 .discussion-post-image {
-    width: 300px;
+    min-width: 100px;
+    max-width: 300px;
     height: 300px;
-    max-width: 100%;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -133,6 +138,8 @@
 }
 
 .discussion-post-description {
+    max-height: 150px;
+    max-width: 400px;
     font-size: 1rem;
     color: var(--text-primary, #212529);
     white-space: pre-wrap;
@@ -231,6 +238,10 @@
 }
 
 .topic-title {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 1.15rem;
     font-weight: 600;
     color: var(--text-primary, #212529);
@@ -246,7 +257,6 @@
     color: #6c757d;
     font-size: 0.9rem;
     text-decoration: none;
-    padding: 4px 8px;
     border-radius: 4px;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -259,12 +269,16 @@
 .topic-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
     font-size: 0.8rem;
     color: var(--text-secondary, #6c757d);
 }
 
 .topic-content {
+    max-height: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     margin: 12px 0;
     line-height: 1.6;
 }
@@ -345,7 +359,6 @@
     text-decoration: none;
     font-size: 0.85rem;
     margin-left: auto;
-    padding: 2px 6px;
     border-radius: 3px;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -389,7 +402,11 @@
     }
 
     .discussion-post-title {
+        max-width: 300px;
         font-size: 1.5rem;
+    }
+    .discussion-post-description {
+        max-width: 300px;
     }
 
     .discussion-post-meta {
@@ -408,12 +425,23 @@
 }
 
 @media (max-width: 576px) {
+    .breadcrumb-item {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
     .discussion-post-content {
         padding: 16px;
     }
 
     .discussion-post-title {
+        max-width: 200px;
         font-size: 1.3rem;
+    }
+    .discussion-post-description {
+        max-width: 250px;
     }
 
     .topic-card {

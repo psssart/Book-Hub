@@ -22,7 +22,7 @@
                                 }
                                 <div class="d-flex flex-column">
                                     <!-- Title -->
-                                    <h5 class="discussion-title text-truncate mb-2 pb-1">
+                                    <h5 class="discussion-title text-truncate mb-2 pb-1" title="@discussion.Tittle">
                                         <a asp-action="Details" asp-route-id="@discussion.Id">
                                             @discussion.Tittle
                                         </a>
@@ -61,7 +61,7 @@
                                     
                                     <!-- Metadata row -->
                                     <div class="discussion-meta d-flex flex-wrap gap-2 small text-muted">
-                                        <span>
+                                        <span class="text-truncate" style="max-width: 143px;">
                                             @if (discussion.CreatorImageData != null)
                                             {
                                                 <img src="data:image;base64,@Convert.ToBase64String(discussion.CreatorImageData)"
@@ -71,7 +71,7 @@
                                             {
                                                 <i class="bi bi-person-circle"></i>
                                             }
-                                            <span class="pt-2">Posted by <strong>@discussion.CreatorUsername</strong></span>
+                                            <span class="pt-2"><strong>@discussion.CreatorUsername</strong></span>
                                         </span>
                                         <span class="d-flex align-items-center">
                                             <i class="bi bi-clock"></i>
@@ -92,13 +92,13 @@
                                         {
                                             <a asp-controller="Books" asp-action="Details"
                                                asp-route-id="@discussion.BookId"
-                                               class="badge bg-primary text-decoration-none">
+                                               class="badge bg-primary text-decoration-none text-wrap">
                                                 <i class="bi bi-book"></i> @discussion.BookTittle
                                             </a>
                                         }
                                         @if (discussion.GenreName != null)
                                         {
-                                            <span class="badge bg-secondary">
+                                            <span class="badge bg-secondary text-wrap">
                                                 <i class="bi bi-tag"></i> @discussion.GenreName
                                             </span>
                                         }
@@ -106,7 +106,7 @@
                                         {
                                             <a asp-controller="Authors" asp-action="Details"
                                                asp-route-id="@discussion.AuthorId"
-                                               class="badge bg-info text-decoration-none">
+                                               class="badge bg-info text-decoration-none text-wrap">
                                                 <i class="bi bi-pen"></i> @discussion.AuthorName
                                             </a>
                                         }
