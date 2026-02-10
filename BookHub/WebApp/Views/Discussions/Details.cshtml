@@ -221,16 +221,16 @@
                                     <div class="message-card">
                                         <div class="message-header">
                                             <span class="message-author">
-                                                @if (topic.AppUser!.AvatarImageData != null)
+                                                @if (message.AppUser!.AvatarImageData != null)
                                                 {
-                                                    <img src="data:image;base64,@Convert.ToBase64String(topic.AppUser!.AvatarImageData)"
+                                                    <img src="data:image;base64,@Convert.ToBase64String(message.AppUser!.AvatarImageData)"
                                                          alt="User Avatar" style="height: 21px;width: 25px;border-radius: 25%;">
                                                 }
                                                 else
                                                 {
                                                     <i class="bi bi-person-circle"></i>
                                                 }
-                                                @topic.AppUser!.FirstName @topic.AppUser!.LastName
+                                                @message.AppUser!.FirstName @message.AppUser!.LastName
                                             </span>
                                             <span class="message-time">
                                                 @message.CreationTime.ToString("MMM dd, HH:mm")
