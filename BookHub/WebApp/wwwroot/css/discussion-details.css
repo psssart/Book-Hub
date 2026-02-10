@@ -201,6 +201,7 @@
 
 /* Topic Card (Reddit comment style) */
 .topic-card {
+    max-width: 300px;
     background-color: var(--bg-secondary, #ffffff);
     border: 1px solid var(--bg-tertiary, #e0e0e0);
     border-radius: 8px;

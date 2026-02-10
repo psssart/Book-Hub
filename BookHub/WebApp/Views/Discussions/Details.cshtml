@@ -153,7 +153,7 @@
             <i class="bi bi-chat-left-text"></i> Topics (@topics.Count)
         </h4>
 
-        <div id="topics-container" class="d-flex gap-3 ">
+        <div id="topics-container" class="d-flex flex-wrap gap-3 ">
             @if (topics.Any())
             {
                 @foreach (var topic in topics.OrderByDescending(t => t.CreationTime))
