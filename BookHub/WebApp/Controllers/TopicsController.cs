@@ -87,7 +87,9 @@ namespace WebApp.Controllers
                         DiscussionId = savedTopic.DiscussionId,
                         Tittle = savedTopic.Tittle,
                         Content = savedTopic.Content,
-                        UserName = savedTopic.AppUser?.UserName ?? "Unknown",
+                        UserName = $"{savedTopic.AppUser?.FirstName} {savedTopic.AppUser?.LastName}".Trim() ?? "Unknown",
+                        UserAvatarBase64 = savedTopic.AppUser?.AvatarImageData != null ? 
+                            Convert.ToBase64String(savedTopic.AppUser.AvatarImageData) : null,
                         CreationTime = savedTopic.CreationTime
                     };
 

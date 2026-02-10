@@ -47,8 +47,16 @@
                     <h2 class="topic-post-title">@Model.Tittle</h2>
                     <div class="topic-post-meta">
                         <span class="meta-item">
-                            <i class="bi bi-person-circle"></i>
-                            Posted by <strong>@Model.AppUser!.UserName</strong>
+                            @if (Model.AppUser!.AvatarImageData != null)
+                            {
+                                <img src="data:image;base64,@Convert.ToBase64String(Model.AppUser!.AvatarImageData)"
+                                     alt="User Avatar" style="height: 21px;width: 25px;">
+                            }
+                            else
+                            {
+                                <i class="bi bi-person-circle"></i>
+                            }
+                            Posted by <strong>@Model.AppUser!.FirstName @Model.AppUser!.LastName</strong>
                         </span>
                         <span class="meta-item">
                             <i class="bi bi-clock"></i>
@@ -95,11 +103,19 @@
                     <div class="message-card" data-message-id="@message.Id">
                         <div class="message-header">
                             <span class="message-author">
-                                <i class="bi bi-person-fill"></i> @message.AppUser!.UserName
+                                @if (message.AppUser!.AvatarImageData != null)
+                                {
+                                    <img src="data:image;base64,@Convert.ToBase64String(message.AppUser!.AvatarImageData)"
+                                         alt="User Avatar" style="height: 21px;width: 25px;border-radius: 25%;">
+                                }
+                                else
+                                {
+                                    <i class="bi bi-person-circle"></i>
+                                }
+                                @message.AppUser!.FirstName @message.AppUser!.LastName
                             </span>
                             <span class="message-time">
                                 @message.CreationTime.ToString("MMM dd, HH:mm")
-                            </span>
                             @if (isMessageOwner)
                             {
                                 <a asp-controller="Messages" asp-action="Edit" asp-route-id="@message.Id"
@@ -107,6 +123,7 @@
                                     <i class="bi bi-pencil"></i>
                                 </a>
                             }
+                            </span>
                         </div>
                         <div class="message-content">
                             @message.Content
@@ -124,6 +141,12 @@
         </div>
     </div>
 
+    <!-- Scroll to bottom button -->
+    <button id="scrollToBottomBtn" class="scroll-to-bottom-btn" title="Scroll to latest message" style="display: none;">
+        <i class="bi bi-arrow-down"></i>
+        <span id="newMessagesBadge" class="new-messages-badge" style="display: none;"></span>
+    </button>
+
     <!-- Create Message Form -->
     <div class="create-message-section mt-4">
         <div class="create-message-form shadow-sm">
@@ -137,7 +160,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control" name="Content" id="messageInput"
                            placeholder="Write your message..." required autocomplete="off"/>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="sendButton">
                         <i class="bi bi-send"></i> Send
                     </button>
                 </div>
@@ -150,36 +173,116 @@
     <script>
         (async function() {
             const topicId = '@Model.Id';
+            const currentUserId = '@currentUserId';
+            let unreadCount = 0;
 
+            const messagesContainer = document.getElementById('messages-container');
+            const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+            const newMessagesBadge = document.getElementById('newMessagesBadge');
+            const messageForm = document.getElementById('messageForm');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+
+            // Scroll to bottom on initial page load
+            scrollToBottom(false);
+
+            // --- Scroll position tracking ---
+            function isNearBottom(threshold) {
+                threshold = threshold || 150;
+                return (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - threshold);
+            }
+
+            function scrollToBottom(smooth) {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+            }
+
+            function showScrollButton() {
+                scrollToBottomBtn.style.display = 'flex';
+            }
+
+            function hideScrollButton() {
+                scrollToBottomBtn.style.display = 'none';
+                unreadCount = 0;
+                newMessagesBadge.style.display = 'none';
+            }
+
+            function updateBadge() {
+                if (unreadCount > 0) {
+                    newMessagesBadge.textContent = unreadCount;
+                    newMessagesBadge.style.display = 'flex';
+                } else {
+                    newMessagesBadge.style.display = 'none';
+                }
+            }
+
+            window.addEventListener('scroll', function() {
+                if (isNearBottom()) {
+                    hideScrollButton();
+                }
+            });
+
+            scrollToBottomBtn.addEventListener('click', function() {
+                scrollToBottom(true);
+                hideScrollButton();
+            });
+
+            // --- AJAX form submission ---
+            messageForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const content = messageInput.value.trim();
+                if (!content) return;
+
+                sendButton.disabled = true;
+
+                try {
+                    const formData = new FormData(messageForm);
+                    const response = await fetch(messageForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        redirect: 'manual'
+                    });
+
+                    // Success (redirect means the server processed it)
+                    messageInput.value = '';
+                } catch (error) {
+                    console.error('Failed to send message:', error);
+                } finally {
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            });
+
+            // --- SignalR ---
             try {
-                // Initialize SignalR connection
                 await window.discussionHub.initialize();
-
-                // Join this topic's room
                 await window.discussionHub.joinTopic(topicId);
 
-                // Listen for new messages
                 window.discussionHub.onReceiveMessage(function(notification) {
-                    // Only add if it's for this topic
                     if (notification.topicId === topicId) {
                         addMessageToUI(notification);
                     }
                 });
 
                 console.log('SignalR connected for topic:', topicId);
-
             } catch (error) {
                 console.error('Failed to connect to SignalR:', error);
             }
 
             function addMessageToUI(notification) {
-                const messagesContainer = document.getElementById('messages-container');
-
                 // Remove "No messages yet" placeholder if present
                 const noMessagesPlaceholder = messagesContainer.querySelector('.no-messages-placeholder');
                 if (noMessagesPlaceholder) {
                     noMessagesPlaceholder.remove();
                 }
+
+                // Prevent duplicate messages
+                if (messagesContainer.querySelector(`[data-message-id="${notification.messageId}"]`)) {
+                    return;
+                }
+
+                const isOwnMessage = notification.appUserId === currentUserId;
+                const wasNearBottom = isNearBottom();
 
                 // Format creation time
                 const creationTime = new Date(notification.creationTime).toLocaleString('en-US', {
@@ -194,10 +297,14 @@
                 messageDiv.className = 'message-card new-message';
                 messageDiv.setAttribute('data-message-id', notification.messageId);
 
+                const notificationAvatar = notification.userAvatarBase64 ?
+                    `<img src="data:image;base64,${notification.userAvatarBase64}" alt="User Avatar" style="width:25px;height:25px;">`
+                    : '<i class="bi bi-person-circle"></i>';
+                
                 messageDiv.innerHTML = `
                     <div class="message-header">
                         <span class="message-author">
-                            <i class="bi bi-person-fill"></i> ${notification.userName}
+                            ${notificationAvatar} ${escapeHtml(notification.userName)}
                         </span>
                         <span class="message-time">${creationTime}</span>
                     </div>
@@ -211,8 +318,17 @@
                 const newCount = messagesContainer.querySelectorAll('.message-card').length;
                 countSpan.textContent = newCount;
 
-                // Scroll to new message
-                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                // Scroll behavior
+                if (isOwnMessage || wasNearBottom) {
+                    // Auto-scroll for own messages or if already at bottom
+                    scrollToBottom(true);
+                    hideScrollButton();
+                } else {
+                    // Show scroll-to-bottom button with unread count
+                    unreadCount++;
+                    updateBadge();
+                    showScrollButton();
+                }
 
                 // Remove highlight class after animation
                 setTimeout(() => {
@@ -220,7 +336,6 @@
                 }, 3000);
             }
 
-            // Helper function to escape HTML
             function escapeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;

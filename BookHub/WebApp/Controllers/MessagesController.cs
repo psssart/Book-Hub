@@ -82,8 +82,11 @@ namespace WebApp.Controllers
                     {
                         MessageId = savedMessage.Id,
                         TopicId = savedMessage.TopicId,
+                        AppUserId = savedMessage.AppUserId,
                         Content = savedMessage.Content,
                         UserName = savedMessage.AppUser?.UserName ?? "Unknown",
+                        UserAvatarBase64 = savedMessage.AppUser?.AvatarImageData != null ? 
+                            Convert.ToBase64String(savedMessage.AppUser.AvatarImageData) : null,
                         CreationTime = savedMessage.CreationTime
                     };
 

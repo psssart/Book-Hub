@@ -150,7 +150,7 @@ namespace WebApp.Controllers
                     CreationTime = d.CreationTime,
                     ImageData = d.imageData,
                     CreatorImageData = d.AppUser?.AvatarImageData,
-                    CreatorUsername = d.AppUser?.UserName ?? "Unknown",
+                    CreatorUsername = $"{d.AppUser?.FirstName} {d.AppUser?.LastName}".Trim() ?? "Unknown",
                     CreatorId = d.AppUserId,
                     BookTittle = d.Book?.Tittle,
                     BookId = d.BookId,
@@ -254,22 +254,21 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            // Load the associated topics for the discussion
-            /*var topics = await _uow.Topics.GetAllByDiscussionIdAsync(discussion.Id);*/
-             var topics = _context.Topics
-                 .Where(t => t.DiscussionId == discussion.Id);
+            // 1. Load Topics AND their AppUser
+            var topics = await _context.Topics
+                .Include(t => t.AppUser) // <--- ADD THIS
+                .Where(t => t.DiscussionId == discussion.Id)
+                .ToListAsync();
 
-            // Load messages related to the topics within the discussion
-            /*var messages2 = await _uow.Messages.GetAllByTopicsAsync(topics);*/
-             var messages = await _context.Messages
-                 .Where(m => topics.Select(t => t.Id).Contains(m.TopicId))
-                 .ToListAsync();
-
-            // Pass the messages to the view
+            // 2. Load Messages AND their AppUser
+            var topicIds = topics.Select(t => t.Id).ToList();
+            var messages = await _context.Messages
+                .Include(m => m.AppUser) // <--- ADD THIS
+                .Where(m => topicIds.Contains(m.TopicId))
+                .ToListAsync();
+            
             ViewData["Messages"] = messages.ToList();
-
-            // Pass the topics to the view
-            ViewData["Topics"] = await topics.ToListAsync();
+            ViewData["Topics"] = topics;
             return View(discussion);
         }
 

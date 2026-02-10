@@ -119,6 +119,7 @@
 .message-header {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
     gap: 12px;
     font-size: 0.85rem;
@@ -222,6 +223,49 @@
 
 .message-card.new-message {
     animation: newMessageHighlight 3s ease-in-out;
+}
+
+/* Scroll to bottom button */
+.scroll-to-bottom-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 32px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #6474C9;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 12px rgba(100, 116, 201, 0.4);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    z-index: 1000;
+}
+
+.scroll-to-bottom-btn:hover {
+    background-color: #4f5fb3;
+    transform: scale(1.1);
+}
+
+.new-messages-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #dc3545;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
 }
 
 /* Responsive Design */

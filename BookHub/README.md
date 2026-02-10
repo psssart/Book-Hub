@@ -56,6 +56,11 @@ BookHub follows a clean, domain-driven design with the following layers:
 3. **Apply migrations and seed data**
     ```bash 
     dotnet ef database update --project App.DAL.EF
+4. **Generate SSL certificates**
+    ```bash
+   openssl req -x509 -newkey rsa:4096 -sha256 -nodes -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost" && \
+   openssl pkcs12 -export -out https/bookhub.pfx -inkey key.pem -in cert.pem -passout pass:MyPassword && \
+   rm key.pem cert.pem
 
 ### Docker Deployment
 Build and run with single command:
