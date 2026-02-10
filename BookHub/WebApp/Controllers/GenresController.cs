@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp.Controllers
 {
@@ -20,6 +21,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Genres
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Genres.ToListAsync());
@@ -44,6 +46,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Genres/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +57,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Name,Description,IsMainGenre,Id")] Genre genre)
         {
             if (ModelState.IsValid)
@@ -67,6 +71,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Genres/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -87,6 +92,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid id, [Bind("Name,Description,IsMainGenre,Id")] Genre genre)
         {
             if (id != genre.Id)
@@ -118,6 +124,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Genres/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -138,6 +145,7 @@ namespace WebApp.Controllers
         // POST: Genres/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var genre = await _context.Genres.FindAsync(id);

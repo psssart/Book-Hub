@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Address_Tables;
 using App.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using WebApp.Models;
 
 namespace WebApp.Controllers
@@ -22,6 +23,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Authors
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Authors.ToListAsync());
@@ -94,6 +96,7 @@ namespace WebApp.Controllers
 
         // GET: Authors/Create
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -104,6 +107,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Name,Age,Biography,Id,imageData")] Author author, IFormFile imageData)
         {
             if (ModelState.IsValid)
@@ -127,6 +131,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Authors/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -147,6 +152,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid id, [Bind("Name,Age,Biography,Id,imageData")] Author author, IFormFile imageData)
         {
             if (id != author.Id)
@@ -188,6 +194,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Authors/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -208,6 +215,7 @@ namespace WebApp.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var author = await _context.Authors.FindAsync(id);

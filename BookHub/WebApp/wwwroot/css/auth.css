@@ -2,7 +2,6 @@ input[type=text], input[type=password] {
     width: 80%;
     padding: 12px 20px;
     margin: 8px;
-    height: 8%;
     display: block;
     border: 3px solid #6474C9;
     color: var(--text-secondary);
@@ -10,5 +9,41 @@ input[type=text], input[type=password] {
     border-radius: 15px;
     box-sizing: border-box;
     font-family: Gilroy-Medium-added;
-    font-size: 28px;
+}
+
+.password-input-wrap {
+    position: relative;
+    width: 80%;
+}
+
+.password-input-wrap input[type=password],
+.password-input-wrap input[type=text] {
+    width: 100%;
+    padding-right: 52px;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6474C9;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.toggle-password-btn:hover {
+    opacity: 1;
+}
+
+.toggle-password-btn svg {
+    width: 24px;
+    height: 24px;
 }

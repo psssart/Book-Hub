@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class WarehousesController : Controller
     {
         private readonly AppDbContext _context;

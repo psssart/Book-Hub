@@ -13,6 +13,7 @@ using App.Domain.Address_Tables;
 using App.Domain.Identity;
 using App.Web.Infrastructure;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace WebApp.Controllers
@@ -29,6 +30,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Books
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.Books.Include(b => b.Publisher);
@@ -75,6 +77,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Books/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Name");
@@ -86,6 +89,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("PublisherId,Tittle,Price,ReleaseYear,Description,Id,imageData")] Book book, IFormFile imageData)
         {
             if (ModelState.IsValid)
@@ -110,6 +114,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Books/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -131,6 +136,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid id, [Bind("PublisherId,Tittle,Price,Description,Id,imageData")] Book book, IFormFile imageData)
         {
             if (id != book.Id)
@@ -173,6 +179,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Books/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -194,6 +201,7 @@ namespace WebApp.Controllers
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var book = await _context.Books.FindAsync(id);

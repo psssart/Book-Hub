@@ -55,7 +55,13 @@
                         <div class="form-element">
                             <label asp-for="Input.Password" class="label-text">Password</label>
                             <div class="d-flex justify-content-center">
-                                <input asp-for="Input.Password" type="password" autocomplete="current-password" aria-required="true" placeholder="Password">
+                                <div class="password-input-wrap">
+                                    <input asp-for="Input.Password" type="password" autocomplete="current-password" aria-required="true" placeholder="Password">
+                                    <button type="button" class="toggle-password-btn" tabindex="-1" aria-label="Toggle password visibility">
+                                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <svg class="eye-closed" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                    </button>
+                                </div>
                             </div>
                             <div class="d-flex justify-content-center">
                                 <span asp-validation-for="Input.Password" class="text-danger fs-6"></span>
@@ -117,6 +123,45 @@
         margin-bottom: 0;
     }
 </style>
+
+<script>
+(function() {
+    // Password toggle
+    document.querySelectorAll('.toggle-password-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var input = this.parentElement.querySelector('input');
+            var eyeOpen = this.querySelector('.eye-open');
+            var eyeClosed = this.querySelector('.eye-closed');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeOpen.style.display = 'none';
+                eyeClosed.style.display = 'block';
+            } else {
+                input.type = 'password';
+                eyeOpen.style.display = 'block';
+                eyeClosed.style.display = 'none';
+            }
+        });
+    });
+
+    // Save form data to localStorage (email only, not password)
+    var emailInput = document.getElementById('Input_Email');
+    var storageKey = 'bookhub_login_email';
+
+    var savedEmail = localStorage.getItem(storageKey);
+    if (savedEmail && !emailInput.value) {
+        emailInput.value = savedEmail;
+    }
+
+    emailInput.addEventListener('input', function() {
+        localStorage.setItem(storageKey, this.value);
+    });
+
+    document.getElementById('account').addEventListener('submit', function() {
+        localStorage.removeItem(storageKey);
+    });
+})();
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
