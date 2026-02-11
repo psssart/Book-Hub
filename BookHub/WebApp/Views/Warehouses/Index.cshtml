@@ -21,6 +21,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.GpsY)
             </th>
+            <th>
+                Location
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -35,6 +38,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.GpsY)
+            </td>
+            <td>
+                @(item.Location != null ? $"{item.Location.Y}, {item.Location.X}" : "N/A")
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

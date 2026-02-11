@@ -30,7 +30,7 @@ var connectionString = builder.Configuration
 // 2. EF Core + UnitOfWork + BLL/DAL
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseNpgsql(connectionString);
+    opt.UseNpgsql(connectionString, o => o.UseNetTopologySuite());
     if (builder.Environment.IsDevelopment())
     {
         opt.EnableDetailedErrors();

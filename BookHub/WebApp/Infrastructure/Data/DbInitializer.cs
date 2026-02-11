@@ -5,6 +5,7 @@ using App.Domain.Entities;
 using App.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using WebApp.Infrastructure.Data.SeedDTO;
 
 namespace WebApp.Infrastructure.Data;
@@ -159,7 +160,8 @@ public static class DbInitializer
             {
                 Name = w.Name,
                 GpsX = w.GpsX,
-                GpsY = w.GpsY
+                GpsY = w.GpsY,
+                Location = new Point(w.GpsY, w.GpsX) { SRID = 4326 }
             });
         }
 
@@ -233,7 +235,9 @@ public static class DbInitializer
                 context.BooksWarehouses.Add(new BookWarehouses
                 {
                     BookId = book.Id,
-                    WarehouseId = warehouseId
+                    WarehouseId = warehouseId,
+                    Count = random.Next(1, 16),
+                    LastSupply = DateTime.UtcNow.AddDays(-random.Next(0, 91))
                 });
             }
 

@@ -28,6 +28,12 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.GpsY)
         </dd>
+        <dt class = "col-sm-2">
+            Location
+        </dt>
+        <dd class = "col-sm-10">
+            @(Model.Location != null ? $"{Model.Location.Y}, {Model.Location.X}" : "Not set")
+        </dd>
     </dl>
 </div>
 <div>

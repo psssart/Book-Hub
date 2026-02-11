@@ -22,7 +22,7 @@ public class AppDbContextFactory :  IDesignTimeDbContextFactory<AppDbContext>
                  ?? throw new InvalidOperationException("Connection string not found.");
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(cs)
+            .UseNpgsql(cs, o => o.UseNetTopologySuite())
             .Options;
 
         return new AppDbContext(options);

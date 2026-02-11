@@ -1,7 +1,9 @@
 # ---Development build---
 services:
   sql:
-    image: postgres:16
+    build:
+      context: .
+      dockerfile: db.Dockerfile
     container_name: bookhub-sql-dev
     ports:
       - "7890:5432"
