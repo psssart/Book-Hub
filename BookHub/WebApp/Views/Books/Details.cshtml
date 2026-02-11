@@ -111,36 +111,45 @@
         <div class="col-12 col-lg-3">
             @* <img class="vertical-line" src="~/img/svg/vertical-line.svg" alt=""> *@
             <div class="d-flex flex-column">
+                @{
+                    var warehouses = ViewData["BookWarehouses"] as List<BookWarehouses> ?? new List<BookWarehouses>();
+                    bool isInStock = warehouses.Any(bw => bw.Count > 0);
+                }
                 <div class="price fs-3">30.21 € Physical</div>
                 <div class="d-flex flex-column gap-3 mx-4 pb-4 border-bottom">
-                    <a href="">
-                        <div class="login-button">
-                            <div class="text-white">
-                                Check availability
+                    @if (isInStock)
+                    {
+                        <a asp-action="Availability" asp-route-id="@Model.Id">
+                            <div class="login-button">
+                                <div class="text-white">
+                                    Check availability
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                    <a href="">
-                        <div class="login-button" style="background-color: #D9D9D9;">
-                            <div class="text-black">
-                                Order
+                        </a>
+                    }
+                    else
+                    {
+                        <form asp-controller="Books" asp-action="SubscribeOnBook" method="post">
+                            <input type="hidden" name="id" value="@Model.Id"/>
+                            <div class="login-button" style="cursor: pointer; background-color: #D9D9D9;" onclick="this.closest('form').submit();">
+                                <div class="text-black">
+                                    Order
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </form>
+                    }
                 </div>
                 <div class="price fs-3 mt-2">@Html.DisplayFor(model => model.Price) € eBook</div>
                 <div class="d-flex flex-column gap-3 mx-4">
-                    <a href="">
-                        <div class="login-button">
-                            <div class="text-white">
-                                Check availability
-                            </div>
+                    <div class="login-button d-none">
+                        <div class="text-white">
+                            Check availability
                         </div>
-                    </a>
+                    </div>
                     <form asp-controller="Books" asp-action="AddToTempCart" method="post">
                         <input type="hidden" name="id" value="@Model.Id"/>
-                        <div class="login-button" style="cursor: pointer; background-color: #D9D9D9;" onclick="this.closest('form').submit();">
-                            <div class="text-black">
+                        <div class="login-button" onclick="this.closest('form').submit();">
+                            <div class="text-white">
                                 Add to cart
                             </div>
                         </div>

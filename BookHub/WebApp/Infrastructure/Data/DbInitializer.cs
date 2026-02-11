@@ -161,6 +161,7 @@ public static class DbInitializer
                 Name = w.Name,
                 GpsX = w.GpsX,
                 GpsY = w.GpsY,
+                Country = w.Country,
                 Location = new Point(w.GpsY, w.GpsX) { SRID = 4326 }
             });
         }

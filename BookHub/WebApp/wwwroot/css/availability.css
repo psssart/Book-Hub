@@ -1,0 +1,241 @@
+.availability-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+}
+
+/* Book info bar */
+.availability-book-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+.availability-book-info img {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.availability-book-title {
+    font-family: 'Gilroy-SemiBold', sans-serif;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.availability-book-authors {
+    font-family: 'Gilroy-Medium', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.availability-back-link {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.availability-back-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent-color);
+    text-decoration: none;
+    font-family: 'Gilroy-Medium', sans-serif;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+
+.availability-back-link a:hover {
+    opacity: 0.8;
+}
+
+/* Filter bar */
+.availability-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.availability-filters .filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.availability-filters label {
+    display: block;
+    font-family: 'Gilroy-SemiBold', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.availability-filters select {
+    width: 100%;
+    height: 37%;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Gilroy-Medium', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    padding: 0 2.2rem 0 0.8rem;
+}
+
+.availability-filters select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(100, 116, 201, 0.2);
+}
+
+/* Map container */
+.availability-map-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+#availability-map {
+    width: 100%;
+    height: 500px;
+}
+
+@media (max-width: 768px) {
+    #availability-map {
+        height: 350px;
+    }
+}
+
+/* Info panel */
+.availability-info-panel {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.availability-info-panel.empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-family: 'Gilroy-Medium', sans-serif;
+    padding: 2rem;
+}
+
+.info-panel-header {
+    font-family: 'Gilroy-SemiBold', sans-serif;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin: 0 0 0.8rem 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.info-panel-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.info-panel-label {
+    font-family: 'Gilroy-Medium', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-panel-value {
+    font-family: 'Gilroy-SemiBold', sans-serif;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.stock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-family: 'Gilroy-SemiBold', sans-serif;
+}
+
+.stock-badge.in-stock {
+    background: var(--success);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.stock-badge.out-of-stock {
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+[data-theme="dark"] .stock-badge.out-of-stock {
+    background: #6e3b3e;
+    color: #f0a8ab;
+    border: 1px solid #7c4648;
+}
+
+/* Leaflet popup styling */
+.warehouse-popup {
+    font-family: 'Gilroy-Medium', sans-serif;
+}
+
+.warehouse-popup h6 {
+    font-family: 'Gilroy-SemiBold', sans-serif;
+    margin: 0 0 0.3rem 0;
+    color: #333;
+}
+
+.warehouse-popup p {
+    margin: 0.15rem 0;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.warehouse-popup .directions-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.7rem;
+    background: #6474C9;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: 'Gilroy-SemiBold', sans-serif;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.warehouse-popup .directions-btn:hover {
+    background: #5667c7;
+    color: #fff;
+}

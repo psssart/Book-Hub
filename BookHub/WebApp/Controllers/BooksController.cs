@@ -15,6 +15,7 @@ using App.Web.Infrastructure;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using WebApp.ViewModels;
 
 namespace WebApp.Controllers
 {
@@ -74,6 +75,54 @@ namespace WebApp.Controllers
             ViewData["Ratings"] = bookRatings.ToList();
             
             return View(book);
+        }
+
+        // GET: Books/Availability/5
+        public async Task<IActionResult> Availability(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var book = await _context.Books
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var bookAuthors = await _context.BooksAuthors
+                .Where(ba => ba.BookId == book.Id)
+                .Include(ba => ba.Author)
+                .ToListAsync();
+
+            var bookWarehouses = await _context.BooksWarehouses
+                .Where(bw => bw.BookId == book.Id)
+                .Include(bw => bw.Warehouse)
+                .ToListAsync();
+
+            var allWarehouses = await _context.Warehouses.ToListAsync();
+
+            var countries = allWarehouses
+                .Select(w => w.Country)
+                .Where(c => !string.IsNullOrEmpty(c))
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
+            ViewData["BookAuthors"] = bookAuthors;
+
+            var viewModel = new BookAvailabilityViewModel
+            {
+                Book = book,
+                BookWarehouses = bookWarehouses,
+                AllWarehouses = allWarehouses,
+                Countries = countries
+            };
+
+            return View(viewModel);
         }
 
         // GET: Books/Create
@@ -290,6 +339,7 @@ namespace WebApp.Controllers
             
             _context.Add(userSubscription);
             await _context.SaveChangesAsync();
+            TempData.Success("You will be notified by email when book will be in stock");
             return RedirectToAction("Details", new { id = id });
         }
         

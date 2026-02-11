@@ -57,7 +57,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,GpsX,GpsY,Id")] Warehouse warehouse)
+        public async Task<IActionResult> Create([Bind("Name,Country,GpsX,GpsY,Id")] Warehouse warehouse)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,GpsX,GpsY,Id")] Warehouse warehouse)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Country,GpsX,GpsY,Id")] Warehouse warehouse)
         {
             if (id != warehouse.Id)
             {
