@@ -158,6 +158,11 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/artifacts/efbundle.sha256.new
         # stage bundle + checksum
 
+      - name: Push DB Dockerfile to server
+        run: |
+            rsync -e "ssh -p ${{ secrets.SSH_PORT }}" -avz BookHub/db.Dockerfile \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.APP_DIR }}/db.Dockerfile
+
       - name: Deploy over SSH
         env:
           IMAGE_TAG: sha-${{ github.sha }}
@@ -183,8 +188,23 @@ jobs:
           # pull image explicitly and fail if cannot
           docker compose -f docker-compose.prod.yml pull app
           
+          # BUILD the custom DB image (installs PostGIS libraries)
+          docker compose -f docker-compose.prod.yml build sql
+          
           # start DB
           docker compose -f docker-compose.prod.yml up -d sql
+          
+          # WAIT for DB health (Migrator will fail if we don't wait)
+          echo "Waiting for database to be healthy..."
+          for i in {1..30}; do
+            HEALTH=\$(docker inspect -f '{{.State.Health.Status}}' bookhub-sql-dev 2>/dev/null || echo "starting")
+            if [ "\$HEALTH" == "healthy" ]; then
+              echo "Database is ready!"
+              break
+            fi
+            echo "Current status: \$HEALTH... waiting..."
+            sleep 2
+          done
           
           # run migrations only if bundle changed
           NEW_SHA="$(cat artifacts/efbundle.sha256.new 2>/dev/null || true)"
