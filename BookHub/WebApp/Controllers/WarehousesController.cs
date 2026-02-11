@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using NetTopologySuite.Geometries;
 
 namespace WebApp.Controllers
 {
@@ -61,6 +62,7 @@ namespace WebApp.Controllers
             if (ModelState.IsValid)
             {
                 warehouse.Id = Guid.NewGuid();
+                warehouse.Location = new Point(warehouse.GpsX, warehouse.GpsY) { SRID = 4326 };
                 _context.Add(warehouse);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -100,6 +102,7 @@ namespace WebApp.Controllers
             {
                 try
                 {
+                    warehouse.Location = new Point(warehouse.GpsX, warehouse.GpsY) { SRID = 4326 };
                     _context.Update(warehouse);
                     await _context.SaveChangesAsync();
                 }

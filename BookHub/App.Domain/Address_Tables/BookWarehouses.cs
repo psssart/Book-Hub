@@ -9,4 +9,7 @@ public class BookWarehouses : BaseEntityId
     public Book? Book { get; set; }
     public Guid WarehouseId { get; set; }
     public Warehouse? Warehouse { get; set; }
+
+    public int Count { get; set; }
+    public DateTime? LastSupply { get; set; }
 }

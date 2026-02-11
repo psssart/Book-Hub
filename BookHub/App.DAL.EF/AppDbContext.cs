@@ -53,6 +53,8 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, IdentityUs
     {
         base.OnModelCreating(builder);
 
+        builder.HasPostgresExtension("postgis");
+
         builder.Entity<Book>(b =>
         {
             b.Property(x => x.SearchVector)
