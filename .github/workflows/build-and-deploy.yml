@@ -196,13 +196,13 @@ jobs:
           
           # WAIT for DB health (Migrator will fail if we don't wait)
           echo "Waiting for database to be healthy..."
-          for i in {1..30}; do
-            HEALTH=\$(docker inspect -f '{{.State.Health.Status}}' bookhub-sql-dev 2>/dev/null || echo "starting")
-            if [ "\$HEALTH" == "healthy" ]; then
-              echo "Database is ready!"
-              break
+          for i in {1..20}; do
+            HEALTH=$(docker inspect -f '{{.State.Health.Status}}' bookhub-sql-dev 2>/dev/null | xargs || echo "starting")
+            if [ "$HEALTH" = "healthy" ]; then
+            echo "Database is ready!"
+            break
             fi
-            echo "Current status: \$HEALTH... waiting..."
+            echo "Status: $HEALTH... waiting..."
             sleep 2
           done
           

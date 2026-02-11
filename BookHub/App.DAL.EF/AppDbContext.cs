@@ -86,6 +86,21 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, IdentityUs
                 .HasDatabaseName("idx_authors_name_trgm")
                 .HasOperators("gin_trgm_ops");
         });
+        
+        foreach (var entityType in builder.Model.GetEntityTypes())
+        {
+            var properties = entityType.GetProperties()
+                .Where(p => p.ClrType == typeof(DateTime) 
+                            || p.ClrType == typeof(DateTime?));
+
+            foreach (var property in properties)
+            {
+                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                    v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), // To DB
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // From DB
+                ));
+            }
+        }
     }
     
 }

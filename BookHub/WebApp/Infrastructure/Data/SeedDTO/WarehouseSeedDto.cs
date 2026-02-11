@@ -17,4 +17,8 @@ public class WarehouseSeedDto
     /// Warehouse GPS Y coordinate
     /// </summary>
     public double GpsY { get; set; }
+    /// <summary>
+    /// Warehouse country
+    /// </summary>
+    public string Country { get; set; } = null!;
 }
