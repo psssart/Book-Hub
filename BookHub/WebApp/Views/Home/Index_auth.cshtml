@@ -207,6 +207,21 @@ $(document).ready(function() {
         sendSortingRequest($('#sortSelect').val(), getSortDirection())
     });
 
+    // Watching for warehouses selection for filtering
+    $(document).on('change', '.dropdownWar-content input[type="checkbox"]', function() {
+        let warehouseId = $(this).val();
+
+        if($(this).prop('checked')) {
+            selectedWarehousesGuids.push(warehouseId);
+        } else {
+            let index = selectedWarehousesGuids.indexOf(warehouseId);
+            if (index !== -1) {
+                selectedWarehousesGuids.splice(index, 1);
+            }
+        }
+        sendSortingRequest($('#sortSelect').val(), getSortDirection())
+    });
+
     // Show filtering menu
     $(document).on('click', '.filterMenuButton', function (e) {
         e.stopPropagation();

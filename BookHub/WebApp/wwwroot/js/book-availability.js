@@ -259,7 +259,10 @@
             }
         }, function () {
             // Geolocation denied or unavailable — no action needed
-        }, { timeout: 5000 });
+        }, { 
+            //timeout: 10000,
+            enableHighAccuracy: false
+        });
     }
 
     function haversine(lat1, lon1, lat2, lon2) {

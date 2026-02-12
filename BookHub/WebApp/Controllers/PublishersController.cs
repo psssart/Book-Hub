@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
+using App.Domain.Address_Tables;
 using App.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebApp.Models;
 
 namespace WebApp.Controllers
 {
@@ -30,19 +32,63 @@ namespace WebApp.Controllers
         // GET: Publishers/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var publisher = await _context.Publishers
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (publisher == null)
-            {
-                return NotFound();
-            }
+            if (publisher == null) return NotFound();
 
-            return View(publisher);
+            var books = await _context.Books
+                .AsNoTracking()
+                .Where(b => b.PublisherId == publisher.Id)
+                .Include(b => b.Publisher)
+                .ToListAsync();
+
+            var bookIds = books.Select(b => b.Id).ToList();
+
+            var ratings = bookIds.Count == 0
+                ? new List<Rating>()
+                : await _context.Ratings
+                    .AsNoTracking()
+                    .Where(r => bookIds.Contains(r.BookId))
+                    .ToListAsync();
+
+            var bookAuthors = bookIds.Count == 0
+                ? new List<BookAuthor>()
+                : await _context.BooksAuthors
+                    .AsNoTracking()
+                    .Where(ba => bookIds.Contains(ba.BookId))
+                    .Include(ba => ba.Author)
+                    .ToListAsync();
+
+            var genres = bookIds.Count == 0
+                ? new List<BookGenre>()
+                : await _context.BooksGenres
+                    .AsNoTracking()
+                    .Where(bg => bookIds.Contains(bg.BookId))
+                    .Include(bg => bg.Genre)
+                    .ToListAsync();
+
+            var vm = new PublisherDetailsViewModel
+            {
+                Publisher = publisher,
+                BookCount = books.Count,
+                Search = new HomeViewModel
+                {
+                    Books = books,
+                    Ratings = ratings,
+                    BookAuthors = bookAuthors,
+                    BookGenres = genres,
+                    BookWarehouses = [],
+                    Authors = [],
+                    SearchInput = string.Empty,
+                    ShowResults = true,
+                    WithAuthors = false
+                }
+            };
+
+            return View(vm);
         }
 
         // GET: Publishers/Create

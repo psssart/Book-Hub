@@ -52,20 +52,28 @@
                 </div>
                 <div class="row-element">
                     <div class="sub-header border-bottom">Score</div>
-                    @for (var i = 0; i < 5; i++)
-                    {
-                        if (i < roundedRating)
-                        {
-                            <img class="rating-star\" src="~/img/svg/rating-checked.svg" width="24px" height="24px" alt="">
-                        }
-                        else
-                        {
-                            <img class="rating-star\" src="~/img/svg/rating-unchecked.svg" width="24px" height="24px" alt="">
-                        }
-
-                    }
-                    &nbsp; @formattedRating
-
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="score-stars">
+                            @{
+                                int scoreFullStars = (int)Math.Floor(averageRating);
+                                bool scoreHasHalf = (averageRating - scoreFullStars) >= 0.5f;
+                                int scoreEmptyStars = 5 - scoreFullStars - (scoreHasHalf ? 1 : 0);
+                            }
+                            @for (var i = 0; i < scoreFullStars; i++)
+                            {
+                                <img class="rating-star" src="~/img/svg/rating-checked.svg" width="24px" height="24px" alt="">
+                            }
+                            @if (scoreHasHalf)
+                            {
+                                <img class="rating-star" src="~/img/svg/rating-half.svg" width="24px" height="24px" alt="">
+                            }
+                            @for (var i = 0; i < scoreEmptyStars; i++)
+                            {
+                                <img class="rating-star" src="~/img/svg/rating-unchecked.svg" width="24px" height="24px" alt="">
+                            }
+                        </span>
+                        <span class="pt-2">@formattedRating</span>
+                    </div>
                 </div>
                 <div class="row-element">
                     <div class="sub-header border-bottom">
@@ -76,8 +84,10 @@
                             @if (ViewData["BookAuthors"] != null && ((List<BookAuthor>)ViewData["BookAuthors"]!).Any())
                             {
                                 var bookAuthors = ViewData["BookAuthors"] as List<BookAuthor>;
-                                string authors = string.Join(", ", bookAuthors!.Select(bookAuthor => bookAuthor.Author!.Name));
-                                <span>@authors</span>
+                                for (var i = 0; i < bookAuthors!.Count; i++)
+                                {
+                                    <a asp-controller="Authors" asp-action="Details" asp-route-id="@bookAuthors[i].Author!.Id">@bookAuthors[i].Author!.Name</a>@(i < bookAuthors.Count - 1 ? ", " : "")
+                                }
                             }
                             else
                             {
@@ -86,6 +96,17 @@
                         </div>
                     </div>
 
+                </div>
+                <div class="row-element">
+                    <div class="sub-header border-bottom">Publisher</div>
+                    @if (Model.Publisher != null)
+                    {
+                        <a asp-controller="Publishers" asp-action="Details" asp-route-id="@Model.Publisher.Id">@Model.Publisher.Name</a>
+                    }
+                    else
+                    {
+                        <span>Unknown publisher</span>
+                    }
                 </div>
                 <div class="row-element">
                     <div class="sub-header border-bottom">Genres</div>
@@ -182,7 +203,26 @@
                         }
 
                         <div class="author-frame-name-review mb-0">
-                            @rating.AppUser!.FirstName: @rating.Comment
+                            <div class="mb-1">
+                                @{
+                                    int fullStars = (int)Math.Floor(rating.Value);
+                                    bool hasHalf = (rating.Value - fullStars) >= 0.5f;
+                                    int emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+                                }
+                                @for (var i = 0; i < fullStars; i++)
+                                {
+                                    <img src="~/img/svg/rating-checked.svg" width="14px" height="14px" alt="">
+                                }
+                                @if (hasHalf)
+                                {
+                                    <img src="~/img/svg/rating-half.svg" width="14px" height="14px" alt="">
+                                }
+                                @for (var i = 0; i < emptyStars; i++)
+                                {
+                                    <img src="~/img/svg/rating-unchecked.svg" width="14px" height="14px" alt="">
+                                }
+                            </div>
+                            <strong>@rating.AppUser!.FirstName</strong>: @rating.Comment
                         </div>
                     </div>
                 }
