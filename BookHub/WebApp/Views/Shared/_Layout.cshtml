@@ -20,7 +20,7 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
     <title>@ViewData["Title"] - BookHub</title>
     
 </head>
-<body style="z-index: 99999">
+<body style="z-index: 99999; overflow: hidden;">
 @if(User.Identity!.IsAuthenticated) {
     @* Authenticated layout *@
     <header>
@@ -235,7 +235,7 @@ else
             <div class="box row-fluid d-flex">
                 
                 @* Logo section (only for desktop) *@
-                <div class="d-none d-md-flex col-0 col-md-2 p-0">
+                <div class="d-none d-md-flex col-0 col-md-1 col-lg-2 p-0">
                     <nav class="d-flex">
                         <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 ps-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="~/img/svg/logo.svg" alt="Logo" class="img-fluid" style="height: 85%;">
@@ -275,7 +275,7 @@ else
                 </div>
 
                 @* Sign up Log in section *@
-                <div class="col-2 col-md-4 d-flex justify-content-end">
+                <div class="col-2 col-md-5 col-lg-4 d-flex justify-content-end">
                     @* For mobile (dropdown) *@
                     <nav class="d-flex d-md-none">
                         <a class="nav-link dropdown-toggle custom-dropdown d-flex align-items-center fs-2 p-2 pe-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -300,6 +300,11 @@ else
                                     </div>
                                 </a>
                             </li>
+                            <li style="padding-left: 18px;">
+                                <a asp-area="" asp-controller="Discussions" asp-action="Index">
+                                    <img src="~/img/svg/Forums.svg" alt="">
+                                </a>
+                            </li>
                             <li class="hover">
                                 <partial name="_ThemeToggle" view-data='new ViewDataDictionary(ViewData) { ["TextColor"] = "var(--text-primary)" }' />
                             </li>
@@ -307,6 +312,11 @@ else
                     </nav>
                     @* For desktop *@
                     <div class="d-none d-md-flex gap-2 m-3">
+                        <div>
+                            <a asp-area="" asp-controller="Discussions" asp-action="Index">
+                                <img src="~/img/svg/Forums.svg" alt="" class="img-fluid" style="width: 3.5rem">
+                            </a>
+                        </div>
                         <div>
                             <a asp-area="Identity" asp-page="/Account/Register">
                                 <div class="text-wrapper-yellow">

@@ -40,6 +40,7 @@ public class HomeController : Controller
             IQueryable<BookWarehouses> bookWarehouses = _context.BooksWarehouses.Include(bw => bw.Warehouse);
 
             bool? userAuthenticated = User.Identity?.IsAuthenticated;
+            bool searchInputWasProvided = Request.Query.ContainsKey(nameof(searchInput));
             bool emptySearchInput = string.IsNullOrWhiteSpace(searchInput);
             
             if (!emptySearchInput || userAuthenticated == true)
@@ -254,7 +255,7 @@ public class HomeController : Controller
                 BookGenres = bookGenres.ToList(),
                 BookWarehouses = bookWarehouses.ToList(),
                 SearchInput = searchInput,
-                ShowResults = (userAuthenticated == false && !emptySearchInput) || 
+                ShowResults = (userAuthenticated == false && searchInputWasProvided) || 
                               (userAuthenticated == true && (booksList.Any() || authors.Any()))
             };
 
