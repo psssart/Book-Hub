@@ -101,6 +101,8 @@ public class AccountController : ControllerBase
             );
         }
 
+        await _userManager.AddToRoleAsync(appUser, "User");
+
         // save into claims also the user full name
         result = await _userManager.AddClaimsAsync(appUser, new List<Claim>()
         {

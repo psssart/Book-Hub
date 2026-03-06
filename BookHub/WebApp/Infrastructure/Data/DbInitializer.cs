@@ -43,6 +43,7 @@ public static class DbInitializer
         if (seedSettings.Genres) await SeedGenresAsync(context);
         await SeedWarehousesAsync(context, seedSettings.Warehouses);
         await SeedBooksAsync(context, seedSettings.Books);
+        if (seedSettings.Discussions) await SeedDiscussionsAsync(context);
     }
     
         private static async Task SeedUsersAsync(
@@ -246,6 +247,98 @@ public static class DbInitializer
         }
     }
     
+    private static async Task SeedDiscussionsAsync(AppDbContext context)
+    {
+        if (context.Discussions.Any()) return;
+
+        var data = await File.ReadAllTextAsync(GetSeedFilePath("discussions.json"));
+        var discussions = JsonSerializer.Deserialize<List<DiscussionSeedDto>>(data) ?? new();
+
+        // Use the first seeded user as the discussion/topic/message author
+        var user = context.Users.FirstOrDefault();
+        if (user == null) return;
+
+        var secondUser = context.Users.Skip(1).FirstOrDefault();
+
+        foreach (var dto in discussions)
+        {
+            byte[]? imageData = null;
+            Guid? bookId = null;
+            Guid? genreId = null;
+            Guid? authorId = null;
+
+            if (dto.BookTitle != null)
+            {
+                var book = context.Books.FirstOrDefault(b => b.Tittle == dto.BookTitle);
+                if (book != null)
+                {
+                    bookId = book.Id;
+                    if (dto.UseBookImage) imageData = book.imageData;
+                }
+            }
+
+            if (dto.GenreName != null)
+            {
+                var genre = context.Genres.FirstOrDefault(g => g.Name == dto.GenreName);
+                if (genre != null) genreId = genre.Id;
+            }
+
+            if (dto.AuthorName != null)
+            {
+                var author = context.Authors.FirstOrDefault(a => a.Name == dto.AuthorName);
+                if (author != null) authorId = author.Id;
+            }
+
+            var discussion = new Discussion
+            {
+                Tittle = dto.Tittle,
+                Description = dto.Description,
+                CreationTime = DateTime.UtcNow.AddDays(-new Random().Next(1, 30)),
+                AppUserId = user.Id,
+                BookId = bookId,
+                GenreId = genreId,
+                AuthorId = authorId,
+                imageData = imageData
+            };
+
+            context.Discussions.Add(discussion);
+            await context.SaveChangesAsync();
+
+            for (var i = 0; i < dto.Topics.Count; i++)
+            {
+                var topicDto = dto.Topics[i];
+                var topic = new Topic
+                {
+                    Tittle = topicDto.Tittle,
+                    Content = topicDto.Content,
+                    CreationTime = discussion.CreationTime.AddHours(i + 1),
+                    AppUserId = user.Id,
+                    DiscussionId = discussion.Id
+                };
+
+                context.Topics.Add(topic);
+                await context.SaveChangesAsync();
+
+                for (var j = 0; j < topicDto.Messages.Count; j++)
+                {
+                    var msgDto = topicDto.Messages[j];
+                    // Alternate message authors between the two seeded users
+                    var messageUser = (j % 2 == 0) ? (secondUser ?? user) : user;
+
+                    context.Messages.Add(new Message
+                    {
+                        Content = msgDto.Content,
+                        CreationTime = topic.CreationTime.AddMinutes((j + 1) * 15),
+                        AppUserId = messageUser.Id,
+                        TopicId = topic.Id
+                    });
+                }
+
+                await context.SaveChangesAsync();
+            }
+        }
+    }
+
     private static string GetSeedFilePath(string fileName)
     {
         return Path.Combine(AppContext.BaseDirectory, "Infrastructure", "Data", "SeedData", fileName);

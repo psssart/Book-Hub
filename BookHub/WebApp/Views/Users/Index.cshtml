@@ -1,0 +1,62 @@
+@model IEnumerable<WebApp.Models.UserAdminViewModel>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<h1>Users</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Avatar</th>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Roles</th>
+        <th>Books</th>
+        <th>Ratings</th>
+        <th>Discussions</th>
+        <th>Topics</th>
+        <th>Messages</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @if (item.AvatarImageData != null && item.AvatarImageData.Length > 0)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.AvatarImageData)"
+                         alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" />
+                }
+                else
+                {
+                    <img src="~/img/profile-nophoto.svg"
+                         alt="No avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" />
+                }
+            </td>
+            <td>@item.FirstName @item.LastName</td>
+            <td>@item.UserName</td>
+            <td>@item.Email</td>
+            <td>
+                @foreach (var role in item.Roles)
+                {
+                    <span class="badge bg-secondary">@role</span>
+                }
+            </td>
+            <td>@item.PurchasedBooksCount</td>
+            <td>@item.RatingsCount</td>
+            <td>@item.DiscussionsCount</td>
+            <td>@item.TopicsCount</td>
+            <td>@item.MessagesCount</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

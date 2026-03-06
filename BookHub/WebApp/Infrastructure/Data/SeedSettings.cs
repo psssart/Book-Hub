@@ -31,4 +31,8 @@ public class SeedSettings
     /// Number of books to seed (from a predefined JSON list).
     /// </summary>
     public int Books { get; set; }
+    /// <summary>
+    /// Whether to seed a predefined list of discussions with topics and messages.
+    /// </summary>
+    public bool Discussions { get; set; }
 }

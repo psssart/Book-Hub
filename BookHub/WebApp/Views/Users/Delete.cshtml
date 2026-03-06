@@ -1,0 +1,73 @@
+@model WebApp.Models.UserAdminViewModel
+
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this user?</h3>
+<div>
+    <h4>User</h4>
+    <hr />
+
+    <div class="mb-3">
+        @if (Model.AvatarImageData != null && Model.AvatarImageData.Length > 0)
+        {
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.AvatarImageData)"
+                 alt="Avatar" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" />
+        }
+        else
+        {
+            <img src="~/img/profile-nophoto.svg"
+                 alt="No avatar" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" />
+        }
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-2">First Name</dt>
+        <dd class="col-sm-10">@Model.FirstName</dd>
+
+        <dt class="col-sm-2">Last Name</dt>
+        <dd class="col-sm-10">@Model.LastName</dd>
+
+        <dt class="col-sm-2">Username</dt>
+        <dd class="col-sm-10">@Model.UserName</dd>
+
+        <dt class="col-sm-2">Email</dt>
+        <dd class="col-sm-10">@Model.Email</dd>
+
+        <dt class="col-sm-2">Roles</dt>
+        <dd class="col-sm-10">
+            @foreach (var role in Model.Roles)
+            {
+                <span class="badge bg-secondary">@role</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">Purchased Books</dt>
+        <dd class="col-sm-10">@Model.PurchasedBooksCount</dd>
+
+        <dt class="col-sm-2">Ratings</dt>
+        <dd class="col-sm-10">@Model.RatingsCount</dd>
+
+        <dt class="col-sm-2">Discussions</dt>
+        <dd class="col-sm-10">@Model.DiscussionsCount</dd>
+
+        <dt class="col-sm-2">Topics</dt>
+        <dd class="col-sm-10">@Model.TopicsCount</dd>
+
+        <dt class="col-sm-2">Messages</dt>
+        <dd class="col-sm-10">@Model.MessagesCount</dd>
+    </dl>
+
+    <div class="alert alert-warning">
+        <strong>Warning!</strong> Deleting this user will also remove all their ratings, discussions, topics, messages, purchases, and subscriptions. This action cannot be undone.
+    </div>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

@@ -1,0 +1,103 @@
+[
+  {
+    "Tittle": "Dystopian Worlds in Literature",
+    "Description": "A place to discuss dystopian themes across different books and authors.",
+    "GenreName": "Dystopian",
+    "BookTitle": "Moby Dick",
+    "UseBookImage": true,
+    "Topics": []
+  },
+  {
+    "Tittle": "Best Algorithm Textbooks",
+    "Description": "Share your thoughts on the best resources for learning algorithms and data structures.",
+    "BookTitle": "Algorithms Unlocked",
+    "UseBookImage": true,
+    "Topics": [
+      {
+        "Tittle": "CLRS vs Algorithms Unlocked",
+        "Content": "Has anyone compared Introduction to Algorithms with Algorithms Unlocked? Which one is better for beginners?",
+        "Messages": []
+      },
+      {
+        "Tittle": "Self-study roadmap",
+        "Content": "What order should I read algorithm books in if I'm self-studying computer science?",
+        "Messages": []
+      }
+    ]
+  },
+  {
+    "Tittle": "Russian Classic Literature Fan Club",
+    "Description": "Discussing the masterpieces of Russian literature — Dostoevsky, Gogol, Bulgakov and more.",
+    "UseBookImage": false,
+    "Topics": [
+      {
+        "Tittle": "Favorite Dostoevsky work?",
+        "Content": "White Nights is a short but beautiful piece. What's your favorite Dostoevsky novel or short story?",
+        "Messages": [
+          { "Content": "Crime and Punishment changed my perspective on morality. Absolutely my favorite." },
+          { "Content": "I love White Nights for its dreamy atmosphere. It's so different from his heavier works." },
+          { "Content": "The Brothers Karamazov is a masterpiece. The Grand Inquisitor chapter alone is worth reading." }
+        ]
+      },
+      {
+        "Tittle": "Gogol's satirical genius",
+        "Content": "Dead Souls is such a brilliant satire of Russian society. What do you think Gogol was really trying to say?",
+        "Messages": [
+          { "Content": "I think he was critiquing the absurdity of serfdom and the moral bankruptcy of the landowners." },
+          { "Content": "The fact that it was left unfinished makes it even more mysterious and fascinating." }
+        ]
+      }
+    ]
+  },
+  {
+    "Tittle": "1984 — Still Relevant Today?",
+    "Description": "George Orwell's vision of a surveillance state feels eerily modern. Let's discuss its relevance in the digital age.",
+    "UseBookImage": false,
+    "Topics": []
+  },
+  {
+    "Tittle": "Master and Margarita Reading Group",
+    "Description": "Join our reading group for Bulgakov's masterpiece. We'll go chapter by chapter.",
+    "AuthorName": "Mikhail Bulgakov",
+    "UseBookImage": false,
+    "Topics": [
+      {
+        "Tittle": "Chapters 1-5: The Devil arrives in Moscow",
+        "Content": "Woland's arrival at Patriarch's Ponds is one of the greatest openings in literature. What were your first impressions?",
+        "Messages": []
+      },
+      {
+        "Tittle": "The role of Pontius Pilate chapters",
+        "Content": "How do the Jerusalem chapters connect to the main Moscow storyline? Are they a novel within a novel?",
+        "Messages": []
+      }
+    ]
+  },
+  {
+    "Tittle": "Psychology of Decision Making",
+    "Description": "Exploring the ideas from Thinking, Fast and Slow and how cognitive biases affect our daily choices.",
+    "BookTitle": "Thinking, Fast and Slow",
+    "AuthorName": "Daniel Kahneman",
+    "UseBookImage": true,
+    "Topics": [
+      {
+        "Tittle": "System 1 vs System 2 in real life",
+        "Content": "Kahneman describes two systems of thinking. Can you share examples where you caught yourself using System 1 when you should have used System 2?",
+        "Messages": [
+          { "Content": "I always fall for the anchoring effect when shopping. If I see a 'was $100, now $50' tag, I feel like it's a deal even if $50 is still overpriced." },
+          { "Content": "Job interviews are a great example. First impressions (System 1) often dominate the entire evaluation even when you try to be objective." },
+          { "Content": "I noticed it with news headlines. I form an opinion from the headline alone and rarely update it after reading the full article." },
+          { "Content": "The sunk cost fallacy gets me every time. I'll keep watching a terrible movie just because I already spent an hour on it." }
+        ]
+      },
+      {
+        "Tittle": "Practical applications of behavioral economics",
+        "Content": "Has reading this book actually changed how you make decisions? Or is knowing about biases not enough to overcome them?",
+        "Messages": [
+          { "Content": "Knowing about biases helps me pause and reflect, but I still fall for them. Awareness is the first step though." },
+          { "Content": "I started using checklists for important decisions at work. It forces System 2 thinking and has genuinely improved outcomes." }
+        ]
+      }
+    ]
+  }
+]

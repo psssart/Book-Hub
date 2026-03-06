@@ -15,8 +15,8 @@ dotnet run --project WebApp/WebApp.csproj
 # Run with Docker (development mode)
 docker-compose up -d
 
-# Access application at https://localhost:5001
-# Swagger UI available at https://localhost:5001/swagger (Development only)
+# Access application at https://localhost:443 (Docker) or https://localhost:5001 (local)
+# Swagger UI available at /swagger (Development only)
 ```
 
 ### Testing
@@ -66,266 +66,293 @@ dotnet aspnet-codegenerator controller -name <EntityName>Controller \
 
 ## Architecture Overview
 
-BookHub is a .NET 8.0 ASP.NET Core MVC application using a clean, layered architecture with the following structure:
+BookHub is a .NET 8.0 ASP.NET Core MVC application — an online bookstore with forums, ratings, warehouse maps, and a REST API. It uses a clean, layered architecture.
 
-### Layer Hierarchy (Base → App → WebApp)
+### Solution Structure (18 projects)
 
-The solution uses a **two-tier inheritance pattern** where generic base classes (`Base.*`) are extended by application-specific classes (`App.*`):
+The solution (`BookHub.sln`) is organized into three tiers:
 
-1. **Base Layer** (Generic/Reusable):
-   - `Base.Contracts.Domain` - Base domain interfaces (IDomainEntityId)
-   - `Base.Contracts.DAL` - Generic repository interfaces (IEntityRepository, IUnitOfWork)
-   - `Base.Contracts.BLL` - Generic service interfaces (IEntityService, IBLL)
-   - `Base.DAL.EF` - Generic EF Core repository implementations
-   - `Base.BLL` - Generic business logic service implementations
+1. **Base Layer** (Generic/Reusable — `Base.*`):
+   - `Base.Domain` — Abstract base classes: `BaseEntityId`, `BaseEntityIdMetadata`, `BaseRefreshToken`
+   - `Base.Contracts.Domain` — Domain interfaces: `IDomainEntityId`, `IDomainEntityMetadata`, `IDomainAppUser`, `IDomainAppUserId`
+   - `Base.Contracts.DAL` — Generic repository interfaces: `IEntityRepository<T>`, `IUnitOfWork`, `IDalMapper`
+   - `Base.Contracts.BLL` — Generic service interfaces: `IEntityService<T>`, `IBLL`, `IBLLMapper`
+   - `Base.DAL.EF` — Generic EF Core implementations: `BaseEntityRepository`, `BaseUnitOfWork`, `BaseDalDomainMapper`
+   - `Base.BLL` — Generic BLL implementations: `BaseBLL`, `BaseEntityService`
+   - `Base.Tests` — Test infrastructure (test entities, test DbContext, HTML helpers)
 
-2. **App Layer** (Application-Specific):
-   - `App.Domain` - Domain entities (Book, Author, Genre, Publisher, etc.)
-   - `App.Contracts.DAL` - Application repository contracts (IAppUnitOfWork, custom repositories)
-   - `App.DAL.EF` - EF Core implementation (AppDbContext, AppUOW, migrations)
-   - `App.Contracts.BLL` - Application business logic contracts (IAppBLL, custom services)
-   - `App.BLL` - Business logic services (AppBLL implementation)
-   - `App.DTO` - Data transfer objects for API
-   - `App.BLL.DTO` & `App.DAL.DTO` - Layer-specific DTOs
+2. **App Layer** (Application-Specific — `App.*`):
+   - `App.Domain` — Domain entities and identity models
+   - `App.Contracts.DAL` — `IAppUnitOfWork` + custom repository interfaces
+   - `App.DAL.EF` — EF Core: `AppDbContext`, `AppUOW`, repositories, migrations
+   - `App.Contracts.BLL` — `IAppBLL` + custom service interfaces
+   - `App.BLL` — `AppBLL` + service implementations
+   - `App.DTO` — API DTOs (versioned: `v1_0/`)
+   - `App.BLL.DTO` — BLL-layer DTOs
+   - `App.DAL.DTO` — DAL-layer DTOs
+   - `App.Test` — Integration and unit tests
+   - `Helpers` — JWT generation/validation utilities, JSON helpers
 
-3. **WebApp Layer**:
-   - `WebApp` - ASP.NET Core MVC project with:
-     - `Controllers/` - MVC controllers for web UI
-     - `ApiControllers/` - RESTful API controllers (versioned)
-     - `Areas/` - Identity and Admin areas
-     - `Infrastructure/` - Configuration, extensions, email services
-     - `ViewModels/` - View-specific models
+3. **WebApp** (Presentation):
+   - `Controllers/` — 16 MVC controllers
+   - `ApiControllers/` — 4 REST API controllers (versioned)
+   - `Areas/` — Identity (Razor Pages) and Admin (placeholder)
+   - `Hubs/` — SignalR hub for real-time discussions
+   - `Infrastructure/` — Data seeding, email, extensions
+   - `Helpers/` — AutoMapper profiles, file validation attributes
+   - `Models/` & `ViewModels/` — View-specific models
+   - `Views/` — Razor views for all entities
+
+### Domain Entities
+
+**Main Entities** (`App.Domain.Entities/`):
+- `Book` — Tittle, Price, Description, ReleaseYear, imageData, PublisherId, SearchVector (NpgsqlTsVector)
+- `Author` — Name, Age, Biography, imageData, SearchVector
+- `Publisher` — Name, Description
+- `Genre` — Name, Description, IsMainGenre
+- `Warehouse` — Name, GpsX, GpsY, Country, Location (NetTopologySuite Point)
+- `Discussion` — Tittle, Description, CreationTime, imageData, BookId?, GenreId?, AuthorId?, AppUserId
+- `Topic` — Tittle, Content, CreationTime, AppUserId, DiscussionId
+- `Message` — Content, CreationTime, AppUserId, TopicId
+- `Rating` — Value (float), Comment, AppUserId, BookId
+- `Purchase` — Value, Discount, CreationTime, AppUserId
+
+**Junction Tables** (`App.Domain.Address_Tables/`):
+- `BookAuthor` — BookId + AuthorId
+- `BookGenre` — BookId + GenreId
+- `BookWarehouses` — BookId + WarehouseId + Count + LastSupply (inventory tracking)
+- `PurchasedBook` — BookId + PurchaseId + BookHasRead
+- `UserSubscription` — AppUserId + BookId + CreationTime
+
+**Identity** (`App.Domain.Identity/`):
+- `AppUser` (extends IdentityUser<Guid>) — FirstName, LastName, AvatarImageData
+- `AppRole` (extends IdentityRole<Guid>)
+- `AppUserRole` (extends IdentityUserRole<Guid>)
+- `AppRefreshToken` — RefreshToken, ExpirationDT, PreviousRefreshToken, PreviousExpirationDT
+
+All entities inherit from `BaseEntityId` which implements `IDomainEntityId` with Guid-based IDs.
 
 ### Key Architectural Patterns
 
-**Unit of Work + Repository Pattern:**
-- `IAppUnitOfWork` provides access to all repositories
-- Each repository inherits from `IEntityRepository<TEntity>` in Base layer
-- Custom repositories (e.g., `ITopicRepository`, `IMessageRepository`) extend base repository for specific needs
+**Unit of Work + Repository:**
+- `IAppUnitOfWork` exposes: Topics, Messages, Ratings, Users repositories
+- Custom repositories (`ITopicRepository`, `IMessageRepository`, `IRatingRepository`) extend `IEntityRepository<T>` with domain-specific queries
+- Other entities (Book, Author, etc.) are accessed directly via `AppDbContext` in MVC controllers
 
-**Service Layer Pattern:**
-- `IAppBLL` provides access to all services (mirrors UnitOfWork at BLL level)
-- Services inherit from `IEntityService<TEntity>` which extends `IEntityRepository<TEntity>`
-- Services add business logic on top of repository operations
+**Service Layer (BLL):**
+- `IAppBLL` exposes: Messages, Ratings, Topics, Users services
+- Services wrap repositories with BLL-layer mapping via `BaseEntityService<TDalDto, TBllDto, TRepository>`
+- API controllers inject `IAppBLL`; MVC controllers inject `AppDbContext` directly for entities without custom repositories
 
-**AutoMapper for Object Mapping:**
-- Three AutoMapper profiles: `App.DAL.EF.AutoMapperProfile`, `App.BLL.AutoMapperProfile`, `WebApp.Helpers.AutoMapperProfile`
-- Maps between Domain → DAL DTOs → BLL DTOs → API DTOs
+**AutoMapper (3 profiles):**
+- `App.DAL.EF.AutoMapperProfile` — Domain entities ↔ DAL DTOs
+- `App.BLL.AutoMapperProfile` — DAL DTOs ↔ BLL DTOs
+- `WebApp.Helpers.AutoMapperProfile` — BLL DTOs ↔ API DTOs
 
-**Dependency Injection Flow:**
-- `Program.cs` registers: `AppDbContext` → `IAppUnitOfWork` (AppUOW) → `IAppBLL` (AppBLL)
-- Controllers inject `IAppBLL` to access services
-- Services use mappers to transform between layers
+**Dependency Injection Flow (Program.cs):**
+```
+AppDbContext → IAppUnitOfWork (AppUOW) → IAppBLL (AppBLL)
+```
+
+### Controllers
+
+**16 MVC Controllers** (`WebApp/Controllers/`):
+- `HomeController` — Landing page with advanced full-text search, filtering, sorting
+- `BooksController` — CRUD + availability view with warehouse maps
+- `AuthorsController`, `PublishersController`, `GenresController`, `WarehousesController` — Entity CRUD
+- `BooksAuthorsController`, `BooksGenresController`, `BooksWarehousesController` — Junction table management
+- `DiscussionsController`, `TopicsController`, `MessagesController` — Forum with SignalR broadcasting
+- `RatingsController` — Book ratings and reviews
+- `PurchasesController`, `PurchasedBooksController` — Purchase/cart management
+- `UsersSubscriptionsController` — User book subscriptions
+
+**4 API Controllers** (`WebApp/ApiControllers/`):
+- `Identity/AccountController` — Register, Login, RefreshToken, Logout (JWT-based)
+- `MessagesController`, `TopicsController`, `RatingsController` — CRUD APIs
+- Route pattern: `/api/v{version}/[controller]/[action]`
 
 ### Database Configuration
 
-**PostgreSQL with Advanced Search:**
-- Uses Npgsql provider for PostgreSQL
-- Full-text search with `tsvector` columns on Book and Author entities
-- Trigram indexes (`gin_trgm_ops`) for fuzzy text search on titles and names
+**PostgreSQL with PostGIS and Advanced Search:**
+- Npgsql provider with `UseNetTopologySuite()` for geospatial data
+- Full-text search: `tsvector` columns on Book and Author with GIN indexes
+- Trigram indexes (`gin_trgm_ops`) for fuzzy text search
 - DateTime values automatically converted to UTC in `SaveChangesAsync`
+- PostGIS extension enabled in `OnModelCreating` for warehouse location Points
 
 **Connection String:**
 - Development: `Host=localhost;Port=7890;Database=bookhub;Username=postgres;Password=postgres`
-- Docker: Uses service name `bookhub-sql-dev` as host
-- Configured in `appsettings.json` and overridable via environment variables
+- Docker: Uses `bookhub-sql-dev` service name as host
+- Configured in `appsettings.json`, overridable via environment variables
+
+**Migrations** (`App.DAL.EF/Migrations/`):
+- `20240407172441_FOOBAR` — Initial schema
+- `20251024112416_AddFullTextSearch` — tsvector columns and GIN indexes
+- `20260211100741_AddWarehouseLocationAndBookWarehouseSupply` — PostGIS location + inventory tracking
+- `20260211143827_AddWarehouseCountry` — Warehouse country field
 
 ### Authentication & Authorization
 
 **Dual Authentication System:**
-- Cookie-based authentication for MVC UI (ASP.NET Core Identity)
-- JWT Bearer authentication for API endpoints
-- Both configured in `AuthenticationExtensions.AddAppAuthentication()`
+- Cookie-based for MVC UI (ASP.NET Core Identity)
+- JWT Bearer for API endpoints
+- Configured in `AuthenticationExtensions.AddAppAuthentication()`
 
 **Identity Configuration:**
-- Custom user: `AppUser` (in `App.Domain.Identity`)
-- Custom role: `AppRole`
-- Custom user-role: `AppUserRole`
-- Refresh tokens: `AppRefreshToken`
+- Custom user: `AppUser`, Custom role: `AppRole`
+- Cookie: `.AspNetCore.Identity.Application`, Secure=Always, SameSite=Lax
+- JWT: HmacSha256 signing, ClockSkew=0, configurable expiration (default 120s)
 
-**JWT Settings:**
-- Configured in `appsettings.json` under `JWT` section
-- Tokens validated with issuer, audience, and signing key
-- ClockSkew set to zero for exact expiration
+**Roles:** Admin, User (seeded via `appsettings.json`)
 
 ### API Versioning
 
-- Uses `Asp.Versioning.Mvc` and `Asp.Versioning.Mvc.ApiExplorer`
-- Default version: v1.0
-- Version format: `v{version}` (e.g., v1, v2)
-- Swagger UI documents all API versions
-- Configured in `ApiExtensions.AddVersioningAndSwagger()`
+- `Asp.Versioning.Mvc` 8.1.0
+- Default version: v1.0, deprecated: v0.9
+- Format: `v{Major}.{Minor}`
+- Swagger configured via `ConfigureSwaggerOptions` with Bearer security definition
+- API DTOs in `App.DTO/v1_0/` with CreateInfo/UpdateInfo patterns
+
+### Search System (HomeController)
+
+Multi-strategy search with fallback chain:
+1. PostgreSQL full-text search (`tsvector` + `to_tsquery`)
+2. Trigram similarity matching (fuzzy search)
+3. Case-insensitive LIKE with 3-character prefix matching
+4. Filtering by: authors, genres, publishers, warehouses
+5. Sorting by: price, year, rating
+6. AJAX partial view support (`_SearchResults.cshtml`)
 
 ### Docker Setup
 
-**Development Compose (`docker-compose.yml`):**
-- PostgreSQL service on port 7890
-- App service with hot-reload (`dotnet watch`)
-- Volume mounts for live code updates
-- HTTPS certificate from `/https/bookhub.pfx`
-- Health checks for both services
+**Development (`docker-compose.yml`):**
+- `sql` — PostgreSQL + PostGIS (`db.Dockerfile`) on port 7890, health checks
+- `app` — `dotnet watch` with hot-reload, volume-mounted source, HTTPS cert
 
-**Build Configuration (`Directory.Build.props`):**
-- Separate bin/obj directories for container vs local development
-- Prevents file locking conflicts between host and container
-- Nullable reference types enabled with strict warnings as errors
-- Container builds use `/obj/container` and `/bin/container`
-- Local builds use `/obj/local` and `/bin/local`
+**Production (`docker-compose.prod.yml`):**
+- `sql` — PostgreSQL + PostGIS, localhost-only binding (127.0.0.1:5432)
+- `migrator` — EF Core bundle for migrations (`./artifacts/efbundle`)
+- `app` — GHCR image, read-only filesystem, tmpfs for /tmp, security hardening:
+  - `no-new-privileges`, `cap_drop: ALL`, file descriptor limits
+  - Data protection keys on persistent volume
+
+**Dockerfiles:**
+- `Dockerfile` — Multi-stage production build (SDK → alpine chiseled runtime)
+- `dev.Dockerfile` — Development with `dotnet watch`
+- `db.Dockerfile` — PostgreSQL 16.4 with PostGIS 3
+
+### Build Configuration (`Directory.Build.props`)
+
+- Latest C# language version
+- Nullable reference types enabled
+- Warnings as errors: CS8600, CS8602, CS8603, CS8613, CS8618, CS8625
+- Separate bin/obj paths: `obj/local/` (host) vs `obj/container/` (Docker)
+- NuGet codegen packages excluded from runtime
 
 ### Data Seeding
 
-- Configured in `appsettings.json` under `SeedData` section
-- Seeds users (admin and regular users), publishers, authors, genres, warehouses, and books
-- Executed on app startup via `app.SeedAsync()` in `Program.cs`
-- Implementation in `WebApp/Infrastructure/Data/`
+- Configuration in `appsettings.json` under `SeedData` section
+- JSON seed data files in `WebApp/Infrastructure/Data/SeedData/`:
+  - `authors.json`, `books.json`, `genres.json`, `publishers.json`, `warehouses.json`
+- Seed DTOs in `WebApp/Infrastructure/Data/SeedDTO/`
+- Seeds: users with roles, publishers, authors (with images), genres, warehouses (with GPS coordinates), books (with author/genre/warehouse links)
+- Executed via `app.SeedAsync()` in `Program.cs`
 
 ### Email Services
 
-- Uses MailKit for email sending
-- SMTP configuration in `appsettings.json` under `Smtp` section
-- Template-based emails stored in `WebApp/Infrastructure/Email/EmailTemplates/`
-- Services: `IEmailSender` (MailKitEmailSender) and `IEmailTemplateService`
+- MailKit for SMTP (`WebApp/Infrastructure/Email/MailKitEmailSender.cs`)
+- Template service (`EmailTemplateService.cs`) with HTML templates:
+  - `ConfirmEmail.html`, `ResetPassword.html`
+- SMTP config in `appsettings.json` under `Smtp` (Gmail, StartTls)
+- Registered as singletons: `IEmailSender`, `IEmailTemplateService`
+
+### Session Management
+
+- Distributed in-memory cache with 20-minute idle timeout
+- HttpOnly, Essential, SameSite=Lax, Secure=Always cookies
+- Used for shopping cart and user state
 
 ### SignalR Real-Time Communication
 
-**Overview:**
-- ASP.NET Core 8.0 built-in SignalR for WebSocket-based real-time updates
-- JavaScript client library 8.0.0 loaded via CDN
-- Enables instant message and topic updates without page refresh
-- Progressive enhancement approach - forms work without JavaScript
-
-**Hub Architecture:**
-- **Single unified hub**: `WebApp/Hubs/DiscussionHub.cs`
-- Hub endpoint: `/hubs/discussion`
-- Requires authentication via `[Authorize]` attribute
-- Supports both Cookie (MVC) and JWT Bearer (API) authentication
-
-**Group Management Strategy:**
-- **Discussion-level groups**: `discussion_{discussionId}` - broadcasts new topics to all viewers of a discussion
-- **Topic-level groups**: `topic_{topicId}` - broadcasts new messages to all viewers of a topic
-- Groups prevent unnecessary broadcasts to unrelated clients
-- Auto-rejoin groups on reconnection (handled by client-side manager)
+**Hub:** `WebApp/Hubs/DiscussionHub.cs`
+- Endpoint: `/hubs/discussion`
+- Requires authentication (`[Authorize]`)
+- Group-based broadcasting:
+  - `discussion_{id}` — new topics broadcast
+  - `topic_{id}` — new messages broadcast
+- Methods: `JoinDiscussion`, `LeaveDiscussion`, `JoinTopic`, `LeaveTopic`
 
 **Broadcasting from Controllers:**
+- `MessagesController` → `ReceiveMessage` to `topic_{id}` group
+- `TopicsController` → `ReceiveTopic` to `discussion_{id}` group
+- Always after successful database save
 
-When creating new messages or topics, controllers broadcast to SignalR groups:
-
-```csharp
-// In MessagesController - inject IHubContext<DiscussionHub>
-private readonly IHubContext<DiscussionHub> _hubContext;
-
-// After saving message
-var notification = new NewMessageNotification { /* ... */ };
-await _hubContext.Clients
-    .Group($"topic_{topicId}")
-    .SendAsync("ReceiveMessage", notification);
-```
-
-```csharp
-// In TopicsController - inject IHubContext<DiscussionHub>
-private readonly IHubContext<DiscussionHub> _hubContext;
-
-// After saving topic
-var notification = new NewTopicNotification { /* ... */ };
-await _hubContext.Clients
-    .Group($"discussion_{discussionId}")
-    .SendAsync("ReceiveTopic", notification);
-```
-
-**Notification Models:**
-- `WebApp/Models/SignalR/NewMessageNotification.cs` - Message broadcast DTO
-- `WebApp/Models/SignalR/NewTopicNotification.cs` - Topic broadcast DTO
-- Keep DTOs minimal (only essential data for UI updates)
-
-**Client-Side Integration:**
-
-Connection manager: `WebApp/wwwroot/js/discussion-hub.js`
+**Client:** `WebApp/wwwroot/js/discussion-hub.js`
+- SignalR client 8.0.0 via CDN
+- Auto-reconnect with exponential backoff (0, 2, 10, 30 seconds)
 - Global instance: `window.discussionHub`
-- Automatic reconnection with exponential backoff (0, 2, 10, 30 seconds)
-- Methods: `initialize()`, `joinDiscussion(id)`, `joinTopic(id)`, `onReceiveMessage(callback)`, `onReceiveTopic(callback)`
 
-Usage in views:
-```javascript
-// Topics/Details.cshtml - Join topic and listen for messages
-await window.discussionHub.initialize();
-await window.discussionHub.joinTopic(topicId);
-window.discussionHub.onReceiveMessage(function(notification) {
-    // Update UI with new message
-});
+**Notification DTOs:** `WebApp/Models/SignalR/NewMessageNotification.cs`, `NewTopicNotification.cs`
 
-// Discussions/Details.cshtml - Join discussion and listen for topics
-await window.discussionHub.initialize();
-await window.discussionHub.joinDiscussion(discussionId);
-window.discussionHub.onReceiveTopic(function(notification) {
-    // Update UI with new topic
-});
-```
+### Frontend
 
-**Configuration in Program.cs:**
-```csharp
-// Register SignalR services (line ~88)
-builder.Services.AddSignalR(options =>
-{
-    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
-    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
-});
+**CSS** (`wwwroot/css/`): `style.css` (main), `theme.css` (dark/light), `auth.css`, `availability.css`, `discussions.css`, `discussion-details.css`, `topic-details.css`, `site.css`
 
-// CORS configuration requires AllowCredentials for SignalR (line ~67)
-.AllowCredentials(); // Required for SignalR
+**JavaScript** (`wwwroot/js/`): `site.js`, `theme.js`, `books.js`, `book-availability.js`, `book-title-size-handler.js`, `discussions-index.js`, `discussion-hub.js`, `nav/header/header-auth.js`, `nav/header/header-unauth.js`
 
-// Map hub endpoint (line ~162)
-app.MapHub<WebApp.Hubs.DiscussionHub>("/hubs/discussion");
-```
+**Libraries:** Bootstrap 5.3, jQuery 3.6, jQuery Validation, QRCode.js
 
-**Key Implementation Files:**
-- `WebApp/Hubs/DiscussionHub.cs` - SignalR hub with group management
-- `WebApp/Models/SignalR/` - Notification DTOs
-- `WebApp/wwwroot/js/discussion-hub.js` - Client connection manager
-- `WebApp/Controllers/MessagesController.cs` - Broadcasts messages
-- `WebApp/Controllers/TopicsController.cs` - Broadcasts topics
-- `WebApp/Views/Topics/Details.cshtml` - Real-time message UI
-- `WebApp/Views/Discussions/Details.cshtml` - Real-time topic UI
-- `WebApp/Views/Shared/_Layout.cshtml` - SignalR script includes
+**Fonts:** Gilroy (Light, Medium, SemiBold)
 
-**Important Notes:**
-- All SignalR broadcasts happen AFTER successful database saves (hybrid approach)
-- Broadcasting is done through controllers, NOT directly from views
-- Maintains BLL pattern - no breaking changes to business logic
-- Connection logging enabled via `ILogger<DiscussionHub>`
-- Network failures auto-reconnect; groups are automatically rejoined
-- Works in production with proper CORS configuration (`AllowCredentials`)
+**Theme:** Cookie-based dark/light toggle via `data-theme` HTML attribute and CSS custom properties
 
-## Important Conventions
+**Shared Views:** `_Layout.cshtml` (dual layout: authenticated/unauthenticated with admin dropdown), `_LoginPartial.cshtml`, `_ThemeToggle.cshtml`, `_ToastPartial.cshtml`, `_ValidationScriptsPartial.cshtml`
 
-### Naming Patterns
+### File Validation
 
-- Repository interfaces: `I<Entity>Repository` (e.g., `ITopicRepository`)
-- Service interfaces: `I<Entity>Service` (e.g., `IMessageService`)
-- Implementations match interface names without 'I' prefix
-- DTOs follow layer naming: `<Entity>DTO` in respective DTO projects
-
-### Database Entity Relationships
-
-- Many-to-many relationships use junction tables (e.g., `BookGenre`, `BookAuthor`, `BookWarehouses`)
-- All entities inherit from `IDomainEntityId` (Guid-based IDs)
-- Soft deletes supported via base repository methods with `userId` parameter
-
-### API Controllers
-
-- Located in `WebApp/ApiControllers/`
-- Organized by resource (e.g., `MessagesController`, `RatingsController`)
-- Identity-related endpoints in `ApiControllers/Identity/`
-- Use DTOs from `App.DTO` for request/response models
-- Inject `IAppBLL` and use AutoMapper for transformations
-
-### Areas
-
-- **Identity**: ASP.NET Core Identity UI (login, register, etc.)
-- **Admin**: Administrative functionality (placeholder for admin controllers/views)
+Custom attributes in `WebApp/Helpers/Validation/File/`:
+- `AllowedExtensionsAttribute` — Validates file upload extensions
+- `MaxFileSizeAttribute` — Validates file upload size
 
 ### Health Checks
 
 - Endpoint: `/health`
 - Used by Docker health checks
 - Returns HTTP 200 when application is healthy
+
+## Important Conventions
+
+### Naming Patterns
+- Entities: `App.Domain.Entities.<Name>` (main) or `App.Domain.Address_Tables.<Name>` (junction)
+- Repository interfaces: `I<Entity>Repository` (e.g., `ITopicRepository`)
+- Service interfaces: `I<Entity>Service` (e.g., `IMessageService`)
+- Implementations drop the `I` prefix
+- DTOs: same class name across layers (`Message` in DAL.DTO, BLL.DTO, App.DTO)
+- API DTOs: `<Entity>CreateInfo`, `<Entity>UpdateInfo` for write operations
+
+### Entity Relationships
+- Many-to-many via junction tables with explicit entity classes
+- Junction tables have their own Guid ID (inherit `BaseEntityId`)
+- `BookWarehouses` includes inventory data (Count, LastSupply) — not a pure junction
+- User-owned entities implement `IDomainAppUser<AppUser>`
+
+### Image Storage
+- Book covers and author portraits stored as `byte[]` (`imageData` property)
+- Seeded from `wwwroot/img/books/` and `wwwroot/img/authors/` directories
+
+### Areas
+- **Identity** — Full ASP.NET Core Identity Razor Pages (login, register, 2FA, password reset, account management)
+- **Admin** — Placeholder (empty views, `_ViewImports` and `_ViewStart` only)
+
+### Test Projects
+- `App.Test` — Integration tests using `CustomWebApplicationFactory` with in-memory database. Tests: API happy flow, MVC happy flow, repository/service tests, controller tests
+- `Base.Tests` — Base class unit tests and shared test helpers (`HtmlClientExtension`, `HtmlHelpers`)
+
+### Key NuGet Packages
+- `Npgsql.EntityFrameworkCore.PostgreSQL` 8.0.2 + `.NetTopologySuite`
+- `AutoMapper` 13.0.1
+- `Asp.Versioning.Mvc` 8.1.0
+- `MailKit` 4.13.0
+- `Microsoft.AspNetCore.Authentication.JwtBearer` 8.0.3
+- `Swashbuckle.AspNetCore` 6.5.0
+- `System.IdentityModel.Tokens.Jwt` 7.1.2
