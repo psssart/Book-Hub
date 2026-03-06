@@ -13,7 +13,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bookhub
-    restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
@@ -48,7 +47,6 @@ services:
     depends_on:
       sql:
         condition: service_healthy
-    restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 30s
