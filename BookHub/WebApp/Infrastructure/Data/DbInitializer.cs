@@ -51,6 +51,7 @@ public static class DbInitializer
         UserManager<AppUser> userManager,
         RoleManager<AppRole> roleManager)
     {
+        // Ensure roles exist regardless of whether users need seeding
         foreach (var u in users)
         {
             foreach (var role in u.Roles)
@@ -60,10 +61,13 @@ public static class DbInitializer
                     await roleManager.CreateAsync(new AppRole { Name = role });
                 }
             }
+        }
 
-            var existing = await userManager.FindByEmailAsync(u.Email);
-            if (existing != null) continue;
+        // Skip user creation if any users already exist
+        if (userManager.Users.Any()) return;
 
+        foreach (var u in users)
+        {
             var user = new AppUser
             {
                 Email = u.Email,
