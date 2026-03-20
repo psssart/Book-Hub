@@ -43,165 +43,162 @@ public class HomeController : Controller
             bool searchInputWasProvided = Request.Query.ContainsKey(nameof(searchInput));
             bool emptySearchInput = string.IsNullOrWhiteSpace(searchInput);
             
-            if (!emptySearchInput || userAuthenticated == true)
+            if (!emptySearchInput)
             {
-                if (!emptySearchInput)
-                {
-                    var q = searchInput!.Trim();
-                    
-                    var tokens = Regex
-                        .Split(q, @"[^\p{L}\p{N}]+", RegexOptions.CultureInvariant)
-                        .Where(t => !string.IsNullOrWhiteSpace(t))
-                        .Select(t => t.Trim())
-                        .Distinct()
-                        .ToArray();
+                var q = searchInput!.Trim();
 
-                    var loose = tokens.Length > 0 ? tokens[0] : q;
-                    
-                    var prefix3 = loose.Length >= 3 ? loose.Substring(0, 3) : loose;
-                    
-                    books = books
-                        .Where(b =>
-                            // 1) the full text matched
-                            b.SearchVector.Matches(
-                                EF.Functions.WebSearchToTsQuery(
-                                    "simple",
-                                    EF.Functions.Unaccent(q)
-                                )
-                            )
-                            ||
+                var tokens = Regex
+                    .Split(q, @"[^\p{L}\p{N}]+", RegexOptions.CultureInvariant)
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => t.Trim())
+                    .Distinct()
+                    .ToArray();
 
-                            // 2) string matches by keyword
-                            EF.Functions.ILike(b.Tittle, $"%{loose}%") ||
-                            EF.Functions.ILike(b.Description, $"%{loose}%") ||
+                var loose = tokens.Length > 0 ? tokens[0] : q;
 
-                            // 3) match by shortened prefix (3 characters)
-                            EF.Functions.ILike(b.Tittle, $"%{prefix3}%") ||
-                            EF.Functions.ILike(b.Description, $"%{prefix3}%") ||
+                var prefix3 = loose.Length >= 3 ? loose.Substring(0, 3) : loose;
 
-                            // 4) match on the entire user source string
-                            EF.Functions.ILike(b.Tittle, $"%{q}%") ||
-                            EF.Functions.ILike(b.Description, $"%{q}%") ||
-
-                            // 5) similarity by trigrams with a threshold
-                            EF.Functions.TrigramsSimilarity(b.Tittle, q) > 0.1
-                        )
-                        .OrderByDescending(b =>
-                            b.SearchVector.Matches(
-                                EF.Functions.WebSearchToTsQuery(
-                                    "simple",
-                                    EF.Functions.Unaccent(q)
-                                )
+                books = books
+                    .Where(b =>
+                        // 1) the full text matched
+                        b.SearchVector.Matches(
+                            EF.Functions.WebSearchToTsQuery(
+                                "simple",
+                                EF.Functions.Unaccent(q)
                             )
                         )
-                        .ThenByDescending(b =>
-                            b.SearchVector.Rank(
-                                EF.Functions.WebSearchToTsQuery(
-                                    "simple",
-                                    EF.Functions.Unaccent(q)
-                                )
+                        ||
+
+                        // 2) string matches by keyword
+                        EF.Functions.ILike(b.Tittle, $"%{loose}%") ||
+                        EF.Functions.ILike(b.Description, $"%{loose}%") ||
+
+                        // 3) match by shortened prefix (3 characters)
+                        EF.Functions.ILike(b.Tittle, $"%{prefix3}%") ||
+                        EF.Functions.ILike(b.Description, $"%{prefix3}%") ||
+
+                        // 4) match on the entire user source string
+                        EF.Functions.ILike(b.Tittle, $"%{q}%") ||
+                        EF.Functions.ILike(b.Description, $"%{q}%") ||
+
+                        // 5) similarity by trigrams with a threshold
+                        EF.Functions.TrigramsSimilarity(b.Tittle, q) > 0.1
+                    )
+                    .OrderByDescending(b =>
+                        b.SearchVector.Matches(
+                            EF.Functions.WebSearchToTsQuery(
+                                "simple",
+                                EF.Functions.Unaccent(q)
                             )
                         )
-                        .ThenByDescending(b =>
-                            EF.Functions.TrigramsSimilarity(b.Tittle, q)
-                        );
-                    
-                    authors = authors
-                        .Where(a =>
-                            a.SearchVector.Matches(
-                                EF.Functions.WebSearchToTsQuery(
-                                    "simple",
-                                    EF.Functions.Unaccent(q)
-                                )
-                            )
-                            ||
-                            
-                            EF.Functions.ILike(a.Name, $"%{loose}%") ||
-                            EF.Functions.ILike(a.Biography, $"%{loose}%") ||
-                            
-                            EF.Functions.ILike(a.Name, $"%{prefix3}%") ||
-                            EF.Functions.ILike(a.Biography, $"%{prefix3}%") ||
-                            
-                            EF.Functions.ILike(a.Name, $"%{q}%") ||
-                            EF.Functions.ILike(a.Biography, $"%{q}%") ||
-                            
-                            EF.Functions.TrigramsSimilarity(a.Name, q) > 0.1
-                        )
-                        .OrderByDescending(a =>
-                            a.SearchVector.Matches(
-                                EF.Functions.WebSearchToTsQuery(
-                                    "simple",
-                                    EF.Functions.Unaccent(q)
-                                )
+                    )
+                    .ThenByDescending(b =>
+                        b.SearchVector.Rank(
+                            EF.Functions.WebSearchToTsQuery(
+                                "simple",
+                                EF.Functions.Unaccent(q)
                             )
                         )
-                        .ThenByDescending(a =>
-                            a.SearchVector.Rank(
-                                EF.Functions.WebSearchToTsQuery(
-                                    "simple",
-                                    EF.Functions.Unaccent(q)
-                                )
+                    )
+                    .ThenByDescending(b =>
+                        EF.Functions.TrigramsSimilarity(b.Tittle, q)
+                    );
+
+                authors = authors
+                    .Where(a =>
+                        a.SearchVector.Matches(
+                            EF.Functions.WebSearchToTsQuery(
+                                "simple",
+                                EF.Functions.Unaccent(q)
                             )
                         )
-                        .ThenByDescending(a =>
-                            EF.Functions.TrigramsSimilarity(a.Name, q)
-                        );
-                }
+                        ||
 
-                // narrow relations to found books
-                var bookIdsQ = books.Select(b => b.Id);
+                        EF.Functions.ILike(a.Name, $"%{loose}%") ||
+                        EF.Functions.ILike(a.Biography, $"%{loose}%") ||
 
-                bookAuthors = bookAuthors.Where(ba => bookIdsQ.Contains(ba.BookId));
-                bookGenres = bookGenres.Where(bg => bookIdsQ.Contains(bg.BookId));
-                bookWarehouses = bookWarehouses.Where(bw => bookIdsQ.Contains(bw.BookId));
-                ratings = ratings.Where(r => bookIdsQ.Contains(r.BookId));
+                        EF.Functions.ILike(a.Name, $"%{prefix3}%") ||
+                        EF.Functions.ILike(a.Biography, $"%{prefix3}%") ||
 
-                // filters
-                if (!string.IsNullOrWhiteSpace(selectedPublishersGuidsJson) && selectedPublishersGuidsJson != "[]")
-                {
-                    var ids = JsonSerializer.Deserialize<string[]>(selectedPublishersGuidsJson) ??
-                              Array.Empty<string>();
-                    var guidIds = ids.Select(Guid.Parse).ToArray();
-                    books = books.Where(b => guidIds.Contains(b.PublisherId));
-                }
+                        EF.Functions.ILike(a.Name, $"%{q}%") ||
+                        EF.Functions.ILike(a.Biography, $"%{q}%") ||
 
-                if (!string.IsNullOrWhiteSpace(selectedWarehousesGuidsJson) && selectedWarehousesGuidsJson != "[]")
-                {
-                    var ids = JsonSerializer.Deserialize<string[]>(selectedWarehousesGuidsJson) ??
-                              Array.Empty<string>();
-                    var guidIds = ids.Select(Guid.Parse).ToArray();
+                        EF.Functions.TrigramsSimilarity(a.Name, q) > 0.1
+                    )
+                    .OrderByDescending(a =>
+                        a.SearchVector.Matches(
+                            EF.Functions.WebSearchToTsQuery(
+                                "simple",
+                                EF.Functions.Unaccent(q)
+                            )
+                        )
+                    )
+                    .ThenByDescending(a =>
+                        a.SearchVector.Rank(
+                            EF.Functions.WebSearchToTsQuery(
+                                "simple",
+                                EF.Functions.Unaccent(q)
+                            )
+                        )
+                    )
+                    .ThenByDescending(a =>
+                        EF.Functions.TrigramsSimilarity(a.Name, q)
+                    );
+            }
 
-                    var bookIds = bookWarehouses
-                        .Where(bw => guidIds.Contains(bw.WarehouseId))
-                        .Select(bw => bw.BookId);
+            // narrow relations to found books
+            var bookIdsQ = books.Select(b => b.Id);
 
-                    books = books.Where(b => bookIds.Contains(b.Id));
-                }
+            bookAuthors = bookAuthors.Where(ba => bookIdsQ.Contains(ba.BookId));
+            bookGenres = bookGenres.Where(bg => bookIdsQ.Contains(bg.BookId));
+            bookWarehouses = bookWarehouses.Where(bw => bookIdsQ.Contains(bw.BookId));
+            ratings = ratings.Where(r => bookIdsQ.Contains(r.BookId));
 
-                if (!string.IsNullOrWhiteSpace(selectedAuthorsGuidsJson) && selectedAuthorsGuidsJson != "[]")
-                {
-                    var ids = JsonSerializer.Deserialize<string[]>(selectedAuthorsGuidsJson) ??
-                              Array.Empty<string>();
-                    var guidIds = ids.Select(Guid.Parse).ToArray();
+            // filters
+            if (!string.IsNullOrWhiteSpace(selectedPublishersGuidsJson) && selectedPublishersGuidsJson != "[]")
+            {
+                var ids = JsonSerializer.Deserialize<string[]>(selectedPublishersGuidsJson) ??
+                          Array.Empty<string>();
+                var guidIds = ids.Select(Guid.Parse).ToArray();
+                books = books.Where(b => guidIds.Contains(b.PublisherId));
+            }
 
-                    var bookIds = bookAuthors
-                        .Where(ba => guidIds.Contains(ba.AuthorId))
-                        .Select(ba => ba.BookId);
+            if (!string.IsNullOrWhiteSpace(selectedWarehousesGuidsJson) && selectedWarehousesGuidsJson != "[]")
+            {
+                var ids = JsonSerializer.Deserialize<string[]>(selectedWarehousesGuidsJson) ??
+                          Array.Empty<string>();
+                var guidIds = ids.Select(Guid.Parse).ToArray();
 
-                    books = books.Where(b => bookIds.Contains(b.Id));
-                }
+                var bookIds = bookWarehouses
+                    .Where(bw => guidIds.Contains(bw.WarehouseId))
+                    .Select(bw => bw.BookId);
 
-                if (!string.IsNullOrWhiteSpace(selectedGenresGuidsJson) && selectedGenresGuidsJson != "[]")
-                {
-                    var ids = JsonSerializer.Deserialize<string[]>(selectedGenresGuidsJson) ?? Array.Empty<string>();
-                    var guidIds = ids.Select(Guid.Parse).ToArray();
+                books = books.Where(b => bookIds.Contains(b.Id));
+            }
 
-                    var bookIds = bookGenres
-                        .Where(bg => guidIds.Contains(bg.GenreId))
-                        .Select(bg => bg.BookId);
+            if (!string.IsNullOrWhiteSpace(selectedAuthorsGuidsJson) && selectedAuthorsGuidsJson != "[]")
+            {
+                var ids = JsonSerializer.Deserialize<string[]>(selectedAuthorsGuidsJson) ??
+                          Array.Empty<string>();
+                var guidIds = ids.Select(Guid.Parse).ToArray();
 
-                    books = books.Where(b => bookIds.Contains(b.Id));
-                }
+                var bookIds = bookAuthors
+                    .Where(ba => guidIds.Contains(ba.AuthorId))
+                    .Select(ba => ba.BookId);
+
+                books = books.Where(b => bookIds.Contains(b.Id));
+            }
+
+            if (!string.IsNullOrWhiteSpace(selectedGenresGuidsJson) && selectedGenresGuidsJson != "[]")
+            {
+                var ids = JsonSerializer.Deserialize<string[]>(selectedGenresGuidsJson) ?? Array.Empty<string>();
+                var guidIds = ids.Select(Guid.Parse).ToArray();
+
+                var bookIds = bookGenres
+                    .Where(bg => guidIds.Contains(bg.GenreId))
+                    .Select(bg => bg.BookId);
+
+                books = books.Where(b => bookIds.Contains(b.Id));
             }
 
             // sort
