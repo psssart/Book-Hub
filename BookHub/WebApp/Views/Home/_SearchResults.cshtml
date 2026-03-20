@@ -7,6 +7,7 @@
         <div class="search_results container-xxl py-3">
 
             @* BOOKS AS CARDS *@
+            <div id="books-section">
             @if (Model.Books.Any())
             {
                 <div class="books_results">
@@ -117,10 +118,12 @@
                     <p>No book results found.</p>
                 </div>
             }
+            </div>
 
             @if (Model.WithAuthors)
             {
-                <h3 class="mt-4">Authors</h3>
+                <div id="authors-section">
+                <h3 id="authors-section-heading" class="mt-4">Authors</h3>
                 @if (Model.Authors.Any())
                 {
                     <div class="authors_results">
@@ -177,6 +180,7 @@
                         <p>No author results found.</p>
                     </div>
                 }
+                </div>
             }
         </div>
     }

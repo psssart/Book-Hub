@@ -144,6 +144,10 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
+.dropdown-item {
+    color: var(--accent-color);
+}
+
 .dropdown-item:focus,
 .dropdown-item:hover {
     background-color: var(--text-secondary);

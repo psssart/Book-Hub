@@ -19,9 +19,18 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-2">
             @* Left header block *@
             <div class="d-flex flex-wrap align-items-center gap-3">
-                <h3 class="m-0">Books</h3>
+                <div class="dropdown d-inline-block">
+                    <h3 class="m-0 dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="sectionDropdown" style="cursor: pointer;">
+                        Books
+                    </h3>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item section-filter-option active" href="#" data-section="all">All</a></li>
+                        <li><a class="dropdown-item section-filter-option" href="#" data-section="books">Books</a></li>
+                        <li><a class="dropdown-item section-filter-option" href="#" data-section="authors">Authors</a></li>
+                    </ul>
+                </div>
 
-                <div class="d-flex align-items-center gap-2 pt-2">
+                <div id="sortControls" class="d-flex align-items-center gap-2 pt-2">
                     <label for="sortSelect" class="sort_label m-0">Sort by:</label>
                     <select id="sortSelect" class="form-select form-select-sm w-auto me-0" style="background-color: var(--bg-input);">
                         <option value="none"></option>
@@ -141,6 +150,7 @@ var selectedAuthorsGuids = [];
 var selectedGenresGuids = [];
 var selectedPublishersGuids = [];
 var selectedWarehousesGuids = [];
+var currentSectionFilter = 'all';
 $(document).ready(function() {
 
     $(document).on('click', '.dropdown-filter > .dropbtn', function(e) {
@@ -305,6 +315,7 @@ $(document).ready(function() {
                 });
 
                 syncChipsHighlight();
+                applySectionFilter();
             },
             error: function (xhr, status, error) {
                 console.log("status:", status, "error:", error);
@@ -365,6 +376,49 @@ $(document).ready(function() {
             $('.genre-chip[data-id="' + id + '"]').addClass('active-genre');
         });
     }
+
+    // Section dropdown filter
+    $(document).on('click', '.section-filter-option', function(e) {
+        e.preventDefault();
+        currentSectionFilter = $(this).data('section');
+        $('.section-filter-option').removeClass('active');
+        $(this).addClass('active');
+        applySectionFilter();
+    });
+
+    function applySectionFilter() {
+        var $books = $('#books-section');
+        var $authors = $('#authors-section');
+        if (currentSectionFilter === 'all') {
+            $books.show();
+            $authors.show();
+            $('#sortControls').show();
+            updateSectionLabel();
+        } else if (currentSectionFilter === 'books') {
+            $books.show();
+            $authors.hide();
+            $('#sortControls').show();
+            $('#sectionDropdown').text('Books');
+        } else if (currentSectionFilter === 'authors') {
+            $books.hide();
+            $authors.show();
+            $('#sortControls').hide();
+            $('#sectionDropdown').text('Authors');
+        }
+    }
+
+    function updateSectionLabel() {
+        if (currentSectionFilter !== 'all') return;
+        var heading = document.getElementById('authors-section-heading');
+        if (!heading) {
+            $('#sectionDropdown').text('Books');
+            return;
+        }
+        var rect = heading.getBoundingClientRect();
+        $('#sectionDropdown').text(rect.top <= 150 ? 'Authors' : 'Books');
+    }
+
+    $(window).on('scroll', updateSectionLabel);
 
 });
 
