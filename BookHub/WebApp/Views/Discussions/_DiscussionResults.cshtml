@@ -16,7 +16,7 @@
                                 {
                                     <a asp-action="Details" asp-route-id="@discussion.Id"
                                        class="discussion-thumbnail">
-                                        <img src="data:image;base64,@Convert.ToBase64String(discussion.ImageData)"
+                                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(discussion.ImageData)"
                                              alt="@discussion.Tittle">
                                     </a>
                                 }
@@ -64,7 +64,7 @@
                                         <span class="text-truncate" style="max-width: 143px;">
                                             @if (discussion.CreatorImageData != null)
                                             {
-                                                <img src="data:image;base64,@Convert.ToBase64String(discussion.CreatorImageData)"
+                                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(discussion.CreatorImageData)"
                                                      alt="User Avatar" style="width: 25px; height: 25px;border-radius: 25px;">
                                             }
                                             else

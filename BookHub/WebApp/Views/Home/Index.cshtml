@@ -12,7 +12,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
-<body>
 <img src="img/svg/Ellispes.svg" alt="background-ellipses" class="image-ellipse" loading="lazy" decoding="async">
 
 <div id="landing-root">
@@ -42,7 +41,7 @@
     else
     {
         <div class="container-xxl mx-2 ps-5">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-2">
                 @* Left header block *@
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <h3 class="m-0">Books</h3>
@@ -161,8 +160,6 @@
 </div>
 
 @await Html.PartialAsync("_SearchResults", Model)
-
-</body>
 
 <script>
 var showFilterMenuButton;

@@ -39,7 +39,7 @@
                             <a asp-area="" asp-controller="Books" asp-action="Details"
                                asp-route-id="@book.Id" class="text-decoration-none img-wrapper" style="height: 280px;">
                                 <img class="card-img-top img-hover"
-                                     src="data:image;base64,@Convert.ToBase64String(@book.imageData!)" alt="@book.Tittle">
+                                     src="data:image/jpeg;base64,@Convert.ToBase64String(@book.imageData!)" alt="@book.Tittle">
                             </a>
 
                             <div class="card-body d-flex flex-column p-2 pb-1">

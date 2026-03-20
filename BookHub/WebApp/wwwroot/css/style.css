@@ -313,9 +313,13 @@ select {
   border-radius: 0 600px 0 0;
   z-index: -1;
 }
+header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
 .header {
   max-height: 15%;
-  z-index: 999;
 }
 .box {
   background: var(--bg-secondary);
@@ -454,7 +458,6 @@ a:hover {
   height: 8%;
   width: 100%;
   box-shadow: 0 8px 8px 0 rgba(0,0,0,0.16);
-  z-index: 999;
 }
 .navbar li {
   list-style-type: none;
@@ -473,6 +476,7 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
+  overflow-x: clip;
 }
 .right-items-1-admin {
   position: absolute;
@@ -625,9 +629,6 @@ html, body {
 }
 .line-delimiter-purchase {
   width: 100%;
-}
-nav.d-flex {
-  overflow-x: clip;
 }
 .right-items-1-admin .dropdown-menu {
   display: none;

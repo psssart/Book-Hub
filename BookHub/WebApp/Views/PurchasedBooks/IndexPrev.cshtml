@@ -59,7 +59,7 @@
             {
                 <tr>
                     <td>
-                        <img src="data:image;base64,@Convert.ToBase64String(@purchasedBook.Book?.imageData)" width="100px" height="130" alt=""/>
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(@purchasedBook.Book?.imageData)" width="100px" height="130" alt=""/>
                     </td>
                     <td>@purchasedBook.Book?.Tittle</td>
                     <td>@purchasedBook.Book?.Price</td>

@@ -24,19 +24,11 @@
     int roundedRating = (int)Math.Round(averageRating); // Closest integer
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book List</title>
-</head>
-<body>
 <div class="container mt-4">
     <div class="row align-items-center">
         
         <div class="col-12 col-lg-4 text-center">
-            <img class="book-page-image" src="data:image;base64,@Convert.ToBase64String(Model.imageData)" width="285px" height="438px" alt="Picture not found!"/>
+            <img class="book-page-image" src="data:image/jpeg;base64,@Convert.ToBase64String(Model.imageData)" width="285px" height="438px" alt="Picture not found!"/>
         </div>
         
         <div class="col-0 d-none col-lg-auto d-lg-flex">
@@ -194,7 +186,7 @@
                         @if (rating.AppUser!.AvatarImageData != null)
                         { 
                             <img class="author-image" 
-                                 src="data:image;base64,@Convert.ToBase64String(rating.AppUser!.AvatarImageData)" 
+                                 src="data:image/jpeg;base64,@Convert.ToBase64String(rating.AppUser!.AvatarImageData)" 
                                  alt=""/>
                         }
                         else
@@ -231,8 +223,6 @@
         
     </div>
 </div>
-</body>
-</html>
 
 @functions
 {

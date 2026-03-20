@@ -9,6 +9,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<div class="table-responsive">
 <table class="table">
     <thead>
     <tr>
@@ -32,7 +33,7 @@
     <tr>
         <td>
             @* Image of the Author *@
-            <img src="data:image;base64,@Convert.ToBase64String(item.imageData)" width="180px" height="270px" alt="Picture not found!"/>
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.imageData)" width="180px" height="270px" alt="Picture not found!"/>
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Name)
@@ -52,3 +53,4 @@
 }
     </tbody>
 </table>
+</div>

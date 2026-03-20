@@ -20,7 +20,7 @@ var currentTheme = Context.Request.Cookies["theme"] ?? "light";
     <title>@ViewData["Title"] - BookHub</title>
     
 </head>
-<body style="z-index: 99999; overflow: hidden;">
+<body>
 @if(User.Identity!.IsAuthenticated) {
     @* Authenticated layout *@
     <header>

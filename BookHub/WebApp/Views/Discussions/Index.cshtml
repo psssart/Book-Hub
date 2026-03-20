@@ -8,8 +8,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
-<body style="overflow-x: hidden;">
-
 <div class="discussions-header p-0 pe-4 mt-2">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <!-- Left header block -->
@@ -119,8 +117,6 @@
 </div>
 
 @await Html.PartialAsync("_DiscussionResults", Model)
-
-</body>
 
 <!-- JavaScript at bottom -->
 <script src="~/js/discussions-index.js" asp-append-version="true"></script>
