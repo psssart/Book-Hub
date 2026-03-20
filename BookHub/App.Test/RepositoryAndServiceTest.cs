@@ -36,17 +36,17 @@ public class RepositoryAndServiceTest
         _ctx = new AppDbContext(optionsBuilder.Options);
 
         var configUow =
-            new MapperConfiguration(cfg => cfg.CreateMap<App.Domain.Entities.Message, DAL.DTO.Message>().ReverseMap());
+            new MapperConfiguration(cfg => cfg.CreateMap<App.Domain.Entities.Message, DAL.DTO.Message>().ReverseMap(), null);
         var mapperUow = configUow.CreateMapper();
         
         _uow = new AppUOW(_ctx, mapperUow);
         _messageRepository = _uow.Messages;
         
-        var configBll = new MapperConfiguration(cfg => cfg.CreateMap<DAL.DTO.Message, BLL.DTO.Message>().ReverseMap());
+        var configBll = new MapperConfiguration(cfg => cfg.CreateMap<DAL.DTO.Message, BLL.DTO.Message>().ReverseMap(), null);
         var mapperBll = configBll.CreateMapper();
         _bll = new AppBLL(_uow, mapperBll);
         
-        var configWeb = new MapperConfiguration(cfg => cfg.CreateMap<BLL.DTO.Message, DTO.v1_0.Message>().ReverseMap());
+        var configWeb = new MapperConfiguration(cfg => cfg.CreateMap<BLL.DTO.Message, DTO.v1_0.Message>().ReverseMap(), null);
         var mapperWeb = configWeb.CreateMapper();
         
         var storeStub = Substitute.For<IUserStore<AppUser>>();

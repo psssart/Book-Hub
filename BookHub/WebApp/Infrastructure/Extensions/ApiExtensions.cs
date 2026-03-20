@@ -45,9 +45,10 @@ namespace WebApp.Infrastructure.Extensions
         public static IServiceCollection AddMappingProfiles(this IServiceCollection services)
         {
             services.AddAutoMapper(
-                typeof(App.DAL.EF.AutoMapperProfile),
-                typeof(App.BLL.AutoMapperProfile),
-                typeof(Helpers.AutoMapperProfile)
+                cfg => {},
+                typeof(App.DAL.EF.AutoMapperProfile).Assembly,
+                typeof(App.BLL.AutoMapperProfile).Assembly,
+                typeof(Helpers.AutoMapperProfile).Assembly
             );
             return services;
         }

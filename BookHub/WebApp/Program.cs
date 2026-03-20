@@ -87,9 +87,10 @@ builder.Services.AddAppAuthentication(builder.Configuration);
 builder.Services.AddMappingProfiles();
 builder.Services.AddVersioningAndSwagger();
 builder.Services.AddAutoMapper(
-    typeof(App.DAL.EF.AutoMapperProfile),
-    typeof(App.BLL.AutoMapperProfile),
-    typeof(AutoMapperProfile)
+    cfg => {}, 
+    typeof(App.DAL.EF.AutoMapperProfile).Assembly,
+    typeof(App.BLL.AutoMapperProfile).Assembly,
+    typeof(AutoMapperProfile).Assembly
 );
 
 // 7. MVC / Controllers / RazorPages / MailService

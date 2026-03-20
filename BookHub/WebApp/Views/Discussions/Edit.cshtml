@@ -49,7 +49,7 @@
                             </div>
                             <div class="card-body text-center">
                                 <div id="imagePreviewContainer" class="mb-3">
-                                    @if (!Model.imageData.IsNullOrEmpty())
+                                    @if (Model!.imageData != null && Model.imageData.Length > 0)
                                     {
                                         <img id="imagePreview" src="data:image/jpeg;base64,@Convert.ToBase64String(Model.imageData)"
                                              alt="Discussion image"
@@ -75,7 +75,7 @@
                                 <input type="file" id="imageInput" name="imageFile" accept="image/*"
                                        class="d-none" onchange="previewImage(this)" />
 
-                                @if (!Model.imageData.IsNullOrEmpty())
+                                @if (Model!.imageData != null && Model.imageData.Length > 0)
                                 {
                                     <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2" onclick="clearImage()">
                                         <i class="bi bi-x-circle"></i> Remove Image

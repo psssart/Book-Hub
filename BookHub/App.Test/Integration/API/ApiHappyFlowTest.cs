@@ -43,7 +43,7 @@ public class ApiHappyFlowTest : IClassFixture<CustomWebApplicationFactory<Progra
     
     public async Task RegisterNewUser()
     {
-        if (!jwtToken.IsNullOrEmpty())
+        if (!string.IsNullOrEmpty(jwtToken))
         {
             return;
         }

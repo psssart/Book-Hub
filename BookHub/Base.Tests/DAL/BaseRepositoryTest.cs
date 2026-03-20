@@ -24,7 +24,7 @@ public class BaseRepositoryTest
         _ctx.Database.EnsureDeleted();
         _ctx.Database.EnsureCreated();
 
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<TestEntity, TestEntity>());
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<TestEntity, TestEntity>(), null);
         var mapper = config.CreateMapper();
 
         _testEntityRepository =
