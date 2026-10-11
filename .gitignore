@@ -82,3 +82,5 @@ _ReSharper*/
 ## Certificates
 https/
 *.pfx
+
+server-setup.sh
